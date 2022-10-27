@@ -6,9 +6,9 @@
 #include <QGraphicsProxyWidget>
 #include <QMap>
 #include <QStringList>
-#include "constantmapnode.h"
-#include "node.h"
-#include "yaml-cpp/yaml.h"
+#include "src/Nodes/constantmapnode.h"
+#include "src/Nodes/node.h"
+#include "yaml-cpp/emitter.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }

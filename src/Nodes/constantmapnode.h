@@ -5,25 +5,25 @@
 #include <QStringList>
 #include <QVBoxLayout>
 
-
 class ConstantMapNode : public Node
 {
     Q_OBJECT
 public:
-    ConstantMapNode(QStringList* constants);
+    ConstantMapNode(QStringList* outputs);
     ~ConstantMapNode();
     QMap<QString, double>* getValues();
 
 private:
-    const int type = CONSTANTMAPNODE;
-    QMap<QString, double> values;
     ///  TODO: test if I really need to keep it
-    QStringList* constants;
+    QStringList* outputs;
     void createLayout();
-    void addNewConstantsLayoutRow(QVBoxLayout* constantsLayout, int index);
+    void addNewOutputsLayoutRow(QVBoxLayout* outputsLayout, int index);
 
 private slots:
-    void insertNewConstantAtIndex(int index);
+    void insertNewOutputAtIndex(int index);
+
+protected:
+    void performResize() override;
 };
 
 #endif // CONSTANTMAPNODE_H

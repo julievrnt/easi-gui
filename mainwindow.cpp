@@ -1,10 +1,9 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include "nodeparentwidget.h"
+#include "src/Nodes/nodeparentwidget.h"
 #include <QFile>
 #include <QMessageBox>
 #include <QFileDialog>
-#include "yaml-cpp/traits.h"
 
 
 MainWindow::MainWindow(QWidget* parent)
@@ -153,7 +152,7 @@ void MainWindow::save()
     ///     - what to do when they are nodes that are not connected? --> ask Lukas
     ///     update this part
 
-    YAML::Emitter out;
+    //YAML::Emitter out;
 
     // for now, only save focus item
     QGraphicsProxyWidget* itm = (QGraphicsProxyWidget*) nodeScene->focusItem();
@@ -169,7 +168,7 @@ void MainWindow::save()
         case ROOT:
             break;
         case CONSTANTMAPNODE:
-            saveConstantMapNode(&out, (ConstantMapNode*) node);
+            //saveConstantMapNode(&out, (ConstantMapNode*) node);
             break;
         default:
             break;
@@ -231,8 +230,8 @@ void MainWindow::addNewOutputParameter()
     this->outputParameters->append("Test VALUE");
     this->outputParameters->append("mama");
     this->outputParameters->sort();
-    emit outputParameterAdded(outputParameters->indexOf("mama"));
     emit outputParameterAdded(outputParameters->indexOf("Test VALUE"));
+    emit outputParameterAdded(outputParameters->indexOf("mama"));
 }
 
 void MainWindow::addNode(Node* node)
@@ -283,7 +282,7 @@ void MainWindow::addConstantMapNode()
 {
     ConstantMapNode* constantMapNode = new ConstantMapNode(outputParameters);
     addNode(constantMapNode);
-    connect(this, SIGNAL(outputParameterAdded(int)), constantMapNode, SLOT(insertNewOutputParameterAtIndex(int)));
+    connect(this, SIGNAL(outputParameterAdded(int)), constantMapNode, SLOT(insertNewOutputAtIndex(int)));
 }
 
 
