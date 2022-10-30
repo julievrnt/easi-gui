@@ -16,6 +16,6 @@ void NodeParentWidget::resize(QRectF rect)
 /// FOR DEBUG ONLY
 void NodeParentWidget::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
 {
-//   painter->setPen(QPen(Qt::blue));
-    //  painter->drawRect(this->geometry());
+    // painter->setPen(QPen(Qt::blue));
+    // painter->drawRect(this->geometry());
 }

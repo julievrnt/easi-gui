@@ -8,7 +8,6 @@
 #include <QStringList>
 #include "src/Nodes/Maps/constantmapnode.h"
 #include "src/Nodes/nodebase.h"
-#include "src/Nodes/rootnode.h"
 #include "yaml-cpp/emitter.h"
 
 QT_BEGIN_NAMESPACE
@@ -34,7 +33,7 @@ private:
     QGraphicsScene* nodeScene;
     QStringList* outputParameters;
     QAction* deleteNodeAction;
-    /// TODO: root !
+    QGraphicsProxyWidget* proxyRoot;
     bool notSaved;
 
     void connectActions();
@@ -58,7 +57,7 @@ private:
     // basic functions to handle nodes
     void createActions();
     void addNewOutputParameter();
-    void addNode(NodeBase* node);
+    QGraphicsProxyWidget* addNode(NodeBase* node);
     void deleteNode();
     void deleteProxy(QGraphicsItem* proxy);
     void addOutputConnector();

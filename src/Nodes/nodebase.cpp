@@ -12,7 +12,6 @@ NodeBase::NodeBase(QWidget* parent)
     this->setWindowTitle("Node Base");
     outputConnectors = new QList<QGraphicsProxyWidget*>();
     setAttribute(Qt::WA_TranslucentBackground);
-    //setContextMenuPolicy(Qt::CustomContextMenu);
 }
 
 int NodeBase::getTypeOfNode()
@@ -45,18 +44,16 @@ void NodeBase::addOutputConnector(QGraphicsProxyWidget* newOutputConnector)
     outputConnectors->append(newOutputConnector);
 }
 
-void NodeBase::performResize(bool replaceConnectors)
+void NodeBase::performResize()
 {
     setGeometry(QRect(0, 0, sizeHint().width(), sizeHint().height() + (outputConnectors->size() - 1) * 20));
     emit resized(this->geometry());
 
-    if (!replaceConnectors)
-        return;
     for (int i = 0; i < outputConnectors->size(); i++)
     {
         QGraphicsProxyWidget* outputConnector = outputConnectors->at(i);
         int x = outputConnector->parentWidget()->geometry().width() - 7;
-        int y = outputConnector->parentWidget()->geometry().height() - 58 + i * 20;
+        int y = outputConnector->parentWidget()->geometry().height() - 58 - (outputConnectors->size() - 1 - i) * 20;
         outputConnector->setX(x);
         outputConnector->setY(y);
     }
@@ -120,7 +117,7 @@ void NodeBase::addComponentsLayout(QVBoxLayout* globalLayout)
     QLabel* componentsLabel = new QLabel();
     componentsLabel->setText("Components");
     componentsLabel->setAlignment(Qt::AlignCenter);
-    componentsLabel->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+    componentsLabel->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::MinimumExpanding);
     globalLayout->addWidget(componentsLabel);
 
     // add buttons
@@ -148,4 +145,11 @@ void NodeBase::addOutputConnectorButtonClicked(bool clicked)
 void NodeBase::deleteOutputConnectorButtonClicked(bool clicked)
 {
     emit deleteOutputConnectorRequested();
+}
+
+bool NodeBase::event(QEvent* event)
+{
+    if (event->type() == QEvent::Resize)
+        performResize();
+    return QWidget::event(event);
 }

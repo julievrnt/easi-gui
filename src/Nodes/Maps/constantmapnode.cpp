@@ -100,5 +100,4 @@ void ConstantMapNode::insertNewOutputAtIndex(QList<int> indexes)
 {
     foreach (int index, indexes)
         addNewOutputsLayoutRow(this->layout()->findChild<QVBoxLayout*>("outputsLayout"), index);
-    performResize(true);
 }

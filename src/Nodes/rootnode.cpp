@@ -2,7 +2,8 @@
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QPushButton>
-#include <QListView>
+#include <QLabel>
+#include "rootnodedialog.h"
 
 RootNode::RootNode()
 {
@@ -12,11 +13,16 @@ RootNode::RootNode()
     // add default outputs
     outputs = new QStringList();
     *outputs << "lambda" << "mu" << "rho";
-    outputsModel = new QStringListModel(*outputs);
 
     createLayout();
 
     setGeometry(QRect(0, 0, sizeHint().width(), sizeHint().height()));
+}
+
+RootNode::~RootNode()
+{
+    delete outputs;
+    delete outputConnectors;
 }
 
 void RootNode::createLayout()
@@ -24,33 +30,81 @@ void RootNode::createLayout()
     QVBoxLayout* globalLayout = new QVBoxLayout();
     addTitleLayout(globalLayout);
 
-    QListView* outputsList = new QListView();
-    outputsList->setFixedHeight(100);
-    outputsList->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
-    outputsList->setModel(outputsModel);
+    // create layout in order to modify it later
+    QVBoxLayout* outputsLayout = new QVBoxLayout();
+    outputsLayout->setObjectName("Outputs Layout");
 
-    globalLayout->addWidget(outputsList);
+    for (int i = 0; i < outputs->size(); i++)
+    {
+        QLabel* outputLabel = new QLabel();
+        outputLabel->setText(outputs->at(i));
+        outputLabel->setAlignment(Qt::AlignCenter);
+        outputLabel->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+        outputsLayout->addWidget(outputLabel);
+        // store label in list to easily remove it later
+        outputLabels.append(outputLabel);
+    }
 
-    QHBoxLayout* buttonsLayout = new QHBoxLayout();
-    QPushButton* addButton = new QPushButton();
-    addButton->setText("Add");
-    QPushButton* editButton = new QPushButton();
-    editButton->setText("Edit");
-    QPushButton* deleteButton = new QPushButton();
-    deleteButton->setText("Delete");
+    globalLayout->addLayout(outputsLayout);
 
-    buttonsLayout->addWidget(addButton);
-    buttonsLayout->addWidget(editButton);
-    buttonsLayout->addWidget(deleteButton);
+    // modifyButton will open a dialog
+    QPushButton* modifyButton = new QPushButton();
+    modifyButton->setText("Modify Outputs");
 
-    /// TODO: connect buttons
-    globalLayout->addLayout(buttonsLayout);
+    connect(modifyButton, SIGNAL(clicked(bool)), this, SLOT(modifyOutputsButtonClicked(bool)));
+
+    globalLayout->addWidget(modifyButton);
 
     addComponentsLayout(globalLayout);
     this->setLayout(globalLayout);
 }
 
+void RootNode::updateLayout()
+{
+    QVBoxLayout* outputsLayout = (QVBoxLayout*) layout()->findChild<QVBoxLayout*>("Outputs Layout");
+
+    while (!outputLabels.isEmpty())
+    {
+        QLabel* outputLabelToRemove = outputLabels.takeLast();
+        outputsLayout->removeWidget(outputLabelToRemove);
+        delete outputLabelToRemove;
+    }
+
+    // add all new outputs in layout
+    for (int i = 0; i < outputs->size(); i++)
+    {
+        QLabel* outputLabel = new QLabel();
+        outputLabel->setText(outputs->at(i));
+        outputLabel->setAlignment(Qt::AlignCenter);
+        outputLabel->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+        outputsLayout->addWidget(outputLabel);
+        // store label in list to easily remove it later
+        outputLabels.append(outputLabel);
+    }
+}
+
+void RootNode::modifyOutputs()
+{
+    RootNodeDialog modifyOutputsDialog(outputs);
+    connect(&modifyOutputsDialog, SIGNAL(finished(int)), this, SLOT(sortOutputs(int)));
+    modifyOutputsDialog.exec();
+}
+
 void RootNode::mousePressEvent(QMouseEvent* event)
 {
     QWidget::mousePressEvent(event);
+}
+
+void RootNode::modifyOutputsButtonClicked(bool clicked)
+{
+    modifyOutputs();
+}
+
+void RootNode::sortOutputs(int result)
+{
+    qDebug() << result;
+    outputs->sort();
+    updateLayout();
+    /// TODO: find a way to resize correctly
+    //performResize();
 }

@@ -2,21 +2,30 @@
 #define ROOTNODE_H
 
 #include "nodebase.h"
-#include <QStringListModel>>
+#include <QStringListModel>
+#include <QList>
+#include <QLabel>
 
 class RootNode : public NodeBase
 {
     Q_OBJECT
 public:
     RootNode();
+    ~RootNode();
 
 private:
-    QStringListModel* outputsModel;
+    QList<QLabel*> outputLabels;
     void createLayout();
+    void updateLayout();
+    void modifyOutputs();
 
     // QWidget interface
 protected:
-    void mousePressEvent(QMouseEvent *event);
+    void mousePressEvent(QMouseEvent* event);
+
+private slots:
+    void modifyOutputsButtonClicked(bool clicked);
+    void sortOutputs(int result);
 };
 
 #endif // ROOTNODE_H

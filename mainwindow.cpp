@@ -1,4 +1,5 @@
 #include "mainwindow.h"
+#include "src/Nodes/rootnode.h"
 #include "ui_mainwindow.h"
 #include "src/Connectors/connector.h"
 #include "src/Nodes/nodeparentwidget.h"
@@ -27,13 +28,15 @@ MainWindow::MainWindow(QWidget* parent)
     ui->graphicsView->setScene(nodeScene);
 
     connectActions();
-    addNode(new RootNode());
+    proxyRoot = addNode(new RootNode());
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
     delete deleteNodeAction;
+    delete outputParameters;
+    delete proxyRoot;
     delete nodeScene;
 }
 
@@ -177,9 +180,9 @@ void MainWindow::save()
         }
 }
 
+/// return true if canceled
 bool MainWindow::saveDiscardOrCancelBeforeOpenOrNew()
 {
-    // save file if text not empty?
     if (fileName.isEmpty() || notSaved)
     {
         QMessageBox::StandardButton response = QMessageBox::question(this, "Save document?", "Save changes to document " + fileName + " before closing?", QMessageBox::Discard | QMessageBox::Cancel | QMessageBox::Save);
@@ -188,6 +191,7 @@ bool MainWindow::saveDiscardOrCancelBeforeOpenOrNew()
         else if (response == QMessageBox::Save)
             actionSave();
     }
+    return false;
 }
 
 void MainWindow::enableDisableIcons(bool enable)
@@ -237,7 +241,7 @@ void MainWindow::addNewOutputParameter()
     emit outputParameterAdded(test);
 }
 
-void MainWindow::addNode(NodeBase* node)
+QGraphicsProxyWidget* MainWindow::addNode(NodeBase* node)
 {
     // add a graphic widget as parent & proxy to communicate between node and scene
     NodeParentWidget* nodeParentWidget = new NodeParentWidget();
@@ -245,19 +249,15 @@ void MainWindow::addNode(NodeBase* node)
     nodeParentWidget->setFlags(QGraphicsItem::ItemIsMovable | QGraphicsItem::ItemIsSelectable);
     nodeScene->addItem(nodeParentWidget);
     //nodeScene->addRect(node->geometry(), QPen(Qt::red));
-    nodeScene->addWidget(node)->setParentItem(nodeParentWidget);
-
-    QRect geometry(node->geometry());
-    int x, y;
+    QGraphicsProxyWidget* proxyNode = nodeScene->addWidget(node);
+    proxyNode->setParentItem(nodeParentWidget);
 
     // the root does not need any input
     if (node->getTypeOfNode() != ROOT)
     {
         // Add input connector
         Connector* inputConnector = new Connector();
-        x = geometry.topLeft().x() - 7;
-        y = geometry.topLeft().y() + 20;
-        inputConnector->setGeometry(x, y, 15, 15);
+        inputConnector->setGeometry(-8, 20, 15, 15);
         QGraphicsProxyWidget* inputConnectorProxy = nodeScene->addWidget(inputConnector);
         inputConnectorProxy->setParentItem(nodeParentWidget);
 
@@ -266,8 +266,9 @@ void MainWindow::addNode(NodeBase* node)
 
     // Add one output connector
     Connector* outputConnector = new Connector();
-    x = geometry.bottomRight().x() - 7;
-    y = geometry.bottomRight().y() - 58;
+    int x, y;
+    x = node->width() - 7;
+    y = node->height() - 58;
     outputConnector->setGeometry(x, y, 15, 15);
     QGraphicsProxyWidget* outputConnectorProxy = nodeScene->addWidget(outputConnector);
     outputConnectorProxy->setParentItem(nodeParentWidget);
@@ -279,6 +280,7 @@ void MainWindow::addNode(NodeBase* node)
     connect(node, SIGNAL(addOutputConnectorRequested()), this, SLOT(actionAddOutputConnector()));
     connect(node, SIGNAL(deleteOutputConnectorRequested()), this, SLOT(actionDeleteOutputConnector()));
     nodeScene->setFocusItem(nodeParentWidget);
+    return proxyNode;
 }
 
 void MainWindow::deleteNode()
@@ -321,11 +323,10 @@ void MainWindow::addOutputConnector()
     QGraphicsProxyWidget* outputConnectorProxy = nodeScene->addWidget(outputConnector);
     outputConnectorProxy->setParentItem(currentProxyNode->parentItem());
     currentNode->addOutputConnector(outputConnectorProxy);
-    currentNode->performResize(false);
+    currentNode->performResize();
 
-    QRect geometry(currentNode->geometry());
-    int x = geometry.bottomRight().x() - 7;
-    int y = geometry.bottomRight().y() - 58;
+    int x = currentNode->geometry().width() - 7;
+    int y = currentNode->geometry().height() - 58;
     outputConnector->setGeometry(x, y, 15, 15);
 }
 
@@ -348,7 +349,7 @@ bool MainWindow::deleteOutputConnector()
     QGraphicsProxyWidget* outputConnector = outputConnectors->takeLast();
     nodeScene->removeItem(outputConnector);
     delete outputConnector;
-    currentNode->performResize(false);
+    currentNode->performResize();
     return true;
 }
 
@@ -383,7 +384,18 @@ void MainWindow::getNewFocusItem(QGraphicsItem* newFocusItem, QGraphicsItem* old
         enableDisableIcons(false);
     }
     else
-        enableDisableIcons(true);
+    {
+        QGraphicsProxyWidget* currentProxyNode = (QGraphicsProxyWidget*) newFocusItem;
+        NodeBase* currentNode = (NodeBase*) currentProxyNode->widget();
+        if (currentNode == nullptr || currentNode->getTypeOfNode() == ROOT)
+        {
+            enableDisableIcons(false);
+        }
+        else
+        {
+            enableDisableIcons(true);
+        }
+    }
 }
 
 void MainWindow::stateChanged()

@@ -15,7 +15,8 @@ SOURCES += \
     mainwindow.cpp \
     src/Nodes/nodebase.cpp \
     src/Nodes/nodeparentwidget.cpp \
-    src/Nodes/rootnode.cpp
+    src/Nodes/rootnode.cpp \
+    src/Nodes/rootnodedialog.cpp
 
 HEADERS += \
     src/Connectors/connector.h \
@@ -23,7 +24,8 @@ HEADERS += \
     mainwindow.h \
     src/Nodes/nodebase.h \
     src/Nodes/nodeparentwidget.h \
-    src/Nodes/rootnode.h
+    src/Nodes/rootnode.h \
+    src/Nodes/rootnodedialog.h
 
 FORMS += \
     mainwindow.ui

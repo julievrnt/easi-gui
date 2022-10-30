@@ -25,7 +25,7 @@ public:
     void setInputConnector(QGraphicsProxyWidget* newInputConnector);
     QList<QGraphicsProxyWidget*>* getOutputConnectors() const;
     void addOutputConnector(QGraphicsProxyWidget* newOutputConnector);
-    void performResize(bool replaceConnectors);
+    void performResize();
 
 signals:
     void nodeContextMenuRequested(QPoint pos);
@@ -49,6 +49,10 @@ protected:
 private slots:
     void addOutputConnectorButtonClicked(bool clicked);
     void deleteOutputConnectorButtonClicked(bool clicked);
+
+    // QObject interface
+public:
+    bool event(QEvent* event);
 };
 
 #endif // NODE_H
