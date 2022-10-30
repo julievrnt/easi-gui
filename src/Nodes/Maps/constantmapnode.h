@@ -1,29 +1,24 @@
 #ifndef CONSTANTMAPNODE_H
 #define CONSTANTMAPNODE_H
 
-#include "node.h"
+#include "src/Nodes/nodebase.h"
 #include <QStringList>
 #include <QVBoxLayout>
 
-class ConstantMapNode : public Node
+class ConstantMapNode : public NodeBase
 {
     Q_OBJECT
 public:
-    ConstantMapNode(QStringList* outputs);
+    ConstantMapNode(QGraphicsScene* nodeScene, QStringList* outputs);
     ~ConstantMapNode();
     QMap<QString, double>* getValues();
 
 private:
-    ///  TODO: test if I really need to keep it
-    QStringList* outputs;
     void createLayout();
     void addNewOutputsLayoutRow(QVBoxLayout* outputsLayout, int index);
 
 private slots:
-    void insertNewOutputAtIndex(int index);
-
-protected:
-    void performResize() override;
+    void insertNewOutputAtIndex(QList<int> indexes);
 };
 
 #endif // CONSTANTMAPNODE_H

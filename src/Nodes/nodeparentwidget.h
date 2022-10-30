@@ -14,6 +14,10 @@ signals:
 
 private slots:
     void resize(QRectF rect);
+
+    // QGraphicsItem interface
+public:
+    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 };
 
 #endif // NODEPARENTWIDGET_H

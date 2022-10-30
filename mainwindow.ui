@@ -20,8 +20,8 @@
    <widget class="QGraphicsView" name="graphicsView">
     <property name="geometry">
      <rect>
-      <x>160</x>
-      <y>90</y>
+      <x>60</x>
+      <y>50</y>
       <width>256</width>
       <height>192</height>
      </rect>
@@ -34,7 +34,7 @@
      <x>0</x>
      <y>0</y>
      <width>822</width>
-     <height>29</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuAdd_map">

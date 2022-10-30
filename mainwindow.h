@@ -6,8 +6,9 @@
 #include <QGraphicsProxyWidget>
 #include <QMap>
 #include <QStringList>
-#include "src/Nodes/constantmapnode.h"
-#include "src/Nodes/node.h"
+#include "src/Nodes/Maps/constantmapnode.h"
+#include "src/Nodes/nodebase.h"
+#include "src/Nodes/rootnode.h"
 #include "yaml-cpp/emitter.h"
 
 QT_BEGIN_NAMESPACE
@@ -25,7 +26,7 @@ public:
     ~MainWindow();
 
 signals:
-    void outputParameterAdded(int index);
+    void outputParameterAdded(QList<int> indexes);
 
 private:
     Ui::MainWindow* ui;
@@ -57,9 +58,11 @@ private:
     // basic functions to handle nodes
     void createActions();
     void addNewOutputParameter();
-    void addNode(Node* node);
+    void addNode(NodeBase* node);
     void deleteNode();
     void deleteProxy(QGraphicsItem* proxy);
+    void addOutputConnector();
+    bool deleteOutputConnector();
 
     // add map functions
     void addConstantMapNode();
@@ -68,6 +71,8 @@ private slots:
     void nodeContextMenu(QPoint pos);
     void getNewFocusItem(QGraphicsItem* newFocusItem, QGraphicsItem* oldFocusItem, Qt::FocusReason reason);
     void stateChanged();
+    void actionAddOutputConnector();
+    void actionDeleteOutputConnector();
     void actionAddConstantMap();
     void actionNewOutputParameter();
     void actionNew();

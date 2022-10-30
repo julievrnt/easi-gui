@@ -3,12 +3,12 @@
 
 #include <QWidget>
 
-class ConnectorWidget : public QWidget
+class Connector : public QWidget
 {
     Q_OBJECT
 public:
-    explicit ConnectorWidget(QStringList* outputs = nullptr, QWidget *parent = nullptr);
-
+    explicit Connector(QStringList* outputs = nullptr, QWidget* parent = nullptr);
+    ~Connector();
     QStringList* getOutputs() const;
 
 signals:
@@ -18,7 +18,7 @@ private:
 
     // QWidget interface
 protected:
-    void paintEvent(QPaintEvent *event);
+    void paintEvent(QPaintEvent* event);
 };
 
 #endif // CONNECTORWIDGET_H

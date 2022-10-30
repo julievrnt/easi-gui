@@ -8,27 +8,23 @@
 #include <QLineEdit>
 #include <QMap>
 #include "float.h"
-#include "src/Widgets/componentswidget.h"
 
-ConstantMapNode::ConstantMapNode(QStringList* outputs)
+ConstantMapNode::ConstantMapNode(QGraphicsScene* nodeScene, QStringList* outputs)
 {
     typeOfNode = CONSTANTMAPNODE;
     this->outputs = outputs;
+    this->nodeScene = nodeScene;
 
-    int height = (outputs->size() + 3 + getNumberOfComponents()) * 32 ;
-    setGeometry(QRect(0, 0, 250, height));
-
-    //this->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    setWindowTitle("Output Map");
+    setWindowTitle("Constant Map");
     createLayout();
 
+    setGeometry(QRect(0, 0, sizeHint().width(), sizeHint().height()));
     //getValues();
 }
 
 ConstantMapNode::~ConstantMapNode()
 {
-    /// TODO: check if necessary
-    // delete outputs;
+    delete outputs;
 }
 
 QMap<QString, double>*  ConstantMapNode::getValues()
@@ -49,21 +45,8 @@ QMap<QString, double>*  ConstantMapNode::getValues()
 
 void ConstantMapNode::createLayout()
 {
-    // add title
     QVBoxLayout* globalLayout = new QVBoxLayout(this);
-    QLabel* title = new QLabel(this);
-    title->setText(this->windowTitle());
-    title->setAlignment(Qt::AlignCenter);
-    title->setStyleSheet("QLabel { background-color : rgb(70,70,70);}");
-    title->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-    title->setFixedHeight(30);
-    globalLayout->addWidget(title);
-
-    // add line to separate title from the rest
-    QFrame* line = new QFrame(this);
-    line->setFrameShape(QFrame::HLine);
-    line->setFrameShadow(QFrame::Sunken);
-    globalLayout->addWidget(line);
+    addTitleLayout(globalLayout);
 
     // add output parameters and field for value
     QVBoxLayout* outputsLayout = new QVBoxLayout();
@@ -78,9 +61,7 @@ void ConstantMapNode::createLayout()
     }
     globalLayout->addLayout(outputsLayout);
 
-    ComponentsWidget* components = new ComponentsWidget(this);
-    connect(components, SIGNAL(componentsChanged(int)), this, SLOT(componentRemovedOrAdded(int)));
-    globalLayout->addWidget(components);
+    addComponentsLayout(globalLayout);
     this->setLayout(globalLayout);
 }
 
@@ -115,15 +96,9 @@ void ConstantMapNode::addNewOutputsLayoutRow(QVBoxLayout* outputsLayout, int ind
     outputsLayout->insertLayout(index, outputLayout);
 }
 
-void ConstantMapNode::insertNewOutputAtIndex(int index)
+void ConstantMapNode::insertNewOutputAtIndex(QList<int> indexes)
 {
-    performResize();
-    addNewOutputsLayoutRow(this->layout()->findChild<QVBoxLayout*>("outputsLayout"), index);
-}
-
-void ConstantMapNode::performResize()
-{
-    int height = (outputs->size() + 3 + getNumberOfComponents()) * 32 ;
-    setGeometry(QRect(0, 0, 250, height));
-    emit resized(this->geometry());
+    foreach (int index, indexes)
+        addNewOutputsLayoutRow(this->layout()->findChild<QVBoxLayout*>("outputsLayout"), index);
+    performResize(true);
 }
