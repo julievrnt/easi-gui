@@ -4,6 +4,7 @@
 #include <QLabel>
 #include <QHBoxLayout>
 #include <QPushButton>
+#include "../helpers.h"
 
 NodeBase::NodeBase(QWidget* parent)
     : QWidget{parent}
@@ -12,6 +13,7 @@ NodeBase::NodeBase(QWidget* parent)
     this->setWindowTitle("Node Base");
     outputConnectors = new QList<QGraphicsProxyWidget*>();
     setAttribute(Qt::WA_TranslucentBackground);
+    setObjectName("Node");
 }
 
 int NodeBase::getTypeOfNode()
@@ -48,7 +50,6 @@ void NodeBase::performResize()
 {
     setGeometry(QRect(0, 0, sizeHint().width(), sizeHint().height() + (outputConnectors->size() - 1) * 20));
     emit resized(this->geometry());
-
     for (int i = 0; i < outputConnectors->size(); i++)
     {
         QGraphicsProxyWidget* outputConnector = outputConnectors->at(i);
@@ -85,6 +86,17 @@ void NodeBase::paintEvent(QPaintEvent* event)
     painter.drawRoundedRect(rect, 20, 20);
 
     QWidget::paintEvent(event);
+}
+
+void NodeBase::outputsChanged()
+{
+    if (outputs == nullptr)
+    {
+        qDebug() << "ERROR: outputs is null";
+        return;
+    }
+    updateLayout();
+    emit transferOutputsRequested(outputs);
 }
 
 void NodeBase::addTitleLayout(QVBoxLayout* globalLayout)
@@ -137,14 +149,43 @@ void NodeBase::addComponentsLayout(QVBoxLayout* globalLayout)
     globalLayout->addLayout(buttonsLayout);
 }
 
+void NodeBase::clearLayout(QLayout* layout, bool deleteWidgets)
+{
+    while (QLayoutItem* item = layout->takeAt(0))
+    {
+        if (deleteWidgets)
+        {
+            if (QWidget* widget = item->widget())
+                widget->deleteLater();
+        }
+        if (QLayout* childLayout = item->layout())
+            clearLayout(childLayout, deleteWidgets);
+        delete item;
+    }
+}
+
+void NodeBase::updateLayout()
+{
+    // do nothing
+}
+
 void NodeBase::addOutputConnectorButtonClicked(bool clicked)
 {
+    UNUSED(clicked);
     emit addOutputConnectorRequested();
 }
 
 void NodeBase::deleteOutputConnectorButtonClicked(bool clicked)
 {
+    UNUSED(clicked);
     emit deleteOutputConnectorRequested();
+}
+
+void NodeBase::transferOutputs(QStringList* outputs)
+{
+    if (this->outputs != outputs)
+        this->outputs = outputs;
+    outputsChanged();
 }
 
 bool NodeBase::event(QEvent* event)

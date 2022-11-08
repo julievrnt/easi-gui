@@ -9,16 +9,16 @@ class ConstantMapNode : public NodeBase
 {
     Q_OBJECT
 public:
-    ConstantMapNode(QGraphicsScene* nodeScene, QStringList* outputs);
+    ConstantMapNode(QGraphicsScene* nodeScene);
     ~ConstantMapNode();
     QMap<QString, double>* getValues();
 
 private:
     void createLayout();
     void addNewOutputsLayoutRow(QVBoxLayout* outputsLayout, int index);
+    void removeOldOutputsLayoutRow(QVBoxLayout* outputsLayout, int index);
 
-private slots:
-    void insertNewOutputAtIndex(QList<int> indexes);
+    void updateLayout();
 };
 
 #endif // CONSTANTMAPNODE_H

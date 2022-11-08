@@ -1,4 +1,5 @@
 #include "rootnodedialog.h"
+#include "../helpers.h"
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QPushButton>
@@ -85,25 +86,30 @@ void RootNodeDialog::deleteOutput()
 void RootNodeDialog::saveOutputs()
 {
     outputs->clear();
-    *outputs = outputsModel->stringList();
+    foreach (QString newOutput, outputsModel->stringList())
+        *outputs << newOutput;
 }
 
 void RootNodeDialog::addOutputButtonClicked(bool clicked)
 {
+    UNUSED(clicked);
     addOutput();
 }
 
 void RootNodeDialog::editOutputButtonClicked(bool clicked)
 {
+    UNUSED(clicked);
     editOutput();
 }
 
 void RootNodeDialog::deleteOutputButtonClicked(bool clicked)
 {
+    UNUSED(clicked);
     deleteOutput();
 }
 
 void RootNodeDialog::saveOutputsButtonClicked(bool clicked)
 {
+    UNUSED(clicked);
     saveOutputs();
 }

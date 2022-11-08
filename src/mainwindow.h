@@ -6,9 +6,12 @@
 #include <QGraphicsProxyWidget>
 #include <QMap>
 #include <QStringList>
+#include "src/Connectors/connectorline.h"
 #include "src/Nodes/Maps/constantmapnode.h"
 #include "src/Nodes/nodebase.h"
+#include "src/Nodes/nodeparentwidget.h"
 #include "yaml-cpp/emitter.h"
+#include "src/Connectors/connectorbase.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -25,7 +28,7 @@ public:
     ~MainWindow();
 
 signals:
-    void outputParameterAdded(QList<int> indexes);
+    void connectConnectorToLine(ConnectorBase* connector);
 
 private:
     Ui::MainWindow* ui;
@@ -34,6 +37,7 @@ private:
     QStringList* outputParameters;
     QAction* deleteNodeAction;
     QGraphicsProxyWidget* proxyRoot;
+    ConnectorLine* newConnectorLine;
     bool notSaved;
 
     void connectActions();
@@ -56,12 +60,18 @@ private:
 
     // basic functions to handle nodes
     void createActions();
-    void addNewOutputParameter();
     QGraphicsProxyWidget* addNode(NodeBase* node);
     void deleteNode();
-    void deleteProxy(QGraphicsItem* proxy);
+    void deleteProxy(QGraphicsProxyWidget* proxy);
+
+    // basic functions to handle connectors
     void addOutputConnector();
     bool deleteOutputConnector();
+    void connectConnectors(ConnectorBase* connector, NodeParentWidget* nodeParentWidget);
+    void createConnectorLine(ConnectorBase* connector);
+    void deleteConnectorLine(QGraphicsProxyWidget* connectorLineProxy);
+    void saveNewConnectorLine(ConnectorLine* connector);
+    void checkConnectionBetweenConnectorAndLine(ConnectorBase* connector);
 
     // add map functions
     void addConstantMapNode();
@@ -70,10 +80,13 @@ private slots:
     void nodeContextMenu(QPoint pos);
     void getNewFocusItem(QGraphicsItem* newFocusItem, QGraphicsItem* oldFocusItem, Qt::FocusReason reason);
     void stateChanged();
+    void actionCreateConnectorLine(ConnectorBase* connector);
+    void actionDeleteConnectorLine(QGraphicsProxyWidget* connectorLineProxy);
+    void actionConnectorLineDrawn(ConnectorLine* connectorLine);
+    void actionCheckIfConnectorNeedsConnection(ConnectorBase* connector);
     void actionAddOutputConnector();
     void actionDeleteOutputConnector();
     void actionAddConstantMap();
-    void actionNewOutputParameter();
     void actionNew();
     void actionOpen();
     void actionClose();

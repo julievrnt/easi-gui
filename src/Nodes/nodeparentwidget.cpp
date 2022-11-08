@@ -3,7 +3,7 @@
 
 NodeParentWidget::NodeParentWidget()
 {
-
+    setObjectName("papa");
 }
 
 void NodeParentWidget::resize(QRectF rect)
@@ -18,4 +18,10 @@ void NodeParentWidget::paint(QPainter* painter, const QStyleOptionGraphicsItem* 
 {
     // painter->setPen(QPen(Qt::blue));
     // painter->drawRect(this->geometry());
+}
+
+void NodeParentWidget::moveEvent(QGraphicsSceneMoveEvent* event)
+{
+    emit hasMoved();
+    QGraphicsWidget::moveEvent(event);
 }

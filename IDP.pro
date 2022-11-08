@@ -9,23 +9,32 @@ CONFIG += c++17
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
-    src/Connectors/connector.cpp \
+    src/Connectors/connectorbase.cpp \
+    src/Connectors/connectorline.cpp \
+    src/Connectors/connectorlineparentwidget.cpp \
+    src/Connectors/inputconnector.cpp \
+    src/Connectors/outputconnector.cpp \
     src/Nodes/Maps/constantmapnode.cpp \
-    main.cpp \
-    mainwindow.cpp \
+    src/main.cpp \
+    src/mainwindow.cpp \
     src/Nodes/nodebase.cpp \
     src/Nodes/nodeparentwidget.cpp \
     src/Nodes/rootnode.cpp \
     src/Nodes/rootnodedialog.cpp
 
 HEADERS += \
-    src/Connectors/connector.h \
+    src/Connectors/connectorbase.h \
+    src/Connectors/connectorline.h \
+    src/Connectors/connectorlineparentwidget.h \
+    src/Connectors/inputconnector.h \
+    src/Connectors/outputconnector.h \
     src/Nodes/Maps/constantmapnode.h \
-    mainwindow.h \
+    src/mainwindow.h \
     src/Nodes/nodebase.h \
     src/Nodes/nodeparentwidget.h \
     src/Nodes/rootnode.h \
-    src/Nodes/rootnodedialog.h
+    src/Nodes/rootnodedialog.h \
+    src/helpers.h
 
 FORMS += \
     mainwindow.ui

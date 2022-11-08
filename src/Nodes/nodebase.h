@@ -7,6 +7,7 @@
 #include <QVBoxLayout>
 #include <QGraphicsProxyWidget>
 #include "qevent.h"
+#include <QLabel>
 
 #define NODE 0
 #define ROOT 1
@@ -32,6 +33,7 @@ signals:
     void resized(QRectF rect);
     void addOutputConnectorRequested();
     void deleteOutputConnectorRequested();
+    void transferOutputsRequested(QStringList* outputs);
 
 protected:
     QGraphicsProxyWidget* inputConnector;
@@ -42,13 +44,20 @@ protected:
     void mousePressEvent(QMouseEvent* event);
     void paintEvent(QPaintEvent* event);
 
+    void outputsChanged();
+
     // layouts for all nodes
     void addTitleLayout(QVBoxLayout* globalLayout);
     void addComponentsLayout(QVBoxLayout* globalLayout);
 
+    void clearLayout(QLayout* layout, bool deleteWidgets = true);
+
+    virtual void updateLayout();
+
 private slots:
     void addOutputConnectorButtonClicked(bool clicked);
     void deleteOutputConnectorButtonClicked(bool clicked);
+    void transferOutputs(QStringList* outputs);
 
     // QObject interface
 public:

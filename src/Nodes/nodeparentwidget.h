@@ -11,13 +11,18 @@ public:
     NodeParentWidget();
 
 signals:
+    void hasMoved();
 
 private slots:
     void resize(QRectF rect);
 
     // QGraphicsItem interface
 public:
-    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
+    void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget);
+
+    // QGraphicsWidget interface
+protected:
+    void moveEvent(QGraphicsSceneMoveEvent* event);
 };
 
 #endif // NODEPARENTWIDGET_H

@@ -4,6 +4,7 @@
 #include <QPushButton>
 #include <QLabel>
 #include "rootnodedialog.h"
+#include "../helpers.h"
 
 RootNode::RootNode()
 {
@@ -97,14 +98,16 @@ void RootNode::mousePressEvent(QMouseEvent* event)
 
 void RootNode::modifyOutputsButtonClicked(bool clicked)
 {
+    UNUSED(clicked);
     modifyOutputs();
 }
 
 void RootNode::sortOutputs(int result)
 {
-    qDebug() << result;
+    UNUSED(result);
     outputs->sort();
     updateLayout();
-    /// TODO: find a way to resize correctly
-    //performResize();
+    emit transferOutputsRequested(outputs);
+    /// TODO: find a way to resize correctly + add cancel !!!
+    performResize();
 }
