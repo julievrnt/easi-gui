@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include "../Nodes/nodeparentwidget.h"
+#include "yaml-cpp/yaml.h"
 
 #define CONNECTOR 0
 #define INPUTCONNECTOR 1
@@ -38,11 +39,12 @@ signals:
     void moveConnectorLineRequested(int connectorType);
     void deleteConnectorLineRequested();
     void transferOutputsRequested(QStringList* outputs);
+    void saveRequested(YAML::Emitter* out);
 
 private:
+    QStringList* outputs;
     bool highlight;
     bool connectorLineCreated;
-    bool connectorLineConnected;
     QPointF centerPos;
     NodeParentWidget* nodeParentWidget;
 
@@ -55,7 +57,7 @@ private slots:
     // QWidget interface
 protected:
     int typeOfConnector;
-    QStringList* outputs;
+    bool connectorLineConnected;
 
     void paintEvent(QPaintEvent* event);
     void enterEvent(QEnterEvent* event);

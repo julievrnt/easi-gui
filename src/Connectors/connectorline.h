@@ -4,6 +4,7 @@
 #include <QWidget>
 #include "inputconnector.h"
 #include "outputconnector.h"
+#include "yaml-cpp/yaml.h"
 #include <QTimer>
 
 class ConnectorLine : public QWidget
@@ -19,6 +20,7 @@ signals:
     void drawnIsDone(ConnectorLine* connectorLine);
     void deleteConnectorLine(QGraphicsProxyWidget* connectorLineProxy);
     void transferOutputsRequested(QStringList* outputs);
+    void saveRequested(YAML::Emitter* out);
 
 private:
     QPointF inputConnectorPoint;
@@ -46,6 +48,7 @@ private slots:
     void getOhterConnectorTimeOut();
     void deleteConnectorLine();
     void transferOutputs(QStringList* outputs);
+    void save(YAML::Emitter* out);
 };
 
 #endif // CONNECTORLINE_H

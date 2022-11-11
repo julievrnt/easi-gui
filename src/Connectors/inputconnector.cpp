@@ -4,3 +4,8 @@ InputConnector::InputConnector(NodeParentWidget* nodeParentWidget) : ConnectorBa
 {
     this->typeOfConnector = INPUTCONNECTOR;
 }
+
+void InputConnector::save(YAML::Emitter* out)
+{
+    emit saveRequested(out);
+}

@@ -40,6 +40,7 @@ void ConnectorLine::connectLineToConnector(ConnectorBase* connector)
         inputConnector = (InputConnector*) connector;
         inputConnectorPoint = connector->getCenterPos();
         connect(this, SIGNAL(transferOutputsRequested(QStringList*)), inputConnector, SLOT(transferOutputs(QStringList*)));
+        connect(this, SIGNAL(saveRequested(YAML::Emitter*)), inputConnector, SLOT(save(YAML::Emitter*)));
     }
     else if (connector->getTypeOfConnector() == OUTPUTCONNECTOR)
     {
@@ -54,6 +55,7 @@ void ConnectorLine::connectLineToConnector(ConnectorBase* connector)
         outputConnector = (OutputConnector*) connector;
         outputConnectorPoint = connector->getCenterPos();
         connect(outputConnector, SIGNAL(transferOutputsRequested(QStringList*)), this, SLOT(transferOutputs(QStringList*)));
+        connect(outputConnector, SIGNAL(saveRequested(YAML::Emitter*)), this, SLOT(save(YAML::Emitter*)));
     }
     else
         qDebug() << "error: neither input nor output";
@@ -96,26 +98,24 @@ void ConnectorLine::disconnectLineFromConnector(ConnectorBase* connector)
     if (connector->getTypeOfConnector() == INPUTCONNECTOR)
         disconnect(this, SIGNAL(transferOutputsRequested(QStringList*)), inputConnector, SLOT(transferOutputs(QStringList*)));
     else if (connector->getTypeOfConnector() == OUTPUTCONNECTOR)
-        connect(outputConnector, SIGNAL(transferOutputsRequested(QStringList*)), this, SLOT(transferOutputs(QStringList*)));
+        disconnect(outputConnector, SIGNAL(transferOutputsRequested(QStringList*)), this, SLOT(transferOutputs(QStringList*)));
     else
         qDebug() << "error: neither input nor output";
 }
 
 void ConnectorLine::paintEvent(QPaintEvent* event)
 {
-    if (!inputConnectorPoint.isNull() && !outputConnectorPoint.isNull())
-    {
-        QPainter painter(this);
-        painter.setRenderHint(QPainter::Antialiasing);
-        QPen linePen;
-        if (!isDone)
-            linePen.setColor(Qt::yellow);
-        else
-            linePen.setColor(Qt::green);
-        linePen.setWidth(1);
-        painter.setPen(linePen);
-        painter.drawLine(inputConnectorPoint, outputConnectorPoint);
-    }
+    QPainter painter(this);
+    painter.setRenderHint(QPainter::Antialiasing);
+    QPen linePen;
+    if (!isDone)
+        linePen.setColor(Qt::yellow);
+    else
+        linePen.setColor(Qt::green);
+    linePen.setWidth(1);
+    painter.setPen(linePen);
+    painter.drawLine(inputConnectorPoint, outputConnectorPoint);
+
     QWidget::paintEvent(event);
 }
 
@@ -194,4 +194,9 @@ void ConnectorLine::deleteConnectorLine()
 void ConnectorLine::transferOutputs(QStringList* outputs)
 {
     emit transferOutputsRequested(outputs);
+}
+
+void ConnectorLine::save(YAML::Emitter* out)
+{
+    emit saveRequested(out);
 }

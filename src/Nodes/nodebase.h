@@ -8,6 +8,7 @@
 #include <QGraphicsProxyWidget>
 #include "qevent.h"
 #include <QLabel>
+#include "yaml-cpp/yaml.h"
 
 #define NODE 0
 #define ROOT 1
@@ -26,7 +27,7 @@ public:
     void setInputConnector(QGraphicsProxyWidget* newInputConnector);
     QList<QGraphicsProxyWidget*>* getOutputConnectors() const;
     void addOutputConnector(QGraphicsProxyWidget* newOutputConnector);
-    void performResize();
+    virtual void performResize();
 
 signals:
     void nodeContextMenuRequested(QPoint pos);
@@ -45,6 +46,7 @@ protected:
     void paintEvent(QPaintEvent* event);
 
     void outputsChanged();
+    void saveComponents(YAML::Emitter* out);
 
     // layouts for all nodes
     void addTitleLayout(QVBoxLayout* globalLayout);
@@ -53,11 +55,14 @@ protected:
     void clearLayout(QLayout* layout, bool deleteWidgets = true);
 
     virtual void updateLayout();
+    virtual void saveNodeContent(YAML::Emitter* out);
+    virtual void saveValues(YAML::Emitter* out);
 
 private slots:
     void addOutputConnectorButtonClicked(bool clicked);
     void deleteOutputConnectorButtonClicked(bool clicked);
     void transferOutputs(QStringList* outputs);
+    void save(YAML::Emitter* out);
 
     // QObject interface
 public:

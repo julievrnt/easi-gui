@@ -8,6 +8,7 @@
 #include <QStringList>
 #include "src/Connectors/connectorline.h"
 #include "src/Nodes/Maps/constantmapnode.h"
+#include "src/Nodes/rootnode.h"
 #include "src/Nodes/nodebase.h"
 #include "src/Nodes/nodeparentwidget.h"
 #include "yaml-cpp/emitter.h"
@@ -29,6 +30,7 @@ public:
 
 signals:
     void connectConnectorToLine(ConnectorBase* connector);
+    void saveRequested(YAML::Emitter* out);
 
 private:
     Ui::MainWindow* ui;
@@ -60,6 +62,7 @@ private:
 
     // basic functions to handle nodes
     void createActions();
+    void addRoot();
     QGraphicsProxyWidget* addNode(NodeBase* node);
     void deleteNode();
     void deleteProxy(QGraphicsProxyWidget* proxy);

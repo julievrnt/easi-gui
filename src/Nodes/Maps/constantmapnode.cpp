@@ -35,8 +35,8 @@ QMap<QString, double>*  ConstantMapNode::getValues()
     foreach (QObject* outputLayout, outputLayouts)
     {
         QHBoxLayout* layout = (QHBoxLayout*) outputLayout;
-        QString name = layout->findChild<QLabel*> ("output")->text();
-        double value = layout->findChild<QDoubleSpinBox*> ("value")->value();
+        QString name = ((QLabel*) layout->itemAt(0)->widget())->text();
+        double value = ((QDoubleSpinBox*) layout->itemAt(2)->widget())->value();
         values->insert(name, value);
     }
 
@@ -107,9 +107,6 @@ void ConstantMapNode::updateLayout()
     {
         foreach (QObject* child, outputsLayout->children())
         {
-            qDebug() << child;
-            qDebug() << ((QHBoxLayout*) child)->count();
-            qDebug() << ((QLabel*) ((QHBoxLayout*) child)->itemAt(0)->widget())->text();
             oldOutputs.append(((QLabel*) ((QHBoxLayout*) child)->itemAt(0)->widget())->text());
         }
     }
@@ -140,4 +137,29 @@ void ConstantMapNode::updateLayout()
     {
         addNewOutputsLayoutRow(outputsLayout, i);
     }
+}
+
+void ConstantMapNode::saveNodeContent(YAML::Emitter* out)
+{
+    *out << YAML::LocalTag("ConstantMap");
+    *out << YAML::BeginMap;
+    saveValues(out);
+    saveComponents(out);
+    *out << YAML::EndMap;
+}
+
+void ConstantMapNode::saveValues(YAML::Emitter* out)
+{
+    QMap<QString, double>* values = getValues();
+
+    *out << YAML::Key << "map";
+    *out << YAML::Value << YAML::BeginMap;
+    foreach (QString key, values->keys())
+    {
+        *out << YAML::Key << key.toStdString();
+        *out << YAML::Value << values->value(key);
+    }
+    *out << YAML::EndMap;
+
+    delete values;
 }

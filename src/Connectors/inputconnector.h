@@ -8,6 +8,9 @@ class InputConnector : public ConnectorBase
     Q_OBJECT
 public:
     InputConnector(NodeParentWidget* nodeParentWidget);
+
+private slots:
+    void save(YAML::Emitter* out);
 };
 
 #endif // INPUTCONNECTOR_H

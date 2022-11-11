@@ -5,6 +5,7 @@
 #include <QHBoxLayout>
 #include <QPushButton>
 #include "../helpers.h"
+#include "../Connectors/outputconnector.h"
 
 NodeBase::NodeBase(QWidget* parent)
     : QWidget{parent}
@@ -99,6 +100,22 @@ void NodeBase::outputsChanged()
     emit transferOutputsRequested(outputs);
 }
 
+void NodeBase::saveComponents(YAML::Emitter* out)
+{
+    if (!((OutputConnector*) outputConnectors->at(0)->widget())->getConnectorLineConnected())
+        return;
+    *out << YAML::Key << "components";
+    if (outputConnectors->size() > 1 && ((OutputConnector*) outputConnectors->at(1)->widget())->getConnectorLineConnected())
+        *out << YAML::BeginSeq;
+    for (int i = 0; i < outputConnectors->size(); i++)
+    {
+        *out << YAML::Value;
+        ((OutputConnector*) outputConnectors->at(i)->widget())->saveComponent(out);
+    }
+    if (outputConnectors->size() > 1 && ((OutputConnector*) outputConnectors->at(1)->widget())->getConnectorLineConnected())
+        *out << YAML::EndSeq;
+}
+
 void NodeBase::addTitleLayout(QVBoxLayout* globalLayout)
 {
     QLabel* title = new QLabel(this);
@@ -169,6 +186,18 @@ void NodeBase::updateLayout()
     // do nothing
 }
 
+void NodeBase::saveNodeContent(YAML::Emitter* out)
+{
+    UNUSED(out);
+    return;
+}
+
+void NodeBase::saveValues(YAML::Emitter* out)
+{
+    UNUSED(out);
+    return;
+}
+
 void NodeBase::addOutputConnectorButtonClicked(bool clicked)
 {
     UNUSED(clicked);
@@ -186,6 +215,11 @@ void NodeBase::transferOutputs(QStringList* outputs)
     if (this->outputs != outputs)
         this->outputs = outputs;
     outputsChanged();
+}
+
+void NodeBase::save(YAML::Emitter* out)
+{
+    saveNodeContent(out);
 }
 
 bool NodeBase::event(QEvent* event)

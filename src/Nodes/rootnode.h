@@ -15,6 +15,7 @@ public:
 
 private:
     QList<QLabel*> outputLabels;
+    QGraphicsProxyWidget* outputConnector;
     void createLayout();
     void updateLayout();
     void modifyOutputs();
@@ -26,6 +27,15 @@ protected:
 private slots:
     void modifyOutputsButtonClicked(bool clicked);
     void sortOutputs(int result);
+
+    // NodeBase interface
+protected:
+    void saveNodeContent(YAML::Emitter* out);
+
+    // NodeBase interface
+public:
+    void performResize();
+    void setOutputConnector(QGraphicsProxyWidget *newOutputConnector);
 };
 
 #endif // ROOTNODE_H

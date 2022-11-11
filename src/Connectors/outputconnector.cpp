@@ -4,3 +4,11 @@ OutputConnector::OutputConnector(NodeParentWidget* nodeParentWidget) : Connector
 {
     this->typeOfConnector = OUTPUTCONNECTOR;
 }
+
+void OutputConnector::saveComponent(YAML::Emitter* out)
+{
+    if (connectorLineConnected)
+        emit saveRequested(out);
+    else
+        qDebug() << this << " not connected";
+}

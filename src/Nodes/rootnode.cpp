@@ -5,12 +5,13 @@
 #include <QLabel>
 #include "rootnodedialog.h"
 #include "../helpers.h"
+#include "../Connectors/outputconnector.h"
 
 RootNode::RootNode()
 {
     typeOfNode = ROOT;
     setWindowTitle("Outputs");
-
+    outputConnector = nullptr;
     // add default outputs
     outputs = new QStringList();
     *outputs << "lambda" << "mu" << "rho";
@@ -24,6 +25,11 @@ RootNode::~RootNode()
 {
     delete outputs;
     delete outputConnectors;
+}
+
+void RootNode::setOutputConnector(QGraphicsProxyWidget* newOutputConnector)
+{
+    outputConnector = newOutputConnector;
 }
 
 void RootNode::createLayout()
@@ -56,7 +62,6 @@ void RootNode::createLayout()
 
     globalLayout->addWidget(modifyButton);
 
-    addComponentsLayout(globalLayout);
     this->setLayout(globalLayout);
 }
 
@@ -110,4 +115,17 @@ void RootNode::sortOutputs(int result)
     emit transferOutputsRequested(outputs);
     /// TODO: find a way to resize correctly + add cancel !!!
     performResize();
+}
+
+void RootNode::saveNodeContent(YAML::Emitter* out)
+{
+    ((OutputConnector*) outputConnector->widget())->saveComponent(out);
+}
+
+void RootNode::performResize()
+{
+    setGeometry(QRect(0, 0, sizeHint().width(), sizeHint().height()));
+    emit resized(this->geometry());
+    if (outputConnector != nullptr)
+        outputConnector->setX(outputConnector->parentWidget()->geometry().width() - 7);
 }

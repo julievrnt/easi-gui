@@ -6,9 +6,11 @@
 #include "src/Connectors/inputconnector.h"
 #include "src/Connectors/outputconnector.h"
 #include "src/Nodes/nodeparentwidget.h"
+#include "helpers.h"
 #include <QFile>
 #include <QMessageBox>
 #include <QFileDialog>
+#include <QFileInfo>
 
 
 MainWindow::MainWindow(QWidget* parent)
@@ -34,12 +36,12 @@ MainWindow::MainWindow(QWidget* parent)
     QRectF sceneRectInit = QRectF(0, 0, 1700 - 25, 1000 - menuBarHeight - toolBarHeight - startusBarHeight - 20);
     nodeScene->setSceneRect(sceneRectInit);
     ui->graphicsView->setScene(nodeScene);
-    nodeScene->addRect(sceneRectInit, QPen(Qt::white));
+    //nodeScene->addRect(nodeScene->sceneRect(), QPen(Qt::red));
+    //nodeScene->addRect(ui->graphicsView->rect(), QPen(Qt::white));
 
     connectActions();
-    RootNode* rootNode = new RootNode();
-    proxyRoot = addNode(rootNode);
-    emit rootNode->transferOutputsRequested(rootNode->getOutputs());
+
+    addRoot();
 }
 
 MainWindow::~MainWindow()
@@ -94,7 +96,6 @@ void MainWindow::newFile()
 
 void MainWindow::openFile()
 {
-    /// TODO (on va se marrer)
     // is true if canceled
     if (saveDiscardOrCancelBeforeOpenOrNew())
         return;
@@ -122,6 +123,7 @@ void MainWindow::openFile()
 
 void MainWindow::saveFile()
 {
+    // if file not existing yet, act as "save as"
     if (fileName == UNTITLED)
     {
         saveFileAs();
@@ -161,33 +163,27 @@ void MainWindow::save()
     }
 
     /// TODO:
-    ///     - create Root class -> can add connectors to it -> create order
-    ///     - create connection between two nodes
-    ///     - from Root -> get all connected nodes
     ///     - what to do when they are nodes that are not connected? --> ask Lukas
-    ///     update this part
 
-    //YAML::Emitter out;
+    YAML::Emitter out;
 
-    // for now, only save focus item
-    QGraphicsProxyWidget* itm = (QGraphicsProxyWidget*) nodeScene->focusItem();
-    if (itm == nullptr)
-        return;
-    NodeBase* node = (NodeBase*) itm->widget();
-    // undefined reference?
-    switch (node->getTypeOfNode())
-        switch (0)
-        {
-            case NODE:
-                break;
-            case ROOT:
-                break;
-            case CONSTANTMAPNODE:
-                //saveConstantMapNode(&out, (ConstantMapNode*) node);
-                break;
-            default:
-                break;
-        }
+    if (proxyRoot == nullptr)
+        qDebug() << "ERROR: no root !";
+
+    emit saveRequested(&out);
+
+
+    QTextStream outStream(file);
+
+    outStream << out.c_str();
+    outStream.flush();
+
+    // needs to change title in case of save as
+    if (this->windowTitle() != QFileInfo(*file).baseName())
+        this->setWindowTitle(QFileInfo(*file).baseName());
+
+    file->close();
+    notSaved = false;
 }
 
 /// return true if canceled
@@ -221,16 +217,6 @@ void MainWindow::openConstantMapNode()
 
 
 /// ===========================================================================
-/// ==================== SAVE FUNCTIONS FOR EACH NODE TYPE ====================
-/// ===========================================================================
-
-void MainWindow::saveConstantMapNode(YAML::Emitter* out, ConstantMapNode* node)
-{
-    /// TODO
-}
-
-
-/// ===========================================================================
 /// ===================== BASIC FUNCTIONS TO HANDLE NODES =====================
 /// ===========================================================================
 
@@ -238,6 +224,37 @@ void MainWindow::createActions()
 {
     deleteNodeAction = new QAction(tr("&Delete"), this);
     connect(deleteNodeAction, &QAction::triggered, this, &MainWindow::deleteNode);
+}
+
+void MainWindow::addRoot()
+{
+    RootNode* rootNode = new RootNode();
+
+    // add a graphic widget as parent & proxy to communicate between node and scene
+    NodeParentWidget* nodeParentWidget = new NodeParentWidget();
+    nodeParentWidget->setGeometry(rootNode->geometry());
+    nodeParentWidget->setFlags(QGraphicsItem::ItemIsMovable | QGraphicsItem::ItemIsSelectable);
+    nodeScene->addItem(nodeParentWidget);
+    //nodeScene->addRect(node->geometry(), QPen(Qt::red));
+    proxyRoot = nodeScene->addWidget(rootNode);
+    proxyRoot->setParentItem(nodeParentWidget);
+
+    // Add one output connector
+    ConnectorBase* outputConnector = new OutputConnector(nodeParentWidget);
+    connect(rootNode, SIGNAL(transferOutputsRequested(QStringList*)), outputConnector, SLOT(transferOutputs(QStringList*)));
+    outputConnector->setGeometry(rootNode->width() - 7, 20, 15, 15);
+    QGraphicsProxyWidget* outputConnectorProxy = nodeScene->addWidget(outputConnector);
+    outputConnectorProxy->setParentItem(nodeParentWidget);
+    rootNode->setOutputConnector(outputConnectorProxy);
+    connectConnectors(outputConnector, nodeParentWidget);
+
+    connect(rootNode, SIGNAL(resized(QRectF)), nodeParentWidget, SLOT(resize(QRectF)));
+    connect(rootNode, SIGNAL(nodeContextMenuRequested(QPoint)), this, SLOT(nodeContextMenu(QPoint)));
+    connect(rootNode, SIGNAL(addOutputConnectorRequested()), this, SLOT(actionAddOutputConnector()));
+    connect(rootNode, SIGNAL(deleteOutputConnectorRequested()), this, SLOT(actionDeleteOutputConnector()));
+    nodeScene->setFocusItem(nodeParentWidget);
+    emit rootNode->transferOutputsRequested(rootNode->getOutputs());
+    connect(this, SIGNAL(saveRequested(YAML::Emitter*)), rootNode, SLOT(save(YAML::Emitter*)));
 }
 
 QGraphicsProxyWidget* MainWindow::addNode(NodeBase* node)
@@ -262,6 +279,7 @@ QGraphicsProxyWidget* MainWindow::addNode(NodeBase* node)
         inputConnectorProxy->setParentItem(nodeParentWidget);
         node->setInputConnector(inputConnectorProxy);
         connectConnectors(inputConnector, nodeParentWidget);
+        connect(inputConnector, SIGNAL(saveRequested(YAML::Emitter*)), node, SLOT(save(YAML::Emitter*)));
     }
 
     // Add one output connector
@@ -281,6 +299,7 @@ QGraphicsProxyWidget* MainWindow::addNode(NodeBase* node)
     connect(node, SIGNAL(addOutputConnectorRequested()), this, SLOT(actionAddOutputConnector()));
     connect(node, SIGNAL(deleteOutputConnectorRequested()), this, SLOT(actionDeleteOutputConnector()));
     nodeScene->setFocusItem(nodeParentWidget);
+
     return proxyNode;
 }
 
@@ -370,6 +389,8 @@ bool MainWindow::deleteOutputConnector()
     }
     QGraphicsProxyWidget* outputConnector = outputConnectors->takeLast();
     nodeScene->removeItem(outputConnector);
+    ((ConnectorBase*) outputConnector->widget())->deleteLine();
+    //delete outputConnector->widget();
     delete outputConnector;
     currentNode->performResize();
     return true;
@@ -391,6 +412,9 @@ void MainWindow::createConnectorLine(ConnectorBase* connector)
     QGraphicsProxyWidget* connectorLineProxy = nodeScene->addWidget(connectorLine);
     connectorLineProxy->setParentItem(connectorLineParentWidget);
     connectorLine->setConnectorLineProxy(connectorLineProxy);
+    connectorLine->setGeometry(nodeScene->sceneRect().toRect());
+
+    //nodeScene->addRect(connectorLine->geometry(), QPen(Qt::green));
 
     connect(this, SIGNAL(connectConnectorToLine(ConnectorBase*)), connectorLine, SLOT(connectTo(ConnectorBase*)));
     connect(connectorLine, SIGNAL(drawnIsDone(ConnectorLine*)), this, SLOT(actionConnectorLineDrawn(ConnectorLine*)));
@@ -440,6 +464,8 @@ void MainWindow::nodeContextMenu(QPoint pos)
 
 void MainWindow::getNewFocusItem(QGraphicsItem* newFocusItem, QGraphicsItem* oldFocusItem, Qt::FocusReason reason)
 {
+    UNUSED(oldFocusItem);
+    UNUSED(reason);
     if (newFocusItem == nullptr)
     {
         enableDisableIcons(false);

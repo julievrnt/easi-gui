@@ -11,14 +11,18 @@ class ConstantMapNode : public NodeBase
 public:
     ConstantMapNode(QGraphicsScene* nodeScene);
     ~ConstantMapNode();
-    QMap<QString, double>* getValues();
 
 private:
     void createLayout();
     void addNewOutputsLayoutRow(QVBoxLayout* outputsLayout, int index);
     void removeOldOutputsLayoutRow(QVBoxLayout* outputsLayout, int index);
+    QMap<QString, double>* getValues();
 
     void updateLayout();
+
+protected:
+    void saveNodeContent(YAML::Emitter* out);
+    void saveValues(YAML::Emitter* out);
 };
 
 #endif // CONSTANTMAPNODE_H
