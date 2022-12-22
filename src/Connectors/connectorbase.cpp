@@ -7,6 +7,7 @@ ConnectorBase::ConnectorBase(NodeParentWidget* nodeParentWidget, QWidget* parent
     : QWidget{parent}
 {
     this->typeOfConnector = CONNECTOR;
+    this->subtypeOfConnector = NONE;
     this->outputs = nullptr;
     this->nodeParentWidget = nodeParentWidget;
     highlight = false;
@@ -75,6 +76,7 @@ bool ConnectorBase::getConnectorLineConnected() const
 void ConnectorBase::updateCenterPos()
 {
     centerPos = nodeParentWidget->pos() + pos() + QPointF(geometry().width() / 2, geometry().height() / 2);
+    // qDebug() << this << " " << centerPos;
 }
 
 void ConnectorBase::nodeParentWidgetHasMoved()
@@ -90,6 +92,11 @@ void ConnectorBase::transferOutputs(QStringList* outputs)
     outputsChanged();
 }
 
+int ConnectorBase::getSubtypeOfConnector() const
+{
+    return subtypeOfConnector;
+}
+
 void ConnectorBase::outputsChanged()
 {
     emit transferOutputsRequested(outputs);
@@ -102,7 +109,20 @@ void ConnectorBase::paintEvent(QPaintEvent* event)
     if (highlight)
         painter.setBrush(Qt::yellow);
     else
-        painter.setBrush(Qt::green);
+    {
+        switch (subtypeOfConnector)
+        {
+            case NONE :
+                painter.setBrush(Qt::green);
+                break;
+            case MATHS :
+                painter.setBrush(Qt::darkMagenta);
+                break;
+            default :
+                painter.setBrush(Qt::green);
+                break;
+        }
+    }
     painter.setPen(Qt::black);
     painter.drawEllipse(0, 0, 15, 15);
 

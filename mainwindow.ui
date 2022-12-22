@@ -48,6 +48,7 @@
      <string>Add Map...</string>
     </property>
     <addaction name="actionAddConstantMap"/>
+    <addaction name="actionAddAffineMap"/>
    </widget>
    <widget class="QMenu" name="menuAdd_Filter">
     <property name="title">
@@ -111,7 +112,7 @@
   </widget>
   <action name="actionAddConstantMap">
    <property name="text">
-    <string>ConstantMap</string>
+    <string>Constant Map</string>
    </property>
   </action>
   <action name="actionNew">
@@ -259,6 +260,11 @@
    </property>
    <property name="text">
     <string>Save As</string>
+   </property>
+  </action>
+  <action name="actionAddAffineMap">
+   <property name="text">
+    <string>Affine Map</string>
    </property>
   </action>
  </widget>

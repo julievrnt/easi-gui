@@ -9,6 +9,9 @@ void OutputConnector::saveComponent(YAML::Emitter* out)
 {
     if (connectorLineConnected)
         emit saveRequested(out);
-    else
-        qDebug() << this << " not connected";
+}
+
+bool OutputConnector::isFree()
+{
+    return !(connectorLineConnected || connectorLineCreated);
 }

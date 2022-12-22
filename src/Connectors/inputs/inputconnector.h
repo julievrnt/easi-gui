@@ -1,7 +1,7 @@
 #ifndef INPUTCONNECTOR_H
 #define INPUTCONNECTOR_H
 
-#include "connectorbase.h"
+#include "../connectorbase.h"
 
 class InputConnector : public ConnectorBase
 {

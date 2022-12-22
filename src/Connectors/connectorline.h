@@ -2,8 +2,8 @@
 #define CONNECTORLINE_H
 
 #include <QWidget>
-#include "inputconnector.h"
-#include "outputconnector.h"
+#include "inputs/inputconnector.h"
+#include "outputs/outputconnector.h"
 #include "yaml-cpp/yaml.h"
 #include <QTimer>
 
@@ -11,13 +11,15 @@ class ConnectorLine : public QWidget
 {
     Q_OBJECT
 public:
-    explicit ConnectorLine(ConnectorBase* connector, QPointF startPoint, QWidget* parent = nullptr);
+    explicit ConnectorLine(ConnectorBase* connector);
+    explicit ConnectorLine(OutputConnector* outputConnector, InputConnector* inputConnector);
 
     void setConnectorLineProxy(QGraphicsProxyWidget* newConnectorLineProxy);
     QPointF getPositionToCheck();
 
 signals:
     void drawnIsDone(ConnectorLine* connectorLine);
+    void connectorLineConnected();
     void deleteConnectorLine(QGraphicsProxyWidget* connectorLineProxy);
     void transferOutputsRequested(QStringList* outputs);
     void saveRequested(YAML::Emitter* out);

@@ -1,14 +1,26 @@
 #include "connectorline.h"
 #include <QPainter>
 
-ConnectorLine::ConnectorLine(ConnectorBase* connector, QPointF startPoint, QWidget* parent)
-    : QWidget{parent}
+ConnectorLine::ConnectorLine(ConnectorBase* connector)
 {
     getOtherConnectorTimer = new QTimer();
-    inputConnectorPoint = startPoint;
-    outputConnectorPoint = startPoint;
+
+    inputConnectorPoint = connector->getCenterPos();
+    outputConnectorPoint = connector->getCenterPos();
     connectLineToConnector(connector);
+
     setAttribute(Qt::WA_TranslucentBackground);
+}
+
+ConnectorLine::ConnectorLine(OutputConnector* outputConnector, InputConnector* inputConnector)
+{
+    getOtherConnectorTimer = new QTimer();
+
+    connectLineToConnector(outputConnector);
+    connectLineToConnector(inputConnector);
+
+    setAttribute(Qt::WA_TranslucentBackground);
+    isDone = true;
 }
 
 void ConnectorLine::setConnectorLineProxy(QGraphicsProxyWidget* newConnectorLineProxy)
@@ -38,7 +50,7 @@ void ConnectorLine::connectLineToConnector(ConnectorBase* connector)
             return;
 
         inputConnector = (InputConnector*) connector;
-        inputConnectorPoint = connector->getCenterPos();
+        inputConnectorPoint = inputConnector->getCenterPos();
         connect(this, SIGNAL(transferOutputsRequested(QStringList*)), inputConnector, SLOT(transferOutputs(QStringList*)));
         connect(this, SIGNAL(saveRequested(YAML::Emitter*)), inputConnector, SLOT(save(YAML::Emitter*)));
     }
@@ -53,7 +65,7 @@ void ConnectorLine::connectLineToConnector(ConnectorBase* connector)
             return;
 
         outputConnector = (OutputConnector*) connector;
-        outputConnectorPoint = connector->getCenterPos();
+        outputConnectorPoint = outputConnector->getCenterPos();
         connect(outputConnector, SIGNAL(transferOutputsRequested(QStringList*)), this, SLOT(transferOutputs(QStringList*)));
         connect(outputConnector, SIGNAL(saveRequested(YAML::Emitter*)), this, SLOT(save(YAML::Emitter*)));
     }
@@ -81,6 +93,7 @@ void ConnectorLine::connectLineToConnector(ConnectorBase* connector)
         inputConnector->setConnectorLineConnected(true);
         outputConnector->setConnectorLineConnected(true);
         emit outputConnector->transferOutputsRequested(outputConnector->getOutputs());
+        emit connectorLineConnected();
     }
 }
 

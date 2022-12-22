@@ -5,9 +5,14 @@
 #include "../Nodes/nodeparentwidget.h"
 #include "yaml-cpp/yaml.h"
 
+// types
 #define CONNECTOR 0
 #define INPUTCONNECTOR 1
 #define OUTPUTCONNECTOR 2
+
+// subtypes
+#define NONE 0
+#define MATHS 1
 
 class ConnectorBase : public QWidget
 {
@@ -30,6 +35,8 @@ public:
 
     bool getConnectorLineConnected() const;
 
+    int getSubtypeOfConnector() const;
+
 signals:
     void lineDragged();
     void lineNoMoreDragged();
@@ -44,8 +51,6 @@ signals:
 private:
     QStringList* outputs;
     bool highlight;
-    bool connectorLineCreated;
-    QPointF centerPos;
     NodeParentWidget* nodeParentWidget;
 
     void updateCenterPos();
@@ -57,6 +62,9 @@ private slots:
     // QWidget interface
 protected:
     int typeOfConnector;
+    int subtypeOfConnector;
+    QPointF centerPos;
+    bool connectorLineCreated;
     bool connectorLineConnected;
 
     void paintEvent(QPaintEvent* event);

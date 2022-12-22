@@ -1,7 +1,7 @@
 #ifndef OUTPUTCONNECTOR_H
 #define OUTPUTCONNECTOR_H
 
-#include "connectorbase.h"
+#include "../connectorbase.h"
 
 class OutputConnector : public ConnectorBase
 {
@@ -10,6 +10,7 @@ public:
     OutputConnector(NodeParentWidget* nodeParentWidget);
 
     void saveComponent(YAML::Emitter* out);
+    bool isFree();
 };
 
 #endif // OUTPUTCONNECTOR_H

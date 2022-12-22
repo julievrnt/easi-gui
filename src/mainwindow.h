@@ -7,8 +7,6 @@
 #include <QMap>
 #include <QStringList>
 #include "src/Connectors/connectorline.h"
-#include "src/Nodes/Maps/constantmapnode.h"
-#include "src/Nodes/rootnode.h"
 #include "src/Nodes/nodebase.h"
 #include "src/Nodes/nodeparentwidget.h"
 #include "yaml-cpp/emitter.h"
@@ -36,11 +34,11 @@ private:
     Ui::MainWindow* ui;
     QString fileName;
     QGraphicsScene* nodeScene;
-    QStringList* outputParameters;
     QAction* deleteNodeAction;
     QGraphicsProxyWidget* proxyRoot;
+    QList<QGraphicsProxyWidget*> nodes;
     ConnectorLine* newConnectorLine;
-    bool notSaved;
+    bool notSaved = false;
 
     void connectActions();
 
@@ -54,15 +52,10 @@ private:
     bool saveDiscardOrCancelBeforeOpenOrNew();
     void enableDisableIcons(bool enable);
 
-    // open functions for each node type
-    void openConstantMapNode();
-
-    // save functions for each node type
-    void saveConstantMapNode(YAML::Emitter* out, ConstantMapNode* node);
-
     // basic functions to handle nodes
     void createActions();
-    void addRoot();
+    void addRoot(QStringList* outputs = nullptr);
+    void updateRoot();
     QGraphicsProxyWidget* addNode(NodeBase* node);
     void deleteNode();
     void deleteProxy(QGraphicsProxyWidget* proxy);
@@ -70,14 +63,25 @@ private:
     // basic functions to handle connectors
     void addOutputConnector();
     bool deleteOutputConnector();
-    void connectConnectors(ConnectorBase* connector, NodeParentWidget* nodeParentWidget);
+    void connectConnector(ConnectorBase* connector, NodeParentWidget* nodeParentWidget);
+    void addOutputConnectorAtPos(QPointF pos);
+    void deleteOutputConnectorAtPos(QPointF pos);
+
+    // basic functions to handle connector lines
+    void addConnectorLineToScene(ConnectorLine* connectorLine);
     void createConnectorLine(ConnectorBase* connector);
+    void createConnectorLine(OutputConnector* outputConnector, InputConnector* inputConnector);
     void deleteConnectorLine(QGraphicsProxyWidget* connectorLineProxy);
     void saveNewConnectorLine(ConnectorLine* connector);
+    void removeNewConnectorLine();
     void checkConnectionBetweenConnectorAndLine(ConnectorBase* connector);
 
+    // open node functions
+    void openConstantMapNode(NodeBase* parentNode, YAML::Node* node, QStringList* outputs);
+
     // add map functions
-    void addConstantMapNode();
+    QGraphicsProxyWidget* addConstantMapNode(QStringList* outputs = nullptr, QList<double>* values = nullptr);
+    QGraphicsProxyWidget* addAffineMapNode(QStringList* outputs = nullptr, QList<double>* values = nullptr);
 
 private slots:
     void nodeContextMenu(QPoint pos);
@@ -86,10 +90,12 @@ private slots:
     void actionCreateConnectorLine(ConnectorBase* connector);
     void actionDeleteConnectorLine(QGraphicsProxyWidget* connectorLineProxy);
     void actionConnectorLineDrawn(ConnectorLine* connectorLine);
+    void actionConnectorLineConnected();
     void actionCheckIfConnectorNeedsConnection(ConnectorBase* connector);
     void actionAddOutputConnector();
     void actionDeleteOutputConnector();
     void actionAddConstantMap();
+    void actionAddAffineMap();
     void actionNew();
     void actionOpen();
     void actionClose();
@@ -102,4 +108,5 @@ private slots:
     void actionUndo();
     void actionRedo();
 };
+
 #endif // MAINWINDOW_H

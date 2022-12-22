@@ -5,7 +5,7 @@
 #include <QHBoxLayout>
 #include <QPushButton>
 #include "../helpers.h"
-#include "../Connectors/outputconnector.h"
+#include "../Connectors/outputs/outputconnector.h"
 
 NodeBase::NodeBase(QWidget* parent)
     : QWidget{parent}
@@ -47,6 +47,16 @@ void NodeBase::addOutputConnector(QGraphicsProxyWidget* newOutputConnector)
     outputConnectors->append(newOutputConnector);
 }
 
+OutputConnector* NodeBase::getFirstAvailableOutputConnector()
+{
+    foreach (QGraphicsProxyWidget* proxy, *outputConnectors)
+    {
+        OutputConnector* outputConnector = (OutputConnector*) proxy->widget();
+        if (outputConnector->isFree())
+            return outputConnector;
+    }
+}
+
 void NodeBase::performResize()
 {
     setGeometry(QRect(0, 0, sizeHint().width(), sizeHint().height() + (outputConnectors->size() - 1) * 20));
@@ -54,6 +64,8 @@ void NodeBase::performResize()
     for (int i = 0; i < outputConnectors->size(); i++)
     {
         QGraphicsProxyWidget* outputConnector = outputConnectors->at(i);
+        if (((OutputConnector*) outputConnector->widget())->getSubtypeOfConnector() != NONE)
+            continue;
         int x = outputConnector->parentWidget()->geometry().width() - 7;
         int y = outputConnector->parentWidget()->geometry().height() - 58 - (outputConnectors->size() - 1 - i) * 20;
         outputConnector->setX(x);

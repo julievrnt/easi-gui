@@ -9,22 +9,41 @@
 #include <QMap>
 #include "float.h"
 
-ConstantMapNode::ConstantMapNode(QGraphicsScene* nodeScene)
+ConstantMapNode::ConstantMapNode(QStringList* outputs)
 {
     typeOfNode = CONSTANTMAPNODE;
-    this->outputs = nullptr;
-    this->nodeScene = nodeScene;
+    this->outputs = outputs;
 
     setWindowTitle("Constant Map");
     createLayout();
 
     setGeometry(QRect(0, 0, sizeHint().width(), sizeHint().height()));
-    //getValues();
+}
+
+ConstantMapNode::ConstantMapNode(QStringList* outputs, QList<double>* values) : ConstantMapNode(outputs)
+{
+    if (values == nullptr)
+        return;
+
+    if (outputs->size() != values->size())
+    {
+        qDebug() << "ERROR: constant map constructor: size of outputs != size of values";
+        return;
+    }
+
+    QObjectList outputLayouts = this->layout()->findChild<QVBoxLayout*>("outputsLayout")->children();
+    foreach (QObject* outputLayout, outputLayouts)
+    {
+        QHBoxLayout* layout = (QHBoxLayout*) outputLayout;
+        int index = outputs->indexOf(((QLabel*) layout->itemAt(0)->widget())->text());
+        ((QDoubleSpinBox*) layout->itemAt(2)->widget())->setValue(values->at(index));
+    }
+    delete values;
 }
 
 ConstantMapNode::~ConstantMapNode()
 {
-    delete outputs;
+    //delete outputs;
 }
 
 QMap<QString, double>*  ConstantMapNode::getValues()
@@ -51,10 +70,17 @@ void ConstantMapNode::createLayout()
     // add an empty layout that will contain the outputs
     QVBoxLayout* outputsLayout = new QVBoxLayout();
     outputsLayout->setObjectName("outputsLayout");
+    if (outputs != nullptr)
+    {
+        for (int i = 0; i < outputs->size(); i++)
+        {
+            addNewOutputsLayoutRow(outputsLayout, i);
+        }
+    }
 
     globalLayout->addLayout(outputsLayout);
 
-    addComponentsLayout(globalLayout);
+    //addComponentsLayout(globalLayout);
     this->setLayout(globalLayout);
 }
 
@@ -144,7 +170,7 @@ void ConstantMapNode::saveNodeContent(YAML::Emitter* out)
     *out << YAML::LocalTag("ConstantMap");
     *out << YAML::BeginMap;
     saveValues(out);
-    saveComponents(out);
+    //saveComponents(out);
     *out << YAML::EndMap;
 }
 

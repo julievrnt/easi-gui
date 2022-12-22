@@ -6,10 +6,15 @@ NodeParentWidget::NodeParentWidget()
     setObjectName("papa");
 }
 
+void NodeParentWidget::move(int x, int y)
+{
+    this->setPos(x, y);
+    emit hasMoved();
+}
+
 void NodeParentWidget::resize(QRectF rect)
 {
-    this->setGeometry(QRect(pos().x(), pos().y(), rect.width(), rect.height()));
-    //qDebug() << "parent geo: " << geometry();
+    this->setGeometry(pos().x(), pos().y(), rect.width(), rect.height());
 }
 
 

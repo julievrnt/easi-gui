@@ -12,8 +12,10 @@ SOURCES += \
     src/Connectors/connectorbase.cpp \
     src/Connectors/connectorline.cpp \
     src/Connectors/connectorlineparentwidget.cpp \
-    src/Connectors/inputconnector.cpp \
-    src/Connectors/outputconnector.cpp \
+    src/Connectors/inputs/inputconnector.cpp \
+    src/Connectors/outputs/mathsoutputconnector.cpp \
+    src/Connectors/outputs/outputconnector.cpp \
+    src/Nodes/Maps/affinemapnode.cpp \
     src/Nodes/Maps/constantmapnode.cpp \
     src/main.cpp \
     src/mainwindow.cpp \
@@ -26,8 +28,10 @@ HEADERS += \
     src/Connectors/connectorbase.h \
     src/Connectors/connectorline.h \
     src/Connectors/connectorlineparentwidget.h \
-    src/Connectors/inputconnector.h \
-    src/Connectors/outputconnector.h \
+    src/Connectors/inputs/inputconnector.h \
+    src/Connectors/outputs/mathsoutputconnector.h \
+    src/Connectors/outputs/outputconnector.h \
+    src/Nodes/Maps/affinemapnode.h \
     src/Nodes/Maps/constantmapnode.h \
     src/mainwindow.h \
     src/Nodes/nodebase.h \

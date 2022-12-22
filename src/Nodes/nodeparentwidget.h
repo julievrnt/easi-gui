@@ -10,6 +10,8 @@ class NodeParentWidget : public QGraphicsWidget
 public:
     NodeParentWidget();
 
+    void move(int top, int left);
+
 signals:
     void hasMoved();
 

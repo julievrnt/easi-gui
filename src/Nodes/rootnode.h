@@ -10,8 +10,10 @@ class RootNode : public NodeBase
 {
     Q_OBJECT
 public:
-    RootNode();
+    RootNode(QStringList* outputs = nullptr);
     ~RootNode();
+
+    void updateOutputs();
 
 private:
     QList<QLabel*> outputLabels;
@@ -35,7 +37,8 @@ protected:
     // NodeBase interface
 public:
     void performResize();
-    void setOutputConnector(QGraphicsProxyWidget *newOutputConnector);
+    void setOutputConnector(QGraphicsProxyWidget* newOutputConnector);
+    OutputConnector* getFirstAvailableOutputConnector();
 };
 
 #endif // ROOTNODE_H

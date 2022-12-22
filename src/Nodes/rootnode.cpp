@@ -5,16 +5,22 @@
 #include <QLabel>
 #include "rootnodedialog.h"
 #include "../helpers.h"
-#include "../Connectors/outputconnector.h"
+#include "../Connectors/outputs/outputconnector.h"
 
-RootNode::RootNode()
+RootNode::RootNode(QStringList* outputs)
 {
     typeOfNode = ROOT;
     setWindowTitle("Outputs");
     outputConnector = nullptr;
+
     // add default outputs
-    outputs = new QStringList();
-    *outputs << "lambda" << "mu" << "rho";
+    if (outputs == nullptr)
+    {
+        this->outputs = new QStringList();
+        *this->outputs << "lambda" << "mu" << "rho";
+    }
+    else
+        this->outputs = outputs;
 
     createLayout();
 
@@ -27,9 +33,19 @@ RootNode::~RootNode()
     delete outputConnectors;
 }
 
+void RootNode::updateOutputs()
+{
+    sortOutputs(0);
+}
+
 void RootNode::setOutputConnector(QGraphicsProxyWidget* newOutputConnector)
 {
     outputConnector = newOutputConnector;
+}
+
+OutputConnector* RootNode::getFirstAvailableOutputConnector()
+{
+    return (OutputConnector*) outputConnector->widget();
 }
 
 void RootNode::createLayout()

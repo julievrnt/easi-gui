@@ -9,10 +9,16 @@
 #include "qevent.h"
 #include <QLabel>
 #include "yaml-cpp/yaml.h"
+#include "../Connectors/outputs/outputconnector.h"
 
 #define NODE 0
 #define ROOT 1
+
+// maps
 #define CONSTANTMAPNODE 2
+#define AFFINEMAPNODE 3
+
+// filters
 
 class NodeBase : public QWidget
 {
@@ -27,6 +33,7 @@ public:
     void setInputConnector(QGraphicsProxyWidget* newInputConnector);
     QList<QGraphicsProxyWidget*>* getOutputConnectors() const;
     void addOutputConnector(QGraphicsProxyWidget* newOutputConnector);
+    virtual OutputConnector* getFirstAvailableOutputConnector();
     virtual void performResize();
 
 signals:
@@ -41,7 +48,6 @@ protected:
     QList<QGraphicsProxyWidget*>* outputConnectors;
     int typeOfNode;
     QStringList* outputs;
-    QGraphicsScene* nodeScene;
     void mousePressEvent(QMouseEvent* event);
     void paintEvent(QPaintEvent* event);
 
