@@ -115,7 +115,7 @@ void ConnectorBase::paintEvent(QPaintEvent* event)
             case NONE :
                 painter.setBrush(Qt::green);
                 break;
-            case MATHS :
+            case MATH :
                 painter.setBrush(Qt::darkMagenta);
                 break;
             default :

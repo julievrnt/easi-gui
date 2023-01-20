@@ -7,12 +7,14 @@
 #include "../helpers.h"
 #include "../Connectors/outputs/outputconnector.h"
 
-NodeBase::NodeBase(QWidget* parent)
+NodeBase::NodeBase(QStringList* outputs, QWidget* parent)
     : QWidget{parent}
 {
     typeOfNode = NODE;
+    this->outputs = outputs;
     this->setWindowTitle("Node Base");
     outputConnectors = new QList<QGraphicsProxyWidget*>();
+    mathOutputConnectors = new QList<QGraphicsProxyWidget*>();
     setAttribute(Qt::WA_TranslucentBackground);
     setObjectName("Node");
 }
@@ -47,6 +49,11 @@ void NodeBase::addOutputConnector(QGraphicsProxyWidget* newOutputConnector)
     outputConnectors->append(newOutputConnector);
 }
 
+void NodeBase::addMathOutputConnector(QGraphicsProxyWidget* newMathOutputConnector)
+{
+    mathOutputConnectors->append(newMathOutputConnector);
+}
+
 OutputConnector* NodeBase::getFirstAvailableOutputConnector()
 {
     foreach (QGraphicsProxyWidget* proxy, *outputConnectors)
@@ -55,6 +62,7 @@ OutputConnector* NodeBase::getFirstAvailableOutputConnector()
         if (outputConnector->isFree())
             return outputConnector;
     }
+    return nullptr;
 }
 
 void NodeBase::performResize()
@@ -64,13 +72,21 @@ void NodeBase::performResize()
     for (int i = 0; i < outputConnectors->size(); i++)
     {
         QGraphicsProxyWidget* outputConnector = outputConnectors->at(i);
-        if (((OutputConnector*) outputConnector->widget())->getSubtypeOfConnector() != NONE)
-            continue;
         int x = outputConnector->parentWidget()->geometry().width() - 7;
         int y = outputConnector->parentWidget()->geometry().height() - 58 - (outputConnectors->size() - 1 - i) * 20;
         outputConnector->setX(x);
         outputConnector->setY(y);
     }
+}
+
+QGraphicsProxyWidget* NodeBase::getProxyNode() const
+{
+    return proxyNode;
+}
+
+void NodeBase::setProxyNode(QGraphicsProxyWidget* newProxyNode)
+{
+    proxyNode = newProxyNode;
 }
 
 void NodeBase::mousePressEvent(QMouseEvent* event)
@@ -193,6 +209,15 @@ void NodeBase::clearLayout(QLayout* layout, bool deleteWidgets)
     }
 }
 
+void NodeBase::removeLayoutAtIndex(QLayout* layout, int index)
+{
+    QObjectList children = layout->children();
+    QLayout* layoutToRemove = (QLayout*) children.at(index);
+    clearLayout(layoutToRemove, true);
+    layout->removeItem(layoutToRemove);
+    delete layoutToRemove;
+}
+
 void NodeBase::updateLayout()
 {
     // do nothing
@@ -219,7 +244,11 @@ void NodeBase::addOutputConnectorButtonClicked(bool clicked)
 void NodeBase::deleteOutputConnectorButtonClicked(bool clicked)
 {
     UNUSED(clicked);
-    emit deleteOutputConnectorRequested();
+    if (outputConnectors->size() > 1)
+    {
+        emit deleteOutputConnectorRequested(outputConnectors->takeLast());
+        performResize();
+    }
 }
 
 void NodeBase::transferOutputs(QStringList* outputs)

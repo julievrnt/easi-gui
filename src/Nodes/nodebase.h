@@ -24,7 +24,7 @@ class NodeBase : public QWidget
 {
     Q_OBJECT
 public:
-    explicit NodeBase(QWidget* parent = nullptr);
+    explicit NodeBase(QStringList* outputs = nullptr, QWidget* parent = nullptr);
 
     int getTypeOfNode();
     QStringList* getOutputs() const;
@@ -33,6 +33,7 @@ public:
     void setInputConnector(QGraphicsProxyWidget* newInputConnector);
     QList<QGraphicsProxyWidget*>* getOutputConnectors() const;
     void addOutputConnector(QGraphicsProxyWidget* newOutputConnector);
+    void addMathOutputConnector(QGraphicsProxyWidget* newMathOutputConnector);
     virtual OutputConnector* getFirstAvailableOutputConnector();
     virtual void performResize();
 
@@ -40,14 +41,17 @@ signals:
     void nodeContextMenuRequested(QPoint pos);
     void resized(QRectF rect);
     void addOutputConnectorRequested();
-    void deleteOutputConnectorRequested();
+    void deleteOutputConnectorRequested(QGraphicsProxyWidget* outputConnectorProxy);
     void transferOutputsRequested(QStringList* outputs);
+    void deleteNodeRequested(QGraphicsProxyWidget* proxyNode);
 
 protected:
-    QGraphicsProxyWidget* inputConnector;
-    QList<QGraphicsProxyWidget*>* outputConnectors;
     int typeOfNode;
     QStringList* outputs;
+    QGraphicsProxyWidget* proxyNode;
+    QGraphicsProxyWidget* inputConnector;
+    QList<QGraphicsProxyWidget*>* outputConnectors;
+    QList<QGraphicsProxyWidget*>* mathOutputConnectors;
     void mousePressEvent(QMouseEvent* event);
     void paintEvent(QPaintEvent* event);
 
@@ -60,6 +64,7 @@ protected:
 
     void clearLayout(QLayout* layout, bool deleteWidgets = true);
 
+    virtual void removeLayoutAtIndex(QLayout* layout, int index);
     virtual void updateLayout();
     virtual void saveNodeContent(YAML::Emitter* out);
     virtual void saveValues(YAML::Emitter* out);
@@ -73,6 +78,8 @@ private slots:
     // QObject interface
 public:
     bool event(QEvent* event);
+    void setProxyNode(QGraphicsProxyWidget* newProxyNode);
+    QGraphicsProxyWidget* getProxyNode() const;
 };
 
 #endif // NODE_H

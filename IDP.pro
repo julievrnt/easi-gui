@@ -13,32 +13,40 @@ SOURCES += \
     src/Connectors/connectorline.cpp \
     src/Connectors/connectorlineparentwidget.cpp \
     src/Connectors/inputs/inputconnector.cpp \
-    src/Connectors/outputs/mathsoutputconnector.cpp \
+    src/Connectors/inputs/mathinputconnector.cpp \
+    src/Connectors/outputs/mathoutputconnector.cpp \
     src/Connectors/outputs/outputconnector.cpp \
     src/Nodes/Maps/affinemapnode.cpp \
     src/Nodes/Maps/constantmapnode.cpp \
+    src/Nodes/Math/matrixnode.cpp \
+    src/Nodes/Math/translationnode.cpp \
     src/main.cpp \
     src/mainwindow.cpp \
     src/Nodes/nodebase.cpp \
     src/Nodes/nodeparentwidget.cpp \
     src/Nodes/rootnode.cpp \
-    src/Nodes/rootnodedialog.cpp
+    src/Nodes/rootnodedialog.cpp \
+    src/widgetshandler.cpp
 
 HEADERS += \
     src/Connectors/connectorbase.h \
     src/Connectors/connectorline.h \
     src/Connectors/connectorlineparentwidget.h \
     src/Connectors/inputs/inputconnector.h \
-    src/Connectors/outputs/mathsoutputconnector.h \
+    src/Connectors/inputs/mathinputconnector.h \
+    src/Connectors/outputs/mathoutputconnector.h \
     src/Connectors/outputs/outputconnector.h \
     src/Nodes/Maps/affinemapnode.h \
     src/Nodes/Maps/constantmapnode.h \
+    src/Nodes/Math/matrixnode.h \
+    src/Nodes/Math/translationnode.h \
     src/mainwindow.h \
     src/Nodes/nodebase.h \
     src/Nodes/nodeparentwidget.h \
     src/Nodes/rootnode.h \
     src/Nodes/rootnodedialog.h \
-    src/helpers.h
+    src/helpers.h \
+    src/widgetshandler.h
 
 FORMS += \
     mainwindow.ui

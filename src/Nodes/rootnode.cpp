@@ -7,7 +7,7 @@
 #include "../helpers.h"
 #include "../Connectors/outputs/outputconnector.h"
 
-RootNode::RootNode(QStringList* outputs)
+RootNode::RootNode(QStringList* outputs) : NodeBase(outputs)
 {
     typeOfNode = ROOT;
     setWindowTitle("Outputs");
@@ -135,6 +135,8 @@ void RootNode::sortOutputs(int result)
 
 void RootNode::saveNodeContent(YAML::Emitter* out)
 {
+    if (outputConnector == nullptr)
+        qDebug() << "ERROR: output connnector of root is null !";
     ((OutputConnector*) outputConnector->widget())->saveComponent(out);
 }
 

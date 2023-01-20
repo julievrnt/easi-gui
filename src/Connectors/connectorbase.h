@@ -12,7 +12,7 @@
 
 // subtypes
 #define NONE 0
-#define MATHS 1
+#define MATH 1
 
 class ConnectorBase : public QWidget
 {

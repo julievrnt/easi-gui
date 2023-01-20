@@ -49,6 +49,10 @@ void ConnectorLine::connectLineToConnector(ConnectorBase* connector)
         if (outputConnector != nullptr && outputConnector->getNodeParentWidget() == connector->getNodeParentWidget())
             return;
 
+        // don't connect two connectors with different subtypes
+        if (outputConnector != nullptr && connector->getSubtypeOfConnector() != outputConnector->getSubtypeOfConnector())
+            return;
+
         inputConnector = (InputConnector*) connector;
         inputConnectorPoint = inputConnector->getCenterPos();
         connect(this, SIGNAL(transferOutputsRequested(QStringList*)), inputConnector, SLOT(transferOutputs(QStringList*)));
@@ -62,6 +66,10 @@ void ConnectorLine::connectLineToConnector(ConnectorBase* connector)
 
         // don't connect two connectors from the same node
         if (inputConnector != nullptr && inputConnector->getNodeParentWidget() == connector->getNodeParentWidget())
+            return;
+
+        // don't connect two connectors with different subtypes
+        if (inputConnector != nullptr && connector->getSubtypeOfConnector() != inputConnector->getSubtypeOfConnector())
             return;
 
         outputConnector = (OutputConnector*) connector;
@@ -94,6 +102,8 @@ void ConnectorLine::connectLineToConnector(ConnectorBase* connector)
         outputConnector->setConnectorLineConnected(true);
         emit outputConnector->transferOutputsRequested(outputConnector->getOutputs());
         emit connectorLineConnected();
+        isDone = true;
+        this->repaint();
     }
 }
 
@@ -124,7 +134,20 @@ void ConnectorLine::paintEvent(QPaintEvent* event)
     if (!isDone)
         linePen.setColor(Qt::yellow);
     else
-        linePen.setColor(Qt::green);
+    {
+        switch (inputConnector->getSubtypeOfConnector())
+        {
+            case NONE :
+                linePen.setColor(Qt::green);
+                break;
+            case MATH :
+                linePen.setColor(Qt::darkMagenta);
+                break;
+            default :
+                linePen.setColor(Qt::green);
+                break;
+        }
+    }
     linePen.setWidth(1);
     painter.setPen(linePen);
     painter.drawLine(inputConnectorPoint, outputConnectorPoint);
@@ -147,8 +170,6 @@ void ConnectorLine::isNoMoreDragged()
 {
     connect(getOtherConnectorTimer, SIGNAL(timeout()), this, SLOT(getOhterConnectorTimeOut()));
     getOtherConnectorTimer->start(100);
-    isDone = true;
-    this->repaint();
     emit drawnIsDone(this);
 }
 

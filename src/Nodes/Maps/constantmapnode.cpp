@@ -9,11 +9,9 @@
 #include <QMap>
 #include "float.h"
 
-ConstantMapNode::ConstantMapNode(QStringList* outputs)
+ConstantMapNode::ConstantMapNode(QStringList* outputs) : NodeBase(outputs)
 {
     typeOfNode = CONSTANTMAPNODE;
-    this->outputs = outputs;
-
     setWindowTitle("Constant Map");
     createLayout();
 
@@ -24,12 +22,6 @@ ConstantMapNode::ConstantMapNode(QStringList* outputs, QList<double>* values) : 
 {
     if (values == nullptr)
         return;
-
-    if (outputs->size() != values->size())
-    {
-        qDebug() << "ERROR: constant map constructor: size of outputs != size of values";
-        return;
-    }
 
     QObjectList outputLayouts = this->layout()->findChild<QVBoxLayout*>("outputsLayout")->children();
     foreach (QObject* outputLayout, outputLayouts)
@@ -80,7 +72,7 @@ void ConstantMapNode::createLayout()
 
     globalLayout->addLayout(outputsLayout);
 
-    //addComponentsLayout(globalLayout);
+    addComponentsLayout(globalLayout);
     this->setLayout(globalLayout);
 }
 
@@ -141,7 +133,7 @@ void ConstantMapNode::updateLayout()
     {
         if (!outputs->contains(oldOutputs.at(i)))
         {
-            removeOldOutputsLayoutRow(outputsLayout, i);
+            removeLayoutAtIndex(outputsLayout, i);
             oldOutputs.remove(i);
             i--;
         }
@@ -170,7 +162,7 @@ void ConstantMapNode::saveNodeContent(YAML::Emitter* out)
     *out << YAML::LocalTag("ConstantMap");
     *out << YAML::BeginMap;
     saveValues(out);
-    //saveComponents(out);
+    saveComponents(out);
     *out << YAML::EndMap;
 }
 
