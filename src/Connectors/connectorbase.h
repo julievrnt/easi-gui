@@ -64,6 +64,7 @@ protected:
     int typeOfConnector;
     int subtypeOfConnector;
     QPointF centerPos;
+    bool canDisconnect = true;
     bool connectorLineCreated;
     bool connectorLineConnected;
 

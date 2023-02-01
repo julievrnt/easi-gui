@@ -3,4 +3,5 @@
 MathOutputConnector::MathOutputConnector(NodeParentWidget* nodeParentWidget) : OutputConnector(nodeParentWidget)
 {
     this->subtypeOfConnector = MATH;
+    canDisconnect = false;
 }

@@ -3,19 +3,13 @@
 #include "float.h"
 
 
-TranslationNode::TranslationNode(QStringList* outputs) : NodeBase(outputs)
+TranslationNode::TranslationNode() : NodeBase(nullptr)
 {
-    this->typeOfNode = MATH;
+    this->typeOfNode = MATHNODE;
     setWindowTitle("Translation");
     createLayout();
 
     setGeometry(QRect(0, 0, sizeHint().width(), sizeHint().height()));
-}
-
-TranslationNode::TranslationNode(double value) : TranslationNode()
-{
-    QVBoxLayout* translationLayout = this->layout()->findChild<QVBoxLayout*>("translationLayout");
-    ((QDoubleSpinBox*) translationLayout->itemAt(0)->widget())->setValue(value);
 }
 
 TranslationNode::~TranslationNode()
@@ -23,10 +17,16 @@ TranslationNode::~TranslationNode()
 
 }
 
+void TranslationNode::setValue(double value)
+{
+    QVBoxLayout* translationLayout = this->layout()->findChild<QVBoxLayout*>("translationLayout");
+    ((QDoubleSpinBox*) translationLayout->itemAt(0)->widget())->setValue(value);
+}
+
 void TranslationNode::createLayout()
 {
     QVBoxLayout* globalLayout = new QVBoxLayout(this);
-    addTitleLayout(globalLayout);
+    addTitleLayout(globalLayout, true);
 
     // add a layout containing only one dimension
     QVBoxLayout* translationLayout = new QVBoxLayout();
@@ -44,4 +44,17 @@ void TranslationNode::createLayout()
 
     globalLayout->addLayout(translationLayout);
     this->setLayout(globalLayout);
+}
+
+void TranslationNode::saveNodeContent(YAML::Emitter* out)
+{
+    *out << YAML::Key;
+    saveValues(out);
+}
+
+void TranslationNode::saveValues(YAML::Emitter* out)
+{
+    QVBoxLayout* translationLayout = this->layout()->findChild<QVBoxLayout*>("translationLayout");
+    double value = ((QDoubleSpinBox*) translationLayout->itemAt(0)->widget())->value();
+    *out << value;
 }

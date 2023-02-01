@@ -24,14 +24,15 @@ public:
     QGraphicsProxyWidget* getProxyRoot() const;
 
     // basic functions to handle nodes
-    void addRoot(QStringList* outputs = nullptr);
-    void updateRoot();
+    void addRoot();
     void deleteNode();
     void deleteProxy(QGraphicsProxyWidget* proxy);
+    void moveNodeNextTo(QGraphicsProxyWidget* parentProxyNode, QGraphicsProxyWidget* childProxyNode);
+    void connectNodes(NodeBase* parentNode, NodeBase* childNode);
 
     // basic functions to handle connectors
-    void addInputConnector(InputConnector* inputConnector, QGraphicsProxyWidget* proxyNode);
-    void addOutputConnector(OutputConnector* outputConnector, QGraphicsProxyWidget* proxyNode);
+    void addInputConnector(InputConnector* inputConnector, QGraphicsProxyWidget* proxyNode, QPointF pos);
+    void addOutputConnector(OutputConnector* outputConnector, QGraphicsProxyWidget* proxyNode, QPointF pos);
     void connectConnector(ConnectorBase* connector, QGraphicsProxyWidget* connectorProxy);
     bool deleteOutputConnector(QGraphicsProxyWidget* outputConnectorProxy);
 
@@ -48,14 +49,29 @@ public:
     void removeNewConnectorLine();
     void checkConnectionBetweenConnectorAndLine(ConnectorBase* connector);
 
+    // add filter functions
+    QGraphicsProxyWidget* addAnyNode(QStringList* inputs = nullptr);
+    QGraphicsProxyWidget* addAxisAlignedCuboidalDomainFilterNode(QStringList* inputs = nullptr, QList<double>* values = nullptr);
+    QGraphicsProxyWidget* addSphericalDomainFilterNode();
+    QGraphicsProxyWidget* addGroupFilterNode();
+    QGraphicsProxyWidget* addSwitchNode();
+
     // add map functions
     QGraphicsProxyWidget* addConstantMapNode(QStringList* outputs = nullptr, QList<double>* values = nullptr);
-    QGraphicsProxyWidget* addAffineMapNode(QStringList* outputs = nullptr, QList<double>* values = nullptr);
+    QGraphicsProxyWidget* addIdentityMapNode(QStringList* inputs = nullptr);
+    QGraphicsProxyWidget* addAffineMapNode(QStringList* inputs = nullptr, QMap<QString, QList<double>>* values = nullptr);
+    QGraphicsProxyWidget* addPolynomialMapNode();
+    QGraphicsProxyWidget* addFunctionMapNode();
+    QGraphicsProxyWidget* addASAGINode();
+    QGraphicsProxyWidget* addSCECFileNode();
+    QGraphicsProxyWidget* addEvalModelNode();
+    QGraphicsProxyWidget* addOptimalStressNode();
+    QGraphicsProxyWidget* addAndersonianStressNode();
+    QGraphicsProxyWidget* addSpecialMapNode();
 
-
-    // add math nodes
-    QGraphicsProxyWidget* addMatrixNode(QStringList* outputs = nullptr, QList<double>* values = nullptr);
-    QGraphicsProxyWidget* addTranslationNode(double value);
+    // add math functions
+    QGraphicsProxyWidget* addMatrixNode(QStringList* inputs = nullptr);
+    QGraphicsProxyWidget* addTranslationNode();
 
 signals:
     void saveRequested(YAML::Emitter* out);
@@ -79,7 +95,7 @@ private slots:
     void actionConnectorLineDrawn(ConnectorLine* connectorLine);
     void actionConnectorLineConnected();
     void actionCheckIfConnectorNeedsConnection(ConnectorBase* connector);
-    void actionAddOutputConnector();
+    OutputConnector* actionAddOutputConnector(QGraphicsProxyWidget* proxyNode);
     void actionDeleteOutputConnector(QGraphicsProxyWidget* outputConnectorProxy);
     void actionAddMathOutputConnector(QGraphicsProxyWidget* proxyNode, QPointF pos);
     void actionDeleteNode(QGraphicsProxyWidget* proxyNode);

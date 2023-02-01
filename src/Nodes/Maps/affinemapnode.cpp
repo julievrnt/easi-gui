@@ -1,35 +1,25 @@
 #include "affinemapnode.h"
-#include "src/helpers.h"
+#include "src/Connectors/outputs/mathoutputconnector.h"
+#include "src/Nodes/Math/matrixnode.h"
+#include "src/Nodes/Math/translationnode.h"
 #include <QPushButton>
 #include <QLineEdit>
 
-AffineMapNode::AffineMapNode(QStringList* outputs) : NodeBase(outputs)
+AffineMapNode::AffineMapNode(QStringList* inputs) : NodeBase(inputs)
 {
     typeOfNode = AFFINEMAPNODE;
+    removeButtonIndex = 0;
+    dimensionLineEditIndex = 1;
     setWindowTitle("Affine Map");
     createLayout();
 
     setGeometry(QRect(0, 0, sizeHint().width(), sizeHint().height()));
 }
 
-AffineMapNode::AffineMapNode(QStringList* outputs, QList<double>* values) : AffineMapNode(outputs)
-{
-    if (values == nullptr)
-        return;
-
-    QObjectList outputLayouts = this->layout()->findChild<QVBoxLayout*>("outputsLayout")->children();
-    foreach (QObject* outputLayout, outputLayouts)
-    {
-        /// TODO
-        UNUSED(outputLayout);
-    }
-    delete values;
-}
-
 AffineMapNode::~AffineMapNode()
 {
-    emit deleteNodeRequested(matrixProxy);
-    emit deleteNodeRequested(translationProxy);
+    // emit deleteNodeRequested(matrixProxy);
+    // emit deleteNodeRequested(translationProxy);
 }
 
 QList<QGraphicsProxyWidget*>* AffineMapNode::getMathOutputConnectors() const
@@ -37,55 +27,64 @@ QList<QGraphicsProxyWidget*>* AffineMapNode::getMathOutputConnectors() const
     return mathOutputConnectors;
 }
 
-void AffineMapNode::setMatrixProxy(QGraphicsProxyWidget* newMatrixProxy)
+void AffineMapNode::setValues(QMap<QString, QList<double> >* values)
 {
-    matrixProxy = newMatrixProxy;
+    if (values == nullptr)
+        return;
+    outputs = new QStringList(values->keys());
+    outputs->sort();
+    emit transferOutputsRequested(outputs);
+
+    QVBoxLayout* dimensionsLayout = this->layout()->findChild<QVBoxLayout*>("dimensionsLayout");
+
+    for (int i = 0; i < outputs->size(); i++)
+    {
+        addNewDimensionsLayoutRow(dimensionsLayout, i);
+        addMathsConnectors(i);
+
+        // get matrix and translation values
+        QList<double> matrixAndTranslationValues = values->value(outputs->at(i));
+        double translationValue = matrixAndTranslationValues.takeLast();
+
+        // set matrix values
+        MatrixNode* matrixNode = (MatrixNode*) this->matrixProxies.at(i)->widget();
+        matrixNode->setValues(inputs, &matrixAndTranslationValues);
+
+        // set translation values
+        TranslationNode* translationNode = (TranslationNode*) this->translationProxies.at(i)->widget();
+        translationNode->setValue(translationValue);
+    }
+
+    delete values;
 }
 
-void AffineMapNode::setTranslationProxy(QGraphicsProxyWidget* newTranslationProxy)
+void AffineMapNode::addMatrixProxy(QGraphicsProxyWidget* newMatrixProxy)
 {
-    translationProxy = newTranslationProxy;
+    matrixProxies.append(newMatrixProxy);
 }
 
-void AffineMapNode::createLayout()
+void AffineMapNode::addTranslationProxy(QGraphicsProxyWidget* newTranslationProxy)
 {
-    QVBoxLayout* globalLayout = new QVBoxLayout(this);
-    addTitleLayout(globalLayout);
-
-    // add a layout containing only one dimension
-    QVBoxLayout* dimensionsLayout = new QVBoxLayout();
-    dimensionsLayout->setObjectName("dimensionsLayout");
-    addNewDimensionsLayoutRow(dimensionsLayout, 0);
-
-    // add buttons to add or delete dimension row
-    QHBoxLayout* buttonsLayout = new QHBoxLayout();
-
-    QPushButton* addDimensionLayoutButton = new QPushButton();
-    addDimensionLayoutButton->setText("Add New Dimension");
-    connect(addDimensionLayoutButton, SIGNAL(clicked(bool)), this, SLOT(addDimensionsLayoutRowRequested(bool)));
-    buttonsLayout->addWidget(addDimensionLayoutButton);
-
-    QPushButton* removeDimensionLayoutButton = new QPushButton();
-    removeDimensionLayoutButton->setText("Remove Last Dimension");
-    connect(removeDimensionLayoutButton, SIGNAL(clicked(bool)), this, SLOT(removeDimensionsLayoutRowRequested(bool)));
-    buttonsLayout->addWidget(removeDimensionLayoutButton);
-
-    dimensionsLayout->addLayout(buttonsLayout);
-    globalLayout->addLayout(dimensionsLayout);
-
-    addComponentsLayout(globalLayout);
-    this->setLayout(globalLayout);
+    translationProxies.append(newTranslationProxy);
 }
 
 void AffineMapNode::addNewDimensionsLayoutRow(QVBoxLayout* dimensionsLayout, int index)
 {
-    UNUSED(dimensionsLayout);
     QHBoxLayout* row = new QHBoxLayout();
 
+    // add button to remove output
+    addRemoveButton(row, index);
+
     QLineEdit* dimension = new QLineEdit();
+    dimension->setObjectName(QString::number(index));
     dimension->setPlaceholderText("Dimension " + QString::number(index));
-    dimension->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-    dimension->setFixedHeight(40);
+    if (outputs->size() > index)
+        dimension->setText(outputs->at(index));
+    else
+        outputs->append("");
+    dimension->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    dimension->setFixedSize(100, 40);
+    connect(dimension, SIGNAL(textChanged(QString)), this, SLOT(dimensionNameChanged(QString)));
     row->addWidget(dimension);
 
     QVBoxLayout* transformLayout = new QVBoxLayout();
@@ -102,58 +101,114 @@ void AffineMapNode::addNewDimensionsLayoutRow(QVBoxLayout* dimensionsLayout, int
 
     row->addLayout(transformLayout);
     dimensionsLayout->insertLayout(index, row);
+}
+
+void AffineMapNode::addMathsConnectors(int index)
+{
     QPointF posMatrix(sizeHint().width() - 7, 58 + index * 46);
     QPointF posTranslation(sizeHint().width() - 7, 81 + index * 46);
     emit addMathOutputConnectorRequested(proxyNode, posMatrix);
     emit addMathOutputConnectorRequested(proxyNode, posTranslation);
 }
 
-void AffineMapNode::removeDimensionsLayoutLastRow(QVBoxLayout* dimensionsLayout, int index)
+void AffineMapNode::removeMathsOfDimensionRow(int index)
 {
-    if (index < 0)
-        return;
-    QHBoxLayout* layoutToRemove = (QHBoxLayout*) dimensionsLayout->itemAt(index);
-    clearLayout(layoutToRemove, true);
-    dimensionsLayout->removeItem(layoutToRemove);
-    emit deleteNodeRequested(matrixProxy);
-    emit deleteNodeRequested(translationProxy);
-    delete layoutToRemove;
+    emit deleteOutputConnectorRequested(mathOutputConnectors->takeAt(index * 2));
+    emit deleteOutputConnectorRequested(mathOutputConnectors->takeAt(index * 2));
+
+    emit deleteNodeRequested(matrixProxies.takeAt(index));
+    emit deleteNodeRequested(translationProxies.takeAt(index));
 }
 
-void AffineMapNode::updateLayout()
+void AffineMapNode::performResize()
 {
-    /// TODO
-    // change matrix & translation part !
+    NodeBase::performResize();
+    for (int i = 0; i < mathOutputConnectors->size(); i++)
+    {
+        int x = sizeHint().width() - 7;
+        int y = i / 2 * 46;
+        if (i % 2 == 0)
+            y += 58;
+        else
+            y += 81;
+        mathOutputConnectors->at(i)->setPos(x, y);
+
+    }
 }
 
 void AffineMapNode::addDimensionsLayoutRowRequested(bool clicked)
 {
+    NodeBase::addDimensionsLayoutRowRequested(clicked);
     QVBoxLayout* dimensionsLayout = this->layout()->findChild<QVBoxLayout*>("dimensionsLayout");
-    addNewDimensionsLayoutRow(dimensionsLayout, dimensionsLayout->children().size() - 1);
-    UNUSED(clicked);
+    addMathsConnectors(dimensionsLayout->children().size() - 1);
 }
 
 void AffineMapNode::removeDimensionsLayoutRowRequested(bool clicked)
 {
-    UNUSED(clicked);
-    QVBoxLayout* dimensionsLayout = this->layout()->findChild<QVBoxLayout*>("dimensionsLayout");
-    if (mathOutputConnectors->size() > 2)
+    QPushButton* removeButton = qobject_cast<QPushButton*>(sender());
+    removeMathsOfDimensionRow(removeButton->objectName().toInt());
+    NodeBase::removeDimensionsLayoutRowRequested(clicked);
+}
+
+void AffineMapNode::updateLayout()
+{
+    foreach (QGraphicsProxyWidget* mathOutputConnector, (*mathOutputConnectors))
     {
-        removeDimensionsLayoutLastRow(dimensionsLayout, dimensionsLayout->children().size() - 2);
-        emit deleteOutputConnectorRequested(mathOutputConnectors->takeLast());
-        emit deleteOutputConnectorRequested(mathOutputConnectors->takeLast());
-        performResize();
+        emit ((MathOutputConnector*) mathOutputConnector->widget())->transferOutputsRequested(inputs);
     }
+}
+
+QStringList AffineMapNode::getValues()
+{
+    QStringList values;
+
+    QObjectList dimensionsLayout = this->layout()->findChild<QVBoxLayout*>("dimensionsLayout")->children();
+    for (int i = 0; i < dimensionsLayout.size(); i++)
+    {
+        QHBoxLayout* row = (QHBoxLayout*) dimensionsLayout.at(i);
+        values.append(((QLineEdit*) row->itemAt(1)->widget())->text());
+    }
+    return values;
+}
+
+void AffineMapNode::dimensionNameChanged(QString newOutput)
+{
+    QLineEdit* dimension = qobject_cast<QLineEdit*>(sender());
+    int index = dimension->objectName().toInt();
+    outputs->insert(index, newOutput);
+    outputs->removeAt(index + 1);
+    emit transferOutputsRequested(outputs);
 }
 
 void AffineMapNode::saveNodeContent(YAML::Emitter* out)
 {
-    /// TODO
-    UNUSED(out);
+    *out << YAML::LocalTag("AffineMap");
+    *out << YAML::BeginMap;
+    saveValues(out);
+    saveComponents(out);
+    *out << YAML::EndMap;
 }
 
 void AffineMapNode::saveValues(YAML::Emitter* out)
 {
-    /// TODO
-    UNUSED(out);
+    QStringList dimensions = getValues();
+
+    *out << YAML::Key << "matrix";
+    *out << YAML::BeginMap ;
+    for (int i = 0; i < dimensions.size(); i++)
+    {
+        *out << YAML::Key << dimensions[i].toStdString();
+        ((OutputConnector*) mathOutputConnectors->at(i * 2)->widget())->saveComponent(out);
+    }
+    *out << YAML::EndMap;
+
+    *out << YAML::Key << "translation";
+    *out << YAML::BeginMap ;
+    for (int i = 0; i < dimensions.size(); i++)
+    {
+        *out << YAML::Key << dimensions[i].toStdString();
+        ((OutputConnector*) mathOutputConnectors->at(i * 2 + 1)->widget())->saveComponent(out);
+    }
+    *out << YAML::EndMap;
+
 }

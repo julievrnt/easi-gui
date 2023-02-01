@@ -48,12 +48,26 @@
      <string>Add Map...</string>
     </property>
     <addaction name="actionAddConstantMap"/>
+    <addaction name="actionAddIdentityMap"/>
     <addaction name="actionAddAffineMap"/>
+    <addaction name="actionAddPolynomialMap"/>
+    <addaction name="actionAddFunctionMap"/>
+    <addaction name="actionAddASAGI"/>
+    <addaction name="actionAddSCECFile"/>
+    <addaction name="actionAddEvalModel"/>
+    <addaction name="actionAddOptimalStress"/>
+    <addaction name="actionAddAndersonianStress"/>
+    <addaction name="actionAddSpecialMap"/>
    </widget>
    <widget class="QMenu" name="menuAdd_Filter">
     <property name="title">
      <string>Add Filter...</string>
     </property>
+    <addaction name="actionAddAny"/>
+    <addaction name="actionAddAxisAlignedCuboidalDomainFilter"/>
+    <addaction name="actionAddSphericalDomainFilter"/>
+    <addaction name="actionAddGroupFilter"/>
+    <addaction name="actionAddSwitch"/>
    </widget>
    <widget class="QMenu" name="menuFile">
     <property name="title">
@@ -163,18 +177,6 @@
     <string>Ctrl+S</string>
    </property>
   </action>
-  <action name="actionNewOutputParameter">
-   <property name="icon">
-    <iconset theme="list-add">
-     <normaloff>.</normaloff>.</iconset>
-   </property>
-   <property name="text">
-    <string>NewOutputParameter</string>
-   </property>
-   <property name="toolTip">
-    <string>NewOutputParameter</string>
-   </property>
-  </action>
   <action name="actionDelete">
    <property name="enabled">
     <bool>false</bool>
@@ -265,6 +267,79 @@
   <action name="actionAddAffineMap">
    <property name="text">
     <string>Affine Map</string>
+   </property>
+  </action>
+  <action name="actionAddAny">
+   <property name="text">
+    <string>Any</string>
+   </property>
+  </action>
+  <action name="actionAddIdentityMap">
+   <property name="text">
+    <string>Identity Map</string>
+   </property>
+  </action>
+  <action name="actionAddAxisAlignedCuboidalDomainFilter">
+   <property name="text">
+    <string>Axis Aligned Cuboidal Domain Filter</string>
+   </property>
+   <property name="toolTip">
+    <string>Axis Aligned Cuboidal Domain Filter</string>
+   </property>
+  </action>
+  <action name="actionAddSphericalDomainFilter">
+   <property name="text">
+    <string>Spherical Domain Filter</string>
+   </property>
+  </action>
+  <action name="actionAddGroupFilter">
+   <property name="text">
+    <string>Group Filter</string>
+   </property>
+  </action>
+  <action name="actionAddSwitch">
+   <property name="text">
+    <string>Switch</string>
+   </property>
+  </action>
+  <action name="actionAddPolynomialMap">
+   <property name="text">
+    <string>Polynomial Map</string>
+   </property>
+  </action>
+  <action name="actionAddFunctionMap">
+   <property name="text">
+    <string>Function Map</string>
+   </property>
+  </action>
+  <action name="actionAddASAGI">
+   <property name="text">
+    <string>ASAGI</string>
+   </property>
+  </action>
+  <action name="actionAddSCECFile">
+   <property name="text">
+    <string>SCEC File</string>
+   </property>
+  </action>
+  <action name="actionAddEvalModel">
+   <property name="text">
+    <string>Eval Model</string>
+   </property>
+  </action>
+  <action name="actionAddOptimalStress">
+   <property name="text">
+    <string>Optimal Stress</string>
+   </property>
+  </action>
+  <action name="actionAddAndersonianStress">
+   <property name="text">
+    <string>Andersonian Stress</string>
+   </property>
+  </action>
+  <action name="actionAddSpecialMap">
+   <property name="text">
+    <string>Special Map</string>
    </property>
   </action>
  </widget>

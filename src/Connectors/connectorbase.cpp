@@ -87,7 +87,7 @@ void ConnectorBase::nodeParentWidgetHasMoved()
 
 void ConnectorBase::transferOutputs(QStringList* outputs)
 {
-    if (this->outputs == nullptr)
+    if (this->outputs != outputs)
         this->outputs = outputs;
     outputsChanged();
 }
@@ -153,12 +153,19 @@ void ConnectorBase::mousePressEvent(QMouseEvent* event)
 void ConnectorBase::mouseReleaseEvent(QMouseEvent* event)
 {
     UNUSED(event);
+    if (!canDisconnect)
+        return;
     emit lineNoMoreDragged();
     // QWidget::mousePressEvent(event);
 }
 
 void ConnectorBase::mouseMoveEvent(QMouseEvent* event)
 {
+    QWidget::mouseMoveEvent(event);
+
+    if (!canDisconnect)
+        return;
+
     if (connectorLineConnected)
         emit resetConnectorLineRequested(this);
 
@@ -171,7 +178,6 @@ void ConnectorBase::mouseMoveEvent(QMouseEvent* event)
         emit createConnectorLineResquested(this);
         connectorLineCreated = true;
     }
-    QWidget::mouseMoveEvent(event);
 }
 
 void ConnectorBase::moveEvent(QMoveEvent* event)

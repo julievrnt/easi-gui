@@ -7,36 +7,45 @@ class AffineMapNode : public NodeBase
 {
     Q_OBJECT
 public:
-    AffineMapNode(QStringList* outputs = nullptr);
-    AffineMapNode(QStringList* outputs, QList<double>* values);
+    AffineMapNode(QStringList* inputs = nullptr);
     ~AffineMapNode();
 
     QList<QGraphicsProxyWidget*>* getMathOutputConnectors() const;
 
-    void setMatrixProxy(QGraphicsProxyWidget* newMatrixProxy);
-
-    void setTranslationProxy(QGraphicsProxyWidget* newTranslationProxy);
+    void setValues(QMap<QString, QList<double>>* values);
+    void addMatrixProxy(QGraphicsProxyWidget* newMatrixProxy);
+    void addTranslationProxy(QGraphicsProxyWidget* newTranslationProxy);
 
 signals:
     void addMathOutputConnectorRequested(QGraphicsProxyWidget* proxyNode, QPointF pos);
 
 private:
-    QGraphicsProxyWidget* matrixProxy;
-    QGraphicsProxyWidget* translationProxy;
-    void createLayout();
+    QList<QGraphicsProxyWidget*> matrixProxies;
+    QList<QGraphicsProxyWidget*> translationProxies;
     void addNewDimensionsLayoutRow(QVBoxLayout* dimensionsLayout, int index);
-    void removeDimensionsLayoutLastRow(QVBoxLayout* dimensionsLayout, int index);
-    // QMap<QString, double>* getValues();
-
-    void updateLayout();
+    void addMathsConnectors(int index);
+    QStringList getValues();
 
 private slots:
-    void addDimensionsLayoutRowRequested(bool clicked);
-    void removeDimensionsLayoutRowRequested(bool clicked);
+    void dimensionNameChanged(QString newOutput);
 
 protected:
+    void updateLayout();
     void saveNodeContent(YAML::Emitter* out);
     void saveValues(YAML::Emitter* out);
+
+    // NodeBase interface
+protected:
+    void removeMathsOfDimensionRow(int index);
+
+    // NodeBase interface
+public:
+    void performResize();
+
+    // NodeBase interface
+protected slots:
+    void addDimensionsLayoutRowRequested(bool clicked);
+    void removeDimensionsLayoutRowRequested(bool clicked);
 };
 
 #endif // AFFINEMAPNODE_H

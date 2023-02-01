@@ -1,10 +1,6 @@
 #include "mainwindow.h"
-#include "src/Nodes/Maps/constantmapnode.h"
 #include "src/Nodes/rootnode.h"
 #include "ui_mainwindow.h"
-#include "src/Connectors/inputs/inputconnector.h"
-#include "src/Connectors/outputs/outputconnector.h"
-#include "src/Nodes/nodeparentwidget.h"
 #include "helpers.h"
 #include "yaml-cpp/emitter.h"
 #include <QFile>
@@ -47,9 +43,27 @@ MainWindow::~MainWindow()
 
 void MainWindow::connectActions()
 {
-    // state changed?
+    // add filter actions
+    connect(ui->actionAddAny, SIGNAL(triggered(bool)), this, SLOT(actionAddAny()));
+    connect(ui->actionAddAxisAlignedCuboidalDomainFilter, SIGNAL(triggered(bool)), this, SLOT(actionAddAxisAlignedCuboidalDomainFilter()));
+    connect(ui->actionAddSphericalDomainFilter, SIGNAL(triggered(bool)), this, SLOT(actionAddSphericalDomainFilter()));
+    connect(ui->actionAddGroupFilter, SIGNAL(triggered(bool)), this, SLOT(actionAddGroupFilter()));
+    connect(ui->actionAddSwitch, SIGNAL(triggered(bool)), this, SLOT(actionAddSwitch()));
+
+    // add maps actions
     connect(ui->actionAddConstantMap, SIGNAL(triggered(bool)), this, SLOT(actionAddConstantMap()));
+    connect(ui->actionAddIdentityMap, SIGNAL(triggered(bool)), this, SLOT(actionAddIdentityMap()));
     connect(ui->actionAddAffineMap, SIGNAL(triggered(bool)), this, SLOT(actionAddAffineMap()));
+    connect(ui->actionAddPolynomialMap, SIGNAL(triggered(bool)), this, SLOT(actionAddPolynomialMap()));
+    connect(ui->actionAddFunctionMap, SIGNAL(triggered(bool)), this, SLOT(actionAddFunctionMap()));
+    connect(ui->actionAddASAGI, SIGNAL(triggered(bool)), this, SLOT(actionAddASAGI()));
+    connect(ui->actionAddSCECFile, SIGNAL(triggered(bool)), this, SLOT(actionAddSCECFile()));
+    connect(ui->actionAddEvalModel, SIGNAL(triggered(bool)), this, SLOT(actionAddEvalModel()));
+    connect(ui->actionAddOptimalStress, SIGNAL(triggered(bool)), this, SLOT(actionAddOptimalStress()));
+    connect(ui->actionAddAndersonianStress, SIGNAL(triggered(bool)), this, SLOT(actionAddAndersonianStress()));
+    connect(ui->actionAddSpecialMap, SIGNAL(triggered(bool)), this, SLOT(actionAddSpecialMap()));
+
+    // basic actions
     connect(ui->actionNew, SIGNAL(triggered(bool)), this, SLOT(actionNew()));
     connect(ui->actionOpen, SIGNAL(triggered(bool)), this, SLOT(actionOpen()));
     connect(ui->actionClose, SIGNAL(triggered(bool)), this, SLOT(actionClose()));
@@ -109,20 +123,9 @@ void MainWindow::openFile()
     widgetsHandler->init();
     file.close();
 
-    /// TODO --> read file, create nodes and connect them to each other
-
     YAML::Node fileNode = YAML::LoadFile(fileName.toStdString());
     RootNode* rootNode = (RootNode*) widgetsHandler->getProxyRoot()->widget();
-
-    // read tag of first node
-    if (fileNode.Tag() == "!ConstantMap")
-    {
-        rootNode->getOutputs()->clear();
-        rootNode->updateOutputs();
-        openConstantMapNode(rootNode, &fileNode, rootNode->getOutputs());
-    }
-    else
-        qDebug() << "tag is: " << fileNode.Tag().c_str();
+    openNode(widgetsHandler->getProxyRoot(), &fileNode, rootNode->getOutputs());
 }
 
 void MainWindow::saveFile()
@@ -209,50 +212,281 @@ void MainWindow::enableDisableIcons(bool enable)
     ui->actionDelete->setEnabled(enable);
 }
 
+
 /// ===========================================================================
 /// =========================== OPEN NODE FUNCTIONS ===========================
 /// ===========================================================================
 
-void MainWindow::openConstantMapNode(NodeBase* parentNode, YAML::Node* node, QStringList* outputs)
+void MainWindow::openNode(QGraphicsProxyWidget* parentProxyNode, YAML::Node* node, QStringList* outputs)
 {
-    bool outputsNeedUpdate = false;
+    QString tagOfNode = QString::fromStdString((*node).Tag());
+    // read tag of node
 
-    QStringList* outputs_node = new QStringList();
-    QList<double>* values = new QList<double>();
-    if ((*node)["map"])
+    //filters
+    if (tagOfNode == "!Any")
+        openAnyNode(parentProxyNode, node, outputs);
+    else if (tagOfNode == "!AxisAlignedCuboidalDomainFilter")
+        openAxisAlignedCuboidalDomainFilterNode(parentProxyNode, node, outputs);
+    else if (tagOfNode == "!SphericalDomainFilter")
+        openSphericalDomainFilterNode(parentProxyNode, node, outputs);
+    else if (tagOfNode == "!GroupFilter")
+        openGroupFilterNode(parentProxyNode, node, outputs);
+    else if (tagOfNode == "!Switch")
+        openSwitchNode(parentProxyNode, node, outputs);
+
+    // maps
+    else if (tagOfNode == "!ConstantMap")
+        openConstantMapNode(parentProxyNode, node);
+    else if (tagOfNode == "!IdentityMap")
+        openIdentityMapNode(parentProxyNode, node, outputs);
+    else if (tagOfNode == "!AffineMap")
+        openAffineMapNode(parentProxyNode, node, outputs);
+    else if (tagOfNode == "!PolynomialMap")
+        openPolynomialMapNode(parentProxyNode, node, outputs);
+    else if (tagOfNode == "!FunctionMap")
+        openFunctionMapNode(parentProxyNode, node, outputs);
+    else if (tagOfNode == "!ASAGI")
+        openASAGINode(parentProxyNode, node, outputs);
+    else if (tagOfNode == "!SCECFile")
+        openSCECFileNode(parentProxyNode, node, outputs);
+    else if (tagOfNode == "!EvalModel")
+        openEvalModelNode(parentProxyNode, node, outputs);
+    else if (tagOfNode == "!OptimalStress")
+        openOptimalStressNode(parentProxyNode, node, outputs);
+    else if (tagOfNode == "!AndersonianStress")
+        openAndersonianStressNode(parentProxyNode, node, outputs);
+    else
+        openSpecialMapNode(parentProxyNode, node, outputs);
+}
+
+void MainWindow::openComponents(QGraphicsProxyWidget* parentProxyNode, YAML::Node* node, QStringList* outputs)
+{
+    if (!(*node)["components"])
+        return;
+    YAML::Node componentsNode = (*node)["components"];
+    if (componentsNode.IsMap())
     {
-        for (YAML::const_iterator it = (*node)["map"].begin(); it != (*node)["map"].end(); ++it)
+        openNode(parentProxyNode, &componentsNode, outputs);
+    }
+    else if (componentsNode.IsSequence())
+    {
+        for (std::size_t i = 0; i < componentsNode.size(); i++)
         {
-            QString output = it->first.as<std::string>().c_str();
-            if (!outputs->contains(output))
-            {
-                *outputs << output;
-                outputsNeedUpdate = true;
-            }
-            *outputs_node << output;
-            *values << it->second.as<double>();
+            YAML::Node componentsNodeI = componentsNode[i];
+            openNode(parentProxyNode, &componentsNodeI, outputs);
         }
+    }
+    else
+        qDebug() << "components of " << parentProxyNode << " is neither a map nor a sequence";
+}
+
+void MainWindow::openAnyNode(QGraphicsProxyWidget* parentProxyNode, YAML::Node* node, QStringList* inputs)
+{
+    // add node
+    QGraphicsProxyWidget* proxyNode = widgetsHandler->addAnyNode(inputs);
+    // move it next to parent node
+    widgetsHandler->moveNodeNextTo(parentProxyNode, proxyNode);
+    // connect them
+    widgetsHandler->connectNodes((NodeBase*) parentProxyNode->widget(), (NodeBase*) proxyNode->widget());
+
+    openComponents(proxyNode, node, inputs);
+}
+
+void MainWindow::openAxisAlignedCuboidalDomainFilterNode(QGraphicsProxyWidget* parentProxyNode, YAML::Node* node, QStringList* inputs)
+{
+    if (!(*node)["limits"])
+    {
+        qDebug() << "ERROR: no limits part in constant map";
+        return;
+    }
+
+    QList<double>* values = new QList<double>();
+    for (YAML::const_iterator it = (*node)["limits"].begin(); it != (*node)["limits"].end(); ++it)
+    {
+        *values << it->second[0].as<double>();
+        *values << it->second[1].as<double>();
     }
 
     // add node
-    QGraphicsProxyWidget* proxyNode = widgetsHandler->addConstantMapNode(outputs_node, values);
-
+    QGraphicsProxyWidget* proxyNode = widgetsHandler->addAxisAlignedCuboidalDomainFilterNode(inputs, values);
     // move it next to parent node
-    QRect parentGeometry = parentNode->geometry();
-    int right = parentGeometry.right();
-    int top = parentGeometry.top();
-    ((NodeParentWidget*) proxyNode->parentWidget())->move(right + 50, top);
+    widgetsHandler->moveNodeNextTo(parentProxyNode, proxyNode);
+    // connect them
+    widgetsHandler->connectNodes((NodeBase*) parentProxyNode->widget(), (NodeBase*) proxyNode->widget());
 
-    ConstantMapNode* constantMapNode = (ConstantMapNode*) proxyNode->widget();
-    InputConnector* inputConnector = (InputConnector*) constantMapNode->getInputConnector()->widget();
-    OutputConnector* outputConnector = parentNode->getFirstAvailableOutputConnector();
+    openComponents(proxyNode, node, ((NodeBase*)proxyNode->widget())->getOutputs());
+}
 
-    widgetsHandler->createConnectorLine(outputConnector, inputConnector);
+void MainWindow::openSphericalDomainFilterNode(QGraphicsProxyWidget* parentProxyNode, YAML::Node* node, QStringList* inputs)
+{
+    UNUSED(parentProxyNode);
+    UNUSED(node);
+    UNUSED(inputs);
+    /// TODO
+}
 
-    /// TODO: add components
+void MainWindow::openGroupFilterNode(QGraphicsProxyWidget* parentProxyNode, YAML::Node* node, QStringList* inputs)
+{
+    UNUSED(parentProxyNode);
+    UNUSED(node);
+    UNUSED(inputs);
+    /// TODO
+}
 
-    if (outputsNeedUpdate)
-        widgetsHandler->updateRoot();
+void MainWindow::openSwitchNode(QGraphicsProxyWidget* parentProxyNode, YAML::Node* node, QStringList* inputs)
+{
+    UNUSED(parentProxyNode);
+    UNUSED(node);
+    UNUSED(inputs);
+    /// TODO
+}
+
+void MainWindow::openConstantMapNode(QGraphicsProxyWidget* parentProxyNode, YAML::Node* node)
+{
+    if (!(*node)["map"])
+    {
+        qDebug() << "ERROR: no map part in constant map";
+        return;
+    }
+
+    QStringList* outputs = new QStringList();
+    QList<double>* values = new QList<double>();
+    for (YAML::const_iterator it = (*node)["map"].begin(); it != (*node)["map"].end(); ++it)
+    {
+        *outputs << it->first.as<std::string>().c_str();
+        *values << it->second.as<double>();
+    }
+
+    // add node
+    QGraphicsProxyWidget* proxyNode = widgetsHandler->addConstantMapNode(outputs, values);
+    // move it next to parent node
+    widgetsHandler->moveNodeNextTo(parentProxyNode, proxyNode);
+    // connect them
+    widgetsHandler->connectNodes((NodeBase*) parentProxyNode->widget(), (NodeBase*) proxyNode->widget());
+
+    openComponents(proxyNode, node, outputs);
+}
+
+void MainWindow::openIdentityMapNode(QGraphicsProxyWidget* parentProxyNode, YAML::Node* node, QStringList* inputs)
+{
+    // add node
+    QGraphicsProxyWidget* proxyNode = widgetsHandler->addIdentityMapNode(inputs);
+    // move it next to parent node
+    widgetsHandler->moveNodeNextTo(parentProxyNode, proxyNode);
+    // connect them
+    widgetsHandler->connectNodes((NodeBase*) parentProxyNode->widget(), (NodeBase*) proxyNode->widget());
+
+    openComponents(proxyNode, node, inputs);
+}
+
+void MainWindow::openAffineMapNode(QGraphicsProxyWidget* parentProxyNode, YAML::Node* node, QStringList* inputs)
+{
+    // get output and matrix value
+    if (!(*node)["matrix"] || !(*node)["translation"])
+    {
+        qDebug() << "ERROR : no matrix or translation part in affine map";
+        return;
+    }
+
+    // outputs of Affine Map
+    QStringList* outputs = new QStringList();
+    // maps matrix and translation values to outputs
+    QMap<QString, QList<double>>* values = new QMap<QString, QList<double>>();
+    for (YAML::const_iterator it = (*node)["matrix"].begin(); it != (*node)["matrix"].end(); ++it)
+    {
+        QString output = QString::fromStdString(it->first.as<std::string>());
+        outputs->append(output);
+
+        QList<double> matrixValues;
+        for (size_t i = 0; i < it->second.size(); i++)
+            matrixValues.append(it->second[i].as<double>());
+        values->insert(output, matrixValues);
+    }
+
+    // get translation part
+    for (YAML::const_iterator it = (*node)["translation"].begin(); it != (*node)["translation"].end(); ++it)
+    {
+        QString output = QString::fromStdString(it->first.as<std::string>());
+        double translationValue = it->second.as<double>();
+
+        QList<double> matrixAndTranslationValues = values->value(output);
+        matrixAndTranslationValues.append(translationValue);
+
+        values->insert(output, matrixAndTranslationValues);
+    }
+
+    // add node
+    QGraphicsProxyWidget* proxyNode = widgetsHandler->addAffineMapNode(inputs, values);
+    // move it next to parent node
+    widgetsHandler->moveNodeNextTo(parentProxyNode, proxyNode);
+    // connect them
+    widgetsHandler->connectNodes((NodeBase*) parentProxyNode->widget(), (NodeBase*) proxyNode->widget());
+
+    openComponents(proxyNode, node, outputs);
+}
+
+void MainWindow::openPolynomialMapNode(QGraphicsProxyWidget* parentProxyNode, YAML::Node* node, QStringList* inputs)
+{
+    UNUSED(parentProxyNode);
+    UNUSED(node);
+    UNUSED(inputs);
+    /// TODO
+}
+
+void MainWindow::openFunctionMapNode(QGraphicsProxyWidget* parentProxyNode, YAML::Node* node, QStringList* inputs)
+{
+    UNUSED(parentProxyNode);
+    UNUSED(node);
+    UNUSED(inputs);
+    /// TODO
+}
+
+void MainWindow::openASAGINode(QGraphicsProxyWidget* parentProxyNode, YAML::Node* node, QStringList* inputs)
+{
+    UNUSED(parentProxyNode);
+    UNUSED(node);
+    UNUSED(inputs);
+    /// TODO
+}
+
+void MainWindow::openSCECFileNode(QGraphicsProxyWidget* parentProxyNode, YAML::Node* node, QStringList* inputs)
+{
+    UNUSED(parentProxyNode);
+    UNUSED(node);
+    UNUSED(inputs);
+    /// TODO
+}
+
+void MainWindow::openEvalModelNode(QGraphicsProxyWidget* parentProxyNode, YAML::Node* node, QStringList* inputs)
+{
+    UNUSED(parentProxyNode);
+    UNUSED(node);
+    UNUSED(inputs);
+    /// TODO
+}
+
+void MainWindow::openOptimalStressNode(QGraphicsProxyWidget* parentProxyNode, YAML::Node* node, QStringList* inputs)
+{
+    UNUSED(parentProxyNode);
+    UNUSED(node);
+    UNUSED(inputs);
+    /// TODO
+}
+
+void MainWindow::openAndersonianStressNode(QGraphicsProxyWidget* parentProxyNode, YAML::Node* node, QStringList* inputs)
+{
+    UNUSED(parentProxyNode);
+    UNUSED(node);
+    UNUSED(inputs);
+    /// TODO
+}
+
+void MainWindow::openSpecialMapNode(QGraphicsProxyWidget* parentProxyNode, YAML::Node* node, QStringList* inputs)
+{
+    UNUSED(parentProxyNode);
+    UNUSED(node);
+    UNUSED(inputs);
+    /// TODO
 }
 
 
@@ -269,7 +503,7 @@ void MainWindow::getNewFocusItem(QGraphicsItem* newFocusItem, QGraphicsItem* old
     {
         QGraphicsProxyWidget* currentProxyNode = (QGraphicsProxyWidget*) newFocusItem;
         NodeBase* currentNode = (NodeBase*) currentProxyNode->widget();
-        if (currentNode == nullptr || currentNode->getTypeOfNode() == ROOT)
+        if (currentNode == nullptr || currentNode->getTypeOfNode() == ROOTNODE)
         {
             enableDisableIcons(false);
         }
@@ -285,15 +519,100 @@ void MainWindow::stateChanged()
     notSaved = true;
 }
 
+
+/// ===========================================================================
+/// =========================== ACTION ADD FILTERS ============================
+/// ===========================================================================
+
+void MainWindow::actionAddAny()
+{
+    widgetsHandler->addAnyNode();
+}
+
+void MainWindow::actionAddAxisAlignedCuboidalDomainFilter()
+{
+    widgetsHandler->addAxisAlignedCuboidalDomainFilterNode();
+}
+
+void MainWindow::actionAddSphericalDomainFilter()
+{
+    widgetsHandler->addSphericalDomainFilterNode();
+}
+
+void MainWindow::actionAddGroupFilter()
+{
+    widgetsHandler->addGroupFilterNode();
+}
+
+void MainWindow::actionAddSwitch()
+{
+    widgetsHandler->addSwitchNode();
+}
+
+
+/// ===========================================================================
+/// ============================= ACTION ADD MAPS =============================
+/// ===========================================================================
+
 void MainWindow::actionAddConstantMap()
 {
     widgetsHandler->addConstantMapNode();
+}
+
+void MainWindow::actionAddIdentityMap()
+{
+    widgetsHandler->addIdentityMapNode();
 }
 
 void MainWindow::actionAddAffineMap()
 {
     widgetsHandler->addAffineMapNode();
 }
+
+void MainWindow::actionAddPolynomialMap()
+{
+    widgetsHandler->addPolynomialMapNode();
+}
+
+void MainWindow::actionAddFunctionMap()
+{
+    widgetsHandler->addFunctionMapNode();
+}
+
+void MainWindow::actionAddASAGI()
+{
+    widgetsHandler->addASAGINode();
+}
+
+void MainWindow::actionAddSCECFile()
+{
+    widgetsHandler->addSCECFileNode();
+}
+
+void MainWindow::actionAddEvalModel()
+{
+    widgetsHandler->addEvalModelNode();
+}
+
+void MainWindow::actionAddOptimalStress()
+{
+    widgetsHandler->addOptimalStressNode();
+}
+
+void MainWindow::actionAddAndersonianStress()
+{
+    widgetsHandler->addAndersonianStressNode();
+}
+
+void MainWindow::actionAddSpecialMap()
+{
+    widgetsHandler->addSpecialMapNode();
+}
+
+
+/// ===========================================================================
+/// ============================== BASIC ACTIONS ==============================
+/// ===========================================================================
 
 void MainWindow::actionNew()
 {

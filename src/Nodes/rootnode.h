@@ -10,25 +10,14 @@ class RootNode : public NodeBase
 {
     Q_OBJECT
 public:
-    RootNode(QStringList* outputs = nullptr);
+    RootNode();
     ~RootNode();
 
     void updateOutputs();
 
 private:
-    QList<QLabel*> outputLabels;
     QGraphicsProxyWidget* outputConnector;
     void createLayout();
-    void updateLayout();
-    void modifyOutputs();
-
-    // QWidget interface
-protected:
-    void mousePressEvent(QMouseEvent* event);
-
-private slots:
-    void modifyOutputsButtonClicked(bool clicked);
-    void sortOutputs(int result);
 
     // NodeBase interface
 protected:

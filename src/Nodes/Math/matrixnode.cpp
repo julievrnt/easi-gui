@@ -4,28 +4,13 @@
 #include <QLabel>
 #include "float.h"
 
-MatrixNode::MatrixNode(QStringList* outputs) : NodeBase(outputs)
+MatrixNode::MatrixNode(QStringList* inputs) : NodeBase(inputs)
 {
-    this->typeOfNode = MATH;
+    this->typeOfNode = MATHNODE;
     setWindowTitle("Matrix");
     createLayout();
 
     setGeometry(QRect(0, 0, sizeHint().width(), sizeHint().height()));
-}
-
-MatrixNode::MatrixNode(QStringList* outputs, QList<double>* values) : MatrixNode(outputs)
-{
-    if (values == nullptr)
-        return;
-
-    QObjectList matrixLayout = this->layout()->findChild<QVBoxLayout*>("matrixLayout")->children();
-    foreach (QObject* matrixLayoutRow, matrixLayout)
-    {
-        QHBoxLayout* layout = (QHBoxLayout*) matrixLayoutRow;
-        int index = outputs->indexOf(((QLabel*) layout->itemAt(0)->widget())->text());
-        ((QDoubleSpinBox*) layout->itemAt(1)->widget())->setValue(values->at(index));
-    }
-    delete values;
 }
 
 MatrixNode::~MatrixNode()
@@ -33,18 +18,35 @@ MatrixNode::~MatrixNode()
     /// TODO
 }
 
+void MatrixNode::setValues(QStringList* inputs, QList<double>* values)
+{
+    if (inputs->size() != values->size())
+    {
+        qDebug() << "MATRIX NODE: sizes of inputs and values different !";
+        return;
+    }
+
+    QObjectList matrixLayout = this->layout()->findChild<QVBoxLayout*>("matrixLayout")->children();
+    foreach (QObject* matrixLayoutRow, matrixLayout)
+    {
+        QHBoxLayout* layout = (QHBoxLayout*) matrixLayoutRow;
+        int index = inputs->indexOf(((QLabel*) layout->itemAt(0)->widget())->text());
+        ((QDoubleSpinBox*) layout->itemAt(1)->widget())->setValue(values->at(index));
+    }
+}
+
 void MatrixNode::createLayout()
 {
     QVBoxLayout* globalLayout = new QVBoxLayout(this);
-    addTitleLayout(globalLayout);
+    addTitleLayout(globalLayout, true);
 
-    // add a layout containing only one dimension
+    // add a layout containing dimensions
     QVBoxLayout* matrixLayout = new QVBoxLayout();
     matrixLayout->setObjectName("matrixLayout");
 
-    if (outputs != nullptr)
+    if (inputs != nullptr)
     {
-        for (int i = 0; i < outputs->size(); i++)
+        for (int i = 0; i < inputs->size(); i++)
         {
             addNewOutputRowLayout(matrixLayout, i);
         }
@@ -62,7 +64,7 @@ void MatrixNode::addNewOutputRowLayout(QVBoxLayout* matrixLayout, int index)
     QHBoxLayout* matrixRowLayout = new QHBoxLayout();
 
     // add a label that contains the output name
-    QLabel* outputName = new QLabel(outputs->at(index));
+    QLabel* outputName = new QLabel(inputs->at(index));
     outputName->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
     matrixRowLayout->addWidget(outputName);
 
@@ -80,44 +82,74 @@ void MatrixNode::addNewOutputRowLayout(QVBoxLayout* matrixLayout, int index)
     matrixLayout->insertLayout(index, matrixRowLayout);
 }
 
+QList<double> MatrixNode::getValues()
+{
+    QList<double> values;
+
+    QObjectList matrixLayout = this->layout()->findChild<QVBoxLayout*>("matrixLayout")->children();
+    foreach (QObject* matrixLayoutRow, matrixLayout)
+    {
+        QHBoxLayout* layout = (QHBoxLayout*) matrixLayoutRow;
+        double value = ((QDoubleSpinBox*) layout->itemAt(1)->widget())->value();
+        values.append(value);
+    }
+
+    return values;
+}
+
 void MatrixNode::updateLayout()
 {
-    /// TODO
     QVBoxLayout* matrixLayout = this->layout()->findChild<QVBoxLayout*>("matrixLayout");
-    QStringList oldOutputs = QStringList();
+    QStringList oldInputs = QStringList();
 
     if (!matrixLayout->children().isEmpty())
     {
         foreach (QObject* child, matrixLayout->children())
         {
-            oldOutputs.append(((QLabel*) ((QHBoxLayout*) child)->itemAt(0)->widget())->text());
+            oldInputs.append(((QLabel*) ((QHBoxLayout*) child)->itemAt(0)->widget())->text());
         }
     }
 
-    for (int i = 0; i < oldOutputs.size(); i++)
+    for (int i = 0; i < oldInputs.size(); i++)
     {
-        if (!outputs->contains(oldOutputs.at(i)))
+        if (!inputs->contains(oldInputs.at(i)))
         {
-            removeLayoutAtIndex(matrixLayout, i);
-            oldOutputs.remove(i);
+            removeLayoutRow(matrixLayout, i);
+            oldInputs.remove(i);
             i--;
         }
     }
 
-    for (int i = 0; i < oldOutputs.size(); i++)
+    for (int i = 0; i < oldInputs.size(); i++)
     {
-        if (oldOutputs.at(i) != outputs->at(i))
+        if (oldInputs.at(i) != inputs->at(i))
         {
-            if (!oldOutputs.contains(outputs->at(i)))
+            if (!oldInputs.contains(inputs->at(i)))
             {
                 addNewOutputRowLayout(matrixLayout, i);
-                oldOutputs.insert(i, outputs->at(i));
+                oldInputs.insert(i, inputs->at(i));
             }
         }
     }
 
-    for (int i = oldOutputs.size(); i < outputs->size(); i++)
+    for (int i = oldInputs.size(); i < inputs->size(); i++)
     {
         addNewOutputRowLayout(matrixLayout, i);
     }
+}
+
+void MatrixNode::saveNodeContent(YAML::Emitter* out)
+{
+    *out << YAML::Flow;
+    saveValues(out);
+    *out << YAML::Block;
+}
+
+void MatrixNode::saveValues(YAML::Emitter* out)
+{
+    QList<double> values = getValues();
+    *out << YAML::Value << YAML::BeginSeq;
+    for (int i = 0; i < values.size(); i++)
+        *out << values[i];
+    *out << YAML::EndSeq;
 }

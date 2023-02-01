@@ -16,8 +16,14 @@ SOURCES += \
     src/Connectors/inputs/mathinputconnector.cpp \
     src/Connectors/outputs/mathoutputconnector.cpp \
     src/Connectors/outputs/outputconnector.cpp \
+    src/Nodes/Filters/anynode.cpp \
+    src/Nodes/Filters/axisalignedcuboidaldomainfilternode.cpp \
+    src/Nodes/Filters/groupfilternode.cpp \
+    src/Nodes/Filters/sphericaldomainfilternode.cpp \
+    src/Nodes/Filters/swtichnode.cpp \
     src/Nodes/Maps/affinemapnode.cpp \
     src/Nodes/Maps/constantmapnode.cpp \
+    src/Nodes/Maps/identitymapnode.cpp \
     src/Nodes/Math/matrixnode.cpp \
     src/Nodes/Math/translationnode.cpp \
     src/main.cpp \
@@ -36,8 +42,14 @@ HEADERS += \
     src/Connectors/inputs/mathinputconnector.h \
     src/Connectors/outputs/mathoutputconnector.h \
     src/Connectors/outputs/outputconnector.h \
+    src/Nodes/Filters/anynode.h \
+    src/Nodes/Filters/axisalignedcuboidaldomainfilternode.h \
+    src/Nodes/Filters/groupfilternode.h \
+    src/Nodes/Filters/sphericaldomainfilternode.h \
+    src/Nodes/Filters/swtichnode.h \
     src/Nodes/Maps/affinemapnode.h \
     src/Nodes/Maps/constantmapnode.h \
+    src/Nodes/Maps/identitymapnode.h \
     src/Nodes/Math/matrixnode.h \
     src/Nodes/Math/translationnode.h \
     src/mainwindow.h \

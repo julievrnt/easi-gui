@@ -2,16 +2,18 @@
 #include <QHBoxLayout>
 #include <QComboBox>
 #include <QDoubleSpinBox>
-#include <QLabel>
+#include <QPushButton>
 #include <QFrame>
 #include <QSpacerItem>
 #include <QLineEdit>
 #include <QMap>
 #include "float.h"
 
-ConstantMapNode::ConstantMapNode(QStringList* outputs) : NodeBase(outputs)
+ConstantMapNode::ConstantMapNode(QStringList* outputs) : NodeBase(nullptr, outputs)
 {
     typeOfNode = CONSTANTMAPNODE;
+    removeButtonIndex = 2;
+    dimensionLineEditIndex = 0;
     setWindowTitle("Constant Map");
     createLayout();
 
@@ -23,12 +25,12 @@ ConstantMapNode::ConstantMapNode(QStringList* outputs, QList<double>* values) : 
     if (values == nullptr)
         return;
 
-    QObjectList outputLayouts = this->layout()->findChild<QVBoxLayout*>("outputsLayout")->children();
-    foreach (QObject* outputLayout, outputLayouts)
+    QObjectList dimensionsLayout = this->layout()->findChild<QVBoxLayout*>("dimensionsLayout")->children();
+    foreach (QObject* row, dimensionsLayout)
     {
-        QHBoxLayout* layout = (QHBoxLayout*) outputLayout;
-        int index = outputs->indexOf(((QLabel*) layout->itemAt(0)->widget())->text());
-        ((QDoubleSpinBox*) layout->itemAt(2)->widget())->setValue(values->at(index));
+        QHBoxLayout* layout = (QHBoxLayout*) row;
+        int index = outputs->indexOf(((QLineEdit*) layout->itemAt(0)->widget())->text());
+        ((QDoubleSpinBox*) layout->itemAt(1)->widget())->setValue(values->at(index));
     }
     delete values;
 }
@@ -42,119 +44,43 @@ QMap<QString, double>*  ConstantMapNode::getValues()
 {
     QMap<QString, double>* values = new QMap<QString, double>();
 
-    QObjectList outputLayouts = this->layout()->findChild<QVBoxLayout*>("outputsLayout")->children();
-    foreach (QObject* outputLayout, outputLayouts)
+    QObjectList dimensionsLayout = this->layout()->findChild<QVBoxLayout*>("dimensionsLayout")->children();
+    foreach (QObject* row, dimensionsLayout)
     {
-        QHBoxLayout* layout = (QHBoxLayout*) outputLayout;
-        QString name = ((QLabel*) layout->itemAt(0)->widget())->text();
-        double value = ((QDoubleSpinBox*) layout->itemAt(2)->widget())->value();
+        QHBoxLayout* layout = (QHBoxLayout*) row;
+        QString name = ((QLineEdit*) layout->itemAt(0)->widget())->text();
+        double value = ((QDoubleSpinBox*) layout->itemAt(1)->widget())->value();
         values->insert(name, value);
     }
-
     return values;
 }
 
-void ConstantMapNode::createLayout()
+void ConstantMapNode::addNewDimensionsLayoutRow(QVBoxLayout* dimensionsLayout, int index)
 {
-    QVBoxLayout* globalLayout = new QVBoxLayout(this);
-    addTitleLayout(globalLayout);
-
-    // add an empty layout that will contain the outputs
-    QVBoxLayout* outputsLayout = new QVBoxLayout();
-    outputsLayout->setObjectName("outputsLayout");
-    if (outputs != nullptr)
-    {
-        for (int i = 0; i < outputs->size(); i++)
-        {
-            addNewOutputsLayoutRow(outputsLayout, i);
-        }
-    }
-
-    globalLayout->addLayout(outputsLayout);
-
-    addComponentsLayout(globalLayout);
-    this->setLayout(globalLayout);
-}
-
-void ConstantMapNode::addNewOutputsLayoutRow(QVBoxLayout* outputsLayout, int index)
-{
-    QHBoxLayout* outputLayout = new QHBoxLayout();
+    QHBoxLayout* row = new QHBoxLayout();
 
     // add label to display the name of the outputs
-    QLabel* output = new QLabel();
-    output->setObjectName("output");
-    output->setText(outputs->at(index));
-    output->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
-    outputLayout->addWidget(output);
+    QLineEdit* dimension = new QLineEdit();
+    dimension->setPlaceholderText("Dimension " + QString::number(index));
+    if (outputs->size() > index)
+        dimension->setText(outputs->at(index));
+    dimension->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
+    dimension->setFixedWidth(100);
+    row->addWidget(dimension);
 
-    // add spacer for esthetics
-    QSpacerItem* spacer = new QSpacerItem(40, 20, QSizePolicy::MinimumExpanding);
-    outputLayout->addItem(spacer);
-
-    /// TODO: CHANGE TO QLineEdit coupled with QDoubleValidator?
-    /// (can check for scientific notation)
     // add input field to get the value of the parameter
     QDoubleSpinBox* valueField = new QDoubleSpinBox();
-    valueField->setObjectName("value");
     valueField->setButtonSymbols(QAbstractSpinBox::NoButtons);
     valueField->setRange(-DBL_MAX, DBL_MAX);
     valueField->setDecimals(3);
     valueField->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
     valueField->setMaximumWidth(100);
     valueField->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
-    outputLayout->addWidget(valueField);
+    row->addWidget(valueField);
 
-    outputsLayout->insertLayout(index, outputLayout);
-}
-
-void ConstantMapNode::removeOldOutputsLayoutRow(QVBoxLayout* outputsLayout, int index)
-{
-    QObjectList children = outputsLayout->children();
-    QHBoxLayout* layoutToRemove = (QHBoxLayout*) children.at(index);
-    clearLayout(layoutToRemove, true);
-    outputsLayout->removeItem(layoutToRemove);
-    delete layoutToRemove;
-}
-
-void ConstantMapNode::updateLayout()
-{
-    QVBoxLayout* outputsLayout = this->layout()->findChild<QVBoxLayout*>("outputsLayout");
-    QStringList oldOutputs = QStringList();
-
-    if (!outputsLayout->children().isEmpty())
-    {
-        foreach (QObject* child, outputsLayout->children())
-        {
-            oldOutputs.append(((QLabel*) ((QHBoxLayout*) child)->itemAt(0)->widget())->text());
-        }
-    }
-
-    for (int i = 0; i < oldOutputs.size(); i++)
-    {
-        if (!outputs->contains(oldOutputs.at(i)))
-        {
-            removeLayoutAtIndex(outputsLayout, i);
-            oldOutputs.remove(i);
-            i--;
-        }
-    }
-
-    for (int i = 0; i < oldOutputs.size(); i++)
-    {
-        if (oldOutputs.at(i) != outputs->at(i))
-        {
-            if (!oldOutputs.contains(outputs->at(i)))
-            {
-                addNewOutputsLayoutRow(outputsLayout, i);
-                oldOutputs.insert(i, outputs->at(i));
-            }
-        }
-    }
-
-    for (int i = oldOutputs.size(); i < outputs->size(); i++)
-    {
-        addNewOutputsLayoutRow(outputsLayout, i);
-    }
+    // add button to remove dimension
+    addRemoveButton(row, index);
+    dimensionsLayout->insertLayout(index, row);
 }
 
 void ConstantMapNode::saveNodeContent(YAML::Emitter* out)
@@ -172,7 +98,9 @@ void ConstantMapNode::saveValues(YAML::Emitter* out)
 
     *out << YAML::Key << "map";
     *out << YAML::Value << YAML::BeginMap;
-    foreach (QString key, values->keys())
+    QStringList sortKeys = values->keys();
+    sortKeys.sort();
+    foreach (QString key, sortKeys)
     {
         *out << YAML::Key << key.toStdString();
         *out << YAML::Value << values->value(key);

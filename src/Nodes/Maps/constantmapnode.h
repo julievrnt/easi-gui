@@ -14,16 +14,17 @@ public:
     ~ConstantMapNode();
 
 private:
-    void createLayout();
     void addNewOutputsLayoutRow(QVBoxLayout* outputsLayout, int index);
-    void removeOldOutputsLayoutRow(QVBoxLayout* outputsLayout, int index);
+    void removeOutputsLayoutRow(QVBoxLayout* outputsLayout, int index);
     QMap<QString, double>* getValues();
-
-    void updateLayout();
 
 protected:
     void saveNodeContent(YAML::Emitter* out);
     void saveValues(YAML::Emitter* out);
+
+    // NodeBase interface
+protected:
+    void addNewDimensionsLayoutRow(QVBoxLayout* dimensionsLayout, int index);
 };
 
 #endif // CONSTANTMAPNODE_H

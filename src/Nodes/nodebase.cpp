@@ -7,11 +7,19 @@
 #include "../helpers.h"
 #include "../Connectors/outputs/outputconnector.h"
 
-NodeBase::NodeBase(QStringList* outputs, QWidget* parent)
+NodeBase::NodeBase(QStringList* inputs, QStringList* outputs, QWidget* parent)
     : QWidget{parent}
 {
     typeOfNode = NODE;
+
+    this->inputs = inputs;
+    if (this->inputs == nullptr)
+        this->inputs = new QStringList();
+
     this->outputs = outputs;
+    if (this->outputs == nullptr)
+        this->outputs = new QStringList();
+
     this->setWindowTitle("Node Base");
     outputConnectors = new QList<QGraphicsProxyWidget*>();
     mathOutputConnectors = new QList<QGraphicsProxyWidget*>();
@@ -62,7 +70,7 @@ OutputConnector* NodeBase::getFirstAvailableOutputConnector()
         if (outputConnector->isFree())
             return outputConnector;
     }
-    return nullptr;
+    return (emit addOutputConnectorRequested(this->getProxyNode()));
 }
 
 void NodeBase::performResize()
@@ -77,6 +85,11 @@ void NodeBase::performResize()
         outputConnector->setX(x);
         outputConnector->setY(y);
     }
+}
+
+QStringList* NodeBase::getInputs() const
+{
+    return inputs;
 }
 
 QGraphicsProxyWidget* NodeBase::getProxyNode() const
@@ -117,14 +130,15 @@ void NodeBase::paintEvent(QPaintEvent* event)
     QWidget::paintEvent(event);
 }
 
+void NodeBase::inputsChanged()
+{
+    if (inputs == nullptr)
+        return;
+    updateLayout();
+}
+
 void NodeBase::outputsChanged()
 {
-    if (outputs == nullptr)
-    {
-        qDebug() << "ERROR: outputs is null";
-        return;
-    }
-    updateLayout();
     emit transferOutputsRequested(outputs);
 }
 
@@ -144,15 +158,31 @@ void NodeBase::saveComponents(YAML::Emitter* out)
         *out << YAML::EndSeq;
 }
 
-void NodeBase::addTitleLayout(QVBoxLayout* globalLayout)
+void NodeBase::createLayout()
+{
+    QVBoxLayout* globalLayout = new QVBoxLayout(this);
+    if (typeOfNode == ANYNODE || typeOfNode == IDENTITYMAPNODE)
+        addTitleLayout(globalLayout, false);
+    else
+        addTitleLayout(globalLayout, true);
+    addDimensionLayout(globalLayout);
+    if (typeOfNode != ROOTNODE)
+        addComponentsLayout(globalLayout);
+    this->setLayout(globalLayout);
+}
+
+void NodeBase::addTitleLayout(QVBoxLayout* globalLayout, bool addSeparatorLine)
 {
     QLabel* title = new QLabel(this);
     title->setText(this->windowTitle());
     title->setAlignment(Qt::AlignCenter);
     title->setStyleSheet("QLabel { background-color : rgb(70,70,70);}");
-    title->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+    title->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Fixed);
     title->setFixedHeight(30);
     globalLayout->addWidget(title);
+
+    if (!addSeparatorLine)
+        return;
 
     // add line to separate title from the rest
     QFrame* lineTitel = new QFrame(this);
@@ -160,6 +190,40 @@ void NodeBase::addTitleLayout(QVBoxLayout* globalLayout)
     lineTitel->setFrameShadow(QFrame::Sunken);
     lineTitel->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
     globalLayout->addWidget(lineTitel);
+}
+
+void NodeBase::addDimensionLayout(QVBoxLayout* globalLayout)
+{
+    // add an empty layout that will contain the dimensions
+    QVBoxLayout* dimensionsLayout = new QVBoxLayout();
+    dimensionsLayout->setObjectName("dimensionsLayout");
+    if (outputs != nullptr)
+    {
+        for (int i = 0; i < outputs->size(); i++)
+        {
+            addNewDimensionsLayoutRow(dimensionsLayout, i);
+        }
+    }
+    globalLayout->addLayout(dimensionsLayout);
+
+    switch (typeOfNode)
+    {
+        case ANYNODE:
+            return;
+        case AXISALIGNEDCUBOIDALDOMAINFILTERNODE:
+            return;
+        case IDENTITYMAPNODE:
+            return;
+        default:
+            break;
+    }
+
+
+    // add button to add dimension
+    QPushButton* addButton = new QPushButton();
+    addButton->setText("+");
+    connect(addButton, SIGNAL(clicked(bool)), this, SLOT(addDimensionsLayoutRowRequested(bool)));
+    globalLayout->addWidget(addButton);
 }
 
 void NodeBase::addComponentsLayout(QVBoxLayout* globalLayout)
@@ -194,6 +258,16 @@ void NodeBase::addComponentsLayout(QVBoxLayout* globalLayout)
     globalLayout->addLayout(buttonsLayout);
 }
 
+void NodeBase::addRemoveButton(QLayout* layout, int index)
+{
+    // add button to remove dimension
+    QPushButton* removeButton = new QPushButton();
+    removeButton->setObjectName(QString::number(index));
+    removeButton->setText("-");
+    connect(removeButton, SIGNAL(clicked(bool)), this, SLOT(removeDimensionsLayoutRowRequested(bool)));
+    layout->addWidget(removeButton);
+}
+
 void NodeBase::clearLayout(QLayout* layout, bool deleteWidgets)
 {
     while (QLayoutItem* item = layout->takeAt(0))
@@ -209,18 +283,31 @@ void NodeBase::clearLayout(QLayout* layout, bool deleteWidgets)
     }
 }
 
-void NodeBase::removeLayoutAtIndex(QLayout* layout, int index)
+void NodeBase::addNewDimensionsLayoutRow(QVBoxLayout* dimensionsLayout, int index)
 {
-    QObjectList children = layout->children();
+    // needs to be implemented in subclasses
+    UNUSED(dimensionsLayout);
+    UNUSED(index);
+}
+
+void NodeBase::removeLayoutRow(QVBoxLayout* dimensionsLayout, int index)
+{
+    QObjectList children = dimensionsLayout->children();
     QLayout* layoutToRemove = (QLayout*) children.at(index);
     clearLayout(layoutToRemove, true);
-    layout->removeItem(layoutToRemove);
+    dimensionsLayout->removeItem(layoutToRemove);
     delete layoutToRemove;
 }
 
 void NodeBase::updateLayout()
 {
     // do nothing
+}
+
+QPushButton* NodeBase::getRemoveButtonAtIndex(QVBoxLayout* dimensionsLayout, int index)
+{
+    QObjectList rows = dimensionsLayout->children();
+    return (QPushButton*) ((QLayout*) rows.at(index))->itemAt(removeButtonIndex)->widget();
 }
 
 void NodeBase::saveNodeContent(YAML::Emitter* out)
@@ -235,10 +322,39 @@ void NodeBase::saveValues(YAML::Emitter* out)
     return;
 }
 
+void NodeBase::addDimensionsLayoutRowRequested(bool clicked)
+{
+    UNUSED(clicked);
+    QVBoxLayout* dimensionsLayout = this->layout()->findChild<QVBoxLayout*>("dimensionsLayout");
+    addNewDimensionsLayoutRow(dimensionsLayout, dimensionsLayout->children().size());
+}
+
+void NodeBase::removeDimensionsLayoutRowRequested(bool clicked)
+{
+    UNUSED(clicked);
+    QVBoxLayout* dimensionsLayout = this->layout()->findChild<QVBoxLayout*>("dimensionsLayout");
+    QPushButton* removeButton = qobject_cast<QPushButton*>(sender());
+    int index = removeButton->objectName().toInt();
+    removeLayoutRow(dimensionsLayout, index);
+    if (dimensionLineEditIndex != -1)
+    {
+        outputs->removeAt(index);
+        emit transferOutputsRequested(outputs);
+    }
+    if (index != dimensionsLayout->children().size())
+    {
+        if (removeButtonIndex != -1)
+            renameNextRemoveButtons(dimensionsLayout, index);
+        if (dimensionLineEditIndex != -1)
+            renameNextDimensionLineEdit(dimensionsLayout, index);
+    }
+    performResize();
+}
+
 void NodeBase::addOutputConnectorButtonClicked(bool clicked)
 {
     UNUSED(clicked);
-    emit addOutputConnectorRequested();
+    emit addOutputConnectorRequested(this->getProxyNode());
 }
 
 void NodeBase::deleteOutputConnectorButtonClicked(bool clicked)
@@ -251,11 +367,41 @@ void NodeBase::deleteOutputConnectorButtonClicked(bool clicked)
     }
 }
 
-void NodeBase::transferOutputs(QStringList* outputs)
+void NodeBase::renameNextRemoveButtons(QVBoxLayout* dimensionsLayout, int index)
 {
-    if (this->outputs != outputs)
-        this->outputs = outputs;
-    outputsChanged();
+    while (index < dimensionsLayout->children().size())
+    {
+        QPushButton* removeButtonAtIndex = getRemoveButtonAtIndex(dimensionsLayout, index);
+        if (removeButtonAtIndex == nullptr)
+            return;
+        removeButtonAtIndex->setObjectName(QString::number(index));
+        index++;
+    }
+}
+
+QLineEdit* NodeBase::getDimensionLineEditAtIndex(QVBoxLayout* dimensionsLayout, int index)
+{
+    QObjectList rows = dimensionsLayout->children();
+    return (QLineEdit*) ((QLayout*) rows.at(index))->itemAt(dimensionLineEditIndex)->widget();
+}
+
+void NodeBase::renameNextDimensionLineEdit(QVBoxLayout* dimensionsLayout, int index)
+{
+    while (index < dimensionsLayout->children().size())
+    {
+        QLineEdit* dimensionLineEditAtIndex = getDimensionLineEditAtIndex(dimensionsLayout, index);
+        if (dimensionLineEditAtIndex == nullptr)
+            return;
+        dimensionLineEditAtIndex->setPlaceholderText("Dimension " + QString::number(index));
+        index++;
+    }
+}
+
+void NodeBase::transferOutputsReceived(QStringList* newInputs)
+{
+    if (this->inputs != newInputs)
+        this->inputs = newInputs;
+    inputsChanged();
 }
 
 void NodeBase::save(YAML::Emitter* out)

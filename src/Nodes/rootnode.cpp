@@ -3,24 +3,16 @@
 #include <QHBoxLayout>
 #include <QPushButton>
 #include <QLabel>
-#include "rootnodedialog.h"
-#include "../helpers.h"
 #include "../Connectors/outputs/outputconnector.h"
 
-RootNode::RootNode(QStringList* outputs) : NodeBase(outputs)
+RootNode::RootNode()
 {
-    typeOfNode = ROOT;
-    setWindowTitle("Outputs");
+    typeOfNode = ROOTNODE;
+    setWindowTitle("Inputs");
     outputConnector = nullptr;
 
-    // add default outputs
-    if (outputs == nullptr)
-    {
-        this->outputs = new QStringList();
-        *this->outputs << "lambda" << "mu" << "rho";
-    }
-    else
-        this->outputs = outputs;
+    outputs = new QStringList();
+    *outputs << "x" << "y" << "z";
 
     createLayout();
 
@@ -30,12 +22,8 @@ RootNode::RootNode(QStringList* outputs) : NodeBase(outputs)
 RootNode::~RootNode()
 {
     delete outputs;
+    delete outputConnector;
     delete outputConnectors;
-}
-
-void RootNode::updateOutputs()
-{
-    sortOutputs(0);
 }
 
 void RootNode::setOutputConnector(QGraphicsProxyWidget* newOutputConnector)
@@ -51,92 +39,34 @@ OutputConnector* RootNode::getFirstAvailableOutputConnector()
 void RootNode::createLayout()
 {
     QVBoxLayout* globalLayout = new QVBoxLayout();
-    addTitleLayout(globalLayout);
+    addTitleLayout(globalLayout, true);
 
     // create layout in order to modify it later
     QVBoxLayout* outputsLayout = new QVBoxLayout();
-    outputsLayout->setObjectName("Outputs Layout");
+    outputsLayout->setObjectName("outputsLayout");
 
     for (int i = 0; i < outputs->size(); i++)
     {
-        QLabel* outputLabel = new QLabel();
-        outputLabel->setText(outputs->at(i));
-        outputLabel->setAlignment(Qt::AlignCenter);
-        outputLabel->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-        outputsLayout->addWidget(outputLabel);
-        // store label in list to easily remove it later
-        outputLabels.append(outputLabel);
+        QLabel* output = new QLabel();
+        output->setText(outputs->at(i));
+        output->setAlignment(Qt::AlignCenter);
+        output->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
+        output->setFixedWidth(60);
+        outputsLayout->addWidget(output);
     }
 
     globalLayout->addLayout(outputsLayout);
 
-    // modifyButton will open a dialog
-    QPushButton* modifyButton = new QPushButton();
-    modifyButton->setText("Modify Outputs");
-
-    connect(modifyButton, SIGNAL(clicked(bool)), this, SLOT(modifyOutputsButtonClicked(bool)));
-
-    globalLayout->addWidget(modifyButton);
-
     this->setLayout(globalLayout);
-}
-
-void RootNode::updateLayout()
-{
-    QVBoxLayout* outputsLayout = (QVBoxLayout*) layout()->findChild<QVBoxLayout*>("Outputs Layout");
-
-    while (!outputLabels.isEmpty())
-    {
-        QLabel* outputLabelToRemove = outputLabels.takeLast();
-        outputsLayout->removeWidget(outputLabelToRemove);
-        delete outputLabelToRemove;
-    }
-
-    // add all new outputs in layout
-    for (int i = 0; i < outputs->size(); i++)
-    {
-        QLabel* outputLabel = new QLabel();
-        outputLabel->setText(outputs->at(i));
-        outputLabel->setAlignment(Qt::AlignCenter);
-        outputLabel->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-        outputsLayout->addWidget(outputLabel);
-        // store label in list to easily remove it later
-        outputLabels.append(outputLabel);
-    }
-}
-
-void RootNode::modifyOutputs()
-{
-    RootNodeDialog modifyOutputsDialog(outputs);
-    connect(&modifyOutputsDialog, SIGNAL(finished(int)), this, SLOT(sortOutputs(int)));
-    modifyOutputsDialog.exec();
-}
-
-void RootNode::mousePressEvent(QMouseEvent* event)
-{
-    QWidget::mousePressEvent(event);
-}
-
-void RootNode::modifyOutputsButtonClicked(bool clicked)
-{
-    UNUSED(clicked);
-    modifyOutputs();
-}
-
-void RootNode::sortOutputs(int result)
-{
-    UNUSED(result);
-    outputs->sort();
-    updateLayout();
-    emit transferOutputsRequested(outputs);
-    /// TODO: find a way to resize correctly + add cancel !!!
-    performResize();
 }
 
 void RootNode::saveNodeContent(YAML::Emitter* out)
 {
     if (outputConnector == nullptr)
+    {
         qDebug() << "ERROR: output connnector of root is null !";
+        return;
+    }
     ((OutputConnector*) outputConnector->widget())->saveComponent(out);
 }
 
