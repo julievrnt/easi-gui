@@ -144,11 +144,9 @@ void AxisAlignedCuboidalDomainFilterNode::saveValues(YAML::Emitter* out)
     {
         *out << YAML::Key << outputs->at(i).toStdString();
         *out << YAML::Value;
-        *out << YAML::Flow;
-        *out << YAML::BeginSeq;
+        *out << YAML::Flow << YAML::BeginSeq;
         *out << values->at(i * 2) << values->at(i * 2 + 1);
-        *out << YAML::EndSeq;
-        *out << YAML::Block;
+        *out << YAML::EndSeq << YAML::Block;
     }
 
     *out << YAML::EndMap;

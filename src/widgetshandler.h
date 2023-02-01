@@ -53,7 +53,7 @@ public:
     QGraphicsProxyWidget* addAnyNode(QStringList* inputs = nullptr);
     QGraphicsProxyWidget* addAxisAlignedCuboidalDomainFilterNode(QStringList* inputs = nullptr, QList<double>* values = nullptr);
     QGraphicsProxyWidget* addSphericalDomainFilterNode();
-    QGraphicsProxyWidget* addGroupFilterNode();
+    QGraphicsProxyWidget* addGroupFilterNode(QStringList* inputs = nullptr, QList<double>* values = nullptr);
     QGraphicsProxyWidget* addSwitchNode();
 
     // add map functions

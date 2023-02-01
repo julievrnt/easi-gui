@@ -53,6 +53,7 @@ QMap<QString, double>*  ConstantMapNode::getValues()
         double value = ((QDoubleSpinBox*) layout->itemAt(1)->widget())->value();
         values->insert(name, value);
     }
+
     return values;
 }
 
@@ -60,7 +61,6 @@ void ConstantMapNode::dimensionNameChanged(QString newOutput)
 {
     QLineEdit* dimension = qobject_cast<QLineEdit*>(sender());
     int index = dimension->objectName().toInt();
-    qDebug() << index;
     outputs->insert(index, newOutput);
     outputs->removeAt(index + 1);
     emit transferOutputsRequested(outputs);
