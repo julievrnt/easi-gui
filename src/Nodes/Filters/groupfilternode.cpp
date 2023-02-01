@@ -3,6 +3,7 @@
 GroupFilterNode::GroupFilterNode()
 {
     typeOfNode = GROUPFILTERNODE;
+    localTag = "GroupFilter";
     setWindowTitle("Group Filter");
     createLayout();
 

@@ -312,8 +312,11 @@ QPushButton* NodeBase::getRemoveButtonAtIndex(QVBoxLayout* dimensionsLayout, int
 
 void NodeBase::saveNodeContent(YAML::Emitter* out)
 {
-    UNUSED(out);
-    return;
+    *out << YAML::LocalTag(localTag.toStdString());
+    *out << YAML::BeginMap;
+    saveValues(out);
+    saveComponents(out);
+    *out << YAML::EndMap;
 }
 
 void NodeBase::saveValues(YAML::Emitter* out)

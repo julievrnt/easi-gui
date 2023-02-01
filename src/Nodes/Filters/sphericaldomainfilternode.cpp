@@ -3,6 +3,7 @@
 SphericalDomainFilterNode::SphericalDomainFilterNode()
 {
     typeOfNode = SPHERICALDOMAINFILTERNODE;
+    localTag = "SphericalDomainFilter";
     setWindowTitle("Spherical Domain Filter");
     createLayout();
 

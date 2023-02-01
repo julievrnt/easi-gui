@@ -31,7 +31,6 @@ private slots:
 
 protected:
     void updateLayout();
-    void saveNodeContent(YAML::Emitter* out);
     void saveValues(YAML::Emitter* out);
 
     // NodeBase interface

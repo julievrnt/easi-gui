@@ -11,7 +11,6 @@ public:
 
 protected:
     void updateLayout();
-    void saveNodeContent(YAML::Emitter* out);
 };
 
 #endif // IDENTITYMAPNODE_H

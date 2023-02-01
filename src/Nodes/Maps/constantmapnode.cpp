@@ -12,6 +12,7 @@
 ConstantMapNode::ConstantMapNode(QStringList* outputs) : NodeBase(nullptr, outputs)
 {
     typeOfNode = CONSTANTMAPNODE;
+    localTag = "ConstantMap";
     removeButtonIndex = 2;
     dimensionLineEditIndex = 0;
     setWindowTitle("Constant Map");
@@ -55,17 +56,31 @@ QMap<QString, double>*  ConstantMapNode::getValues()
     return values;
 }
 
+void ConstantMapNode::dimensionNameChanged(QString newOutput)
+{
+    QLineEdit* dimension = qobject_cast<QLineEdit*>(sender());
+    int index = dimension->objectName().toInt();
+    qDebug() << index;
+    outputs->insert(index, newOutput);
+    outputs->removeAt(index + 1);
+    emit transferOutputsRequested(outputs);
+}
+
 void ConstantMapNode::addNewDimensionsLayoutRow(QVBoxLayout* dimensionsLayout, int index)
 {
     QHBoxLayout* row = new QHBoxLayout();
 
     // add label to display the name of the outputs
     QLineEdit* dimension = new QLineEdit();
+    dimension->setObjectName(QString::number(index));
     dimension->setPlaceholderText("Dimension " + QString::number(index));
     if (outputs->size() > index)
         dimension->setText(outputs->at(index));
+    else
+        outputs->append("");
     dimension->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
     dimension->setFixedWidth(100);
+    connect(dimension, SIGNAL(textChanged(QString)), this, SLOT(dimensionNameChanged(QString)));
     row->addWidget(dimension);
 
     // add input field to get the value of the parameter
@@ -81,15 +96,6 @@ void ConstantMapNode::addNewDimensionsLayoutRow(QVBoxLayout* dimensionsLayout, i
     // add button to remove dimension
     addRemoveButton(row, index);
     dimensionsLayout->insertLayout(index, row);
-}
-
-void ConstantMapNode::saveNodeContent(YAML::Emitter* out)
-{
-    *out << YAML::LocalTag("ConstantMap");
-    *out << YAML::BeginMap;
-    saveValues(out);
-    saveComponents(out);
-    *out << YAML::EndMap;
 }
 
 void ConstantMapNode::saveValues(YAML::Emitter* out)

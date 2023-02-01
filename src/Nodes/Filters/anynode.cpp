@@ -3,6 +3,7 @@
 AnyNode::AnyNode(QStringList* inputs) : NodeBase(inputs, inputs)
 {
     typeOfNode = ANYNODE;
+    localTag = "Any";
     this->setWindowTitle("Any");
     createLayout();
 
@@ -13,12 +14,4 @@ void AnyNode::updateLayout()
 {
     outputs = inputs;
     emit transferOutputsRequested(outputs);
-}
-
-void AnyNode::saveNodeContent(YAML::Emitter* out)
-{
-    (*out) << YAML::LocalTag("Any");
-    *out << YAML::BeginMap;
-    saveComponents(out);
-    *out << YAML::EndMap;
 }

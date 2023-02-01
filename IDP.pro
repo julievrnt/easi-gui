@@ -22,8 +22,16 @@ SOURCES += \
     src/Nodes/Filters/sphericaldomainfilternode.cpp \
     src/Nodes/Filters/swtichnode.cpp \
     src/Nodes/Maps/affinemapnode.cpp \
+    src/Nodes/Maps/andersonianstressnode.cpp \
+    src/Nodes/Maps/asaginode.cpp \
     src/Nodes/Maps/constantmapnode.cpp \
+    src/Nodes/Maps/evalmodelnode.cpp \
+    src/Nodes/Maps/functionmapnode.cpp \
     src/Nodes/Maps/identitymapnode.cpp \
+    src/Nodes/Maps/optimalstressnode.cpp \
+    src/Nodes/Maps/polynomialmapnode.cpp \
+    src/Nodes/Maps/scecfilenode.cpp \
+    src/Nodes/Maps/specialmapnode.cpp \
     src/Nodes/Math/matrixnode.cpp \
     src/Nodes/Math/translationnode.cpp \
     src/main.cpp \
@@ -48,8 +56,16 @@ HEADERS += \
     src/Nodes/Filters/sphericaldomainfilternode.h \
     src/Nodes/Filters/swtichnode.h \
     src/Nodes/Maps/affinemapnode.h \
+    src/Nodes/Maps/andersonianstressnode.h \
+    src/Nodes/Maps/asaginode.h \
     src/Nodes/Maps/constantmapnode.h \
+    src/Nodes/Maps/evalmodelnode.h \
+    src/Nodes/Maps/functionmapnode.h \
     src/Nodes/Maps/identitymapnode.h \
+    src/Nodes/Maps/optimalstressnode.h \
+    src/Nodes/Maps/polynomialmapnode.h \
+    src/Nodes/Maps/scecfilenode.h \
+    src/Nodes/Maps/specialmapnode.h \
     src/Nodes/Math/matrixnode.h \
     src/Nodes/Math/translationnode.h \
     src/mainwindow.h \

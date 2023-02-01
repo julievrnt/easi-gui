@@ -8,6 +8,7 @@
 AffineMapNode::AffineMapNode(QStringList* inputs) : NodeBase(inputs)
 {
     typeOfNode = AFFINEMAPNODE;
+    localTag = "AffineMap";
     removeButtonIndex = 0;
     dimensionLineEditIndex = 1;
     setWindowTitle("Affine Map");
@@ -178,15 +179,6 @@ void AffineMapNode::dimensionNameChanged(QString newOutput)
     outputs->insert(index, newOutput);
     outputs->removeAt(index + 1);
     emit transferOutputsRequested(outputs);
-}
-
-void AffineMapNode::saveNodeContent(YAML::Emitter* out)
-{
-    *out << YAML::LocalTag("AffineMap");
-    *out << YAML::BeginMap;
-    saveValues(out);
-    saveComponents(out);
-    *out << YAML::EndMap;
 }
 
 void AffineMapNode::saveValues(YAML::Emitter* out)

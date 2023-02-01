@@ -3,6 +3,7 @@
 SwtichNode::SwtichNode()
 {
     typeOfNode = SWITCHNODE;
+    localTag = "Switch";
     setWindowTitle("Switch");
     createLayout();
 

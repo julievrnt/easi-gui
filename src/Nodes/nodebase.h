@@ -72,6 +72,7 @@ signals:
 
 protected:
     int typeOfNode;
+    QString localTag = "";
     int removeButtonIndex = -1;
     int dimensionLineEditIndex = -1;
     QStringList* inputs;

@@ -6,6 +6,7 @@
 AxisAlignedCuboidalDomainFilterNode::AxisAlignedCuboidalDomainFilterNode(QStringList* inputs) : NodeBase(inputs, inputs)
 {
     typeOfNode = AXISALIGNEDCUBOIDALDOMAINFILTERNODE;
+    localTag = "AxisAlignedCuboidalDomainFilter";
     dimensionLineEditIndex = 1;
     setWindowTitle("Axis Aligned Cuboidal Domain Filter");
     if (inputs != nullptr)
@@ -131,15 +132,6 @@ void AxisAlignedCuboidalDomainFilterNode::updateLayout()
     }
 
     emit transferOutputsRequested(outputs);
-}
-
-void AxisAlignedCuboidalDomainFilterNode::saveNodeContent(YAML::Emitter* out)
-{
-    *out << YAML::LocalTag("AxisAlignedCuboidalDomainFilter");
-    *out << YAML::BeginMap;
-    saveValues(out);
-    saveComponents(out);
-    *out << YAML::EndMap;
 }
 
 void AxisAlignedCuboidalDomainFilterNode::saveValues(YAML::Emitter* out)

@@ -3,6 +3,7 @@
 IdentityMapNode::IdentityMapNode(QStringList* inputs): NodeBase(inputs, inputs)
 {
     typeOfNode = IDENTITYMAPNODE;
+    localTag = "IdentityMap";
     this->setWindowTitle("Identity Map");
     createLayout();
 
@@ -13,12 +14,4 @@ void IdentityMapNode::updateLayout()
 {
     outputs = inputs;
     emit transferOutputsRequested(outputs);
-}
-
-void IdentityMapNode::saveNodeContent(YAML::Emitter* out)
-{
-    (*out) << YAML::LocalTag("IdentityMap");
-    *out << YAML::BeginMap;
-    saveComponents(out);
-    *out << YAML::EndMap;
 }
