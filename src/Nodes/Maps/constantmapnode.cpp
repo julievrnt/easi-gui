@@ -105,7 +105,6 @@ void ConstantMapNode::saveValues(YAML::Emitter* out)
     *out << YAML::Key << "map";
     *out << YAML::Value << YAML::BeginMap;
     QStringList sortKeys = values->keys();
-    sortKeys.sort();
     foreach (QString key, sortKeys)
     {
         *out << YAML::Key << key.toStdString();

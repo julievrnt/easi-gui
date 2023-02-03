@@ -84,22 +84,7 @@ qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
-win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../../../../usr/local/lib/release/ -lyaml-cpp
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../../../../usr/local/lib/debug/ -lyaml-cpp
-else:unix: LIBS += -L$$PWD/../../../../usr/local/lib/ -lyaml-cpp
+unix:!macx: LIBS += -L$$PWD/../../../../usr/local/lib/ -lyaml-cpp
 
 INCLUDEPATH += $$PWD/../../../../usr/local/include
 DEPENDPATH += $$PWD/../../../../usr/local/include
-
-win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$PWD/../../../../usr/local/lib/release/libyaml-cpp.a
-else:win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$PWD/../../../../usr/local/lib/debug/libyaml-cpp.a
-else:win32:!win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$PWD/../../../../usr/local/lib/release/yaml-cpp.lib
-else:win32:!win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$PWD/../../../../usr/local/lib/debug/yaml-cpp.lib
-else:unix: PRE_TARGETDEPS += $$PWD/../../../../usr/local/lib/libyaml-cpp.a
-
-#win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../../../../YAMLcpp/ -llibyaml-cpp.dll
-#else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../../../../YAMLcpp/ -llibyaml-cpp.dll
-#else:unix: LIBS += -L$$PWD/../../../../YAMLcpp/ -llibyaml-cpp.dll
-
-#INCLUDEPATH += $$PWD/../../Downloads/yaml-cpp-yaml-cpp-0.7.0/include
-#DEPENDPATH += $$PWD/../../Downloads/yaml-cpp-yaml-cpp-0.7.0/include

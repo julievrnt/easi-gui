@@ -52,7 +52,7 @@ public:
     // add filter functions
     QGraphicsProxyWidget* addAnyNode(QStringList* inputs = nullptr);
     QGraphicsProxyWidget* addAxisAlignedCuboidalDomainFilterNode(QStringList* inputs = nullptr, QList<double>* values = nullptr);
-    QGraphicsProxyWidget* addSphericalDomainFilterNode();
+    QGraphicsProxyWidget* addSphericalDomainFilterNode(QStringList* inputs = nullptr, QList<double>* values = nullptr);
     QGraphicsProxyWidget* addGroupFilterNode(QStringList* inputs = nullptr, QList<double>* values = nullptr);
     QGraphicsProxyWidget* addSwitchNode();
 

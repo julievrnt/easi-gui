@@ -220,8 +220,9 @@ void MainWindow::enableDisableIcons(bool enable)
 void MainWindow::openNode(QGraphicsProxyWidget* parentProxyNode, YAML::Node* node, QStringList* outputs)
 {
     QString tagOfNode = QString::fromStdString((*node).Tag());
+    //qDebug() << tagOfNode;
+
     // read tag of node
-    qDebug() << tagOfNode;
     //filters
     if (tagOfNode == "!Any")
         openAnyNode(parentProxyNode, node, outputs);
@@ -296,7 +297,7 @@ void MainWindow::openAxisAlignedCuboidalDomainFilterNode(QGraphicsProxyWidget* p
 {
     if (!(*node)["limits"])
     {
-        qDebug() << "ERROR: no limits part in constant map";
+        qDebug() << "ERROR: no limits part in axis aligned cuboidal domain filter";
         return;
     }
 
@@ -319,15 +320,35 @@ void MainWindow::openAxisAlignedCuboidalDomainFilterNode(QGraphicsProxyWidget* p
 
 void MainWindow::openSphericalDomainFilterNode(QGraphicsProxyWidget* parentProxyNode, YAML::Node* node, QStringList* inputs)
 {
-    /// TODO
+    if (!(*node)["radius"])
+    {
+        qDebug() << "ERROR: no radius part in spherical domain filter";
+        return;
+    }
+
+    if (!(*node)["center"])
+    {
+        qDebug() << "ERROR: no center part in spherical domain filter";
+        return;
+    }
+
+    QList<double>* values = new QList<double>();
+
+    values->append((*node)["radius"].as<double>());
+
+    for (YAML::const_iterator it = (*node)["center"].begin(); it != (*node)["center"].end(); ++it)
+    {
+        *values << it->second.as<double>();
+    }
+
     // add node
-    QGraphicsProxyWidget* proxyNode = widgetsHandler->addSphericalDomainFilterNode();
+    QGraphicsProxyWidget* proxyNode = widgetsHandler->addSphericalDomainFilterNode(inputs, values);
     // move it next to parent node
     widgetsHandler->moveNodeNextTo(parentProxyNode, proxyNode);
     // connect them
     widgetsHandler->connectNodes((NodeBase*) parentProxyNode->widget(), (NodeBase*) proxyNode->widget());
 
-    openComponents(proxyNode, node, nullptr);
+    openComponents(proxyNode, node, inputs);
 }
 
 void MainWindow::openGroupFilterNode(QGraphicsProxyWidget* parentProxyNode, YAML::Node* node, QStringList* inputs)

@@ -159,19 +159,6 @@ void AffineMapNode::updateLayout()
     }
 }
 
-QStringList AffineMapNode::getValues()
-{
-    QStringList values;
-
-    QObjectList dimensionsLayout = this->layout()->findChild<QVBoxLayout*>("dimensionsLayout")->children();
-    for (int i = 0; i < dimensionsLayout.size(); i++)
-    {
-        QHBoxLayout* row = (QHBoxLayout*) dimensionsLayout.at(i);
-        values.append(((QLineEdit*) row->itemAt(1)->widget())->text());
-    }
-    return values;
-}
-
 void AffineMapNode::dimensionNameChanged(QString newOutput)
 {
     QLineEdit* dimension = qobject_cast<QLineEdit*>(sender());
@@ -183,14 +170,16 @@ void AffineMapNode::dimensionNameChanged(QString newOutput)
 
 void AffineMapNode::saveValues(YAML::Emitter* out)
 {
-    QStringList dimensions = getValues();
+    QStringList dimensions(*outputs);
+    dimensions.sort();
 
     *out << YAML::Key << "matrix";
     *out << YAML::BeginMap ;
     for (int i = 0; i < dimensions.size(); i++)
     {
-        *out << YAML::Key << dimensions[i].toStdString();
-        ((OutputConnector*) mathOutputConnectors->at(i * 2)->widget())->saveComponent(out);
+        int index = outputs->indexOf(dimensions[i]);
+        *out << YAML::Key << outputs->at(index).toStdString();
+        ((OutputConnector*) mathOutputConnectors->at(index * 2)->widget())->saveComponent(out);
     }
     *out << YAML::EndMap;
 
@@ -198,8 +187,9 @@ void AffineMapNode::saveValues(YAML::Emitter* out)
     *out << YAML::BeginMap ;
     for (int i = 0; i < dimensions.size(); i++)
     {
-        *out << YAML::Key << dimensions[i].toStdString();
-        ((OutputConnector*) mathOutputConnectors->at(i * 2 + 1)->widget())->saveComponent(out);
+        int index = outputs->indexOf(dimensions[i]);
+        *out << YAML::Key << outputs->at(index).toStdString();
+        ((OutputConnector*) mathOutputConnectors->at(index * 2 + 1)->widget())->saveComponent(out);
     }
     *out << YAML::EndMap;
 

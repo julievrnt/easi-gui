@@ -368,9 +368,9 @@ QGraphicsProxyWidget* WidgetsHandler::addAxisAlignedCuboidalDomainFilterNode(QSt
     return proxyNode;
 }
 
-QGraphicsProxyWidget* WidgetsHandler::addSphericalDomainFilterNode()
+QGraphicsProxyWidget* WidgetsHandler::addSphericalDomainFilterNode(QStringList* inputs, QList<double>* values)
 {
-    SphericalDomainFilterNode* sphericalDomainFilterNode = new SphericalDomainFilterNode();
+    SphericalDomainFilterNode* sphericalDomainFilterNode = new SphericalDomainFilterNode(inputs, values);
     QGraphicsProxyWidget* proxyNode = addNode(sphericalDomainFilterNode);
     NodeParentWidget* nodeParentWidget = (NodeParentWidget*)proxyNode->parentWidget();
 

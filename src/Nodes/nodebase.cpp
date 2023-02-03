@@ -173,13 +173,16 @@ void NodeBase::createLayout()
 
 void NodeBase::addTitleLayout(QVBoxLayout* globalLayout, bool addSeparatorLine)
 {
+    QVBoxLayout* titleLayout = new QVBoxLayout();
+    titleLayout->setObjectName("titleLayout");
+
     QLabel* title = new QLabel(this);
     title->setText(this->windowTitle());
     title->setAlignment(Qt::AlignCenter);
     title->setStyleSheet("QLabel { background-color : rgb(70,70,70);}");
     title->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Fixed);
     title->setFixedHeight(30);
-    globalLayout->addWidget(title);
+    titleLayout->addWidget(title);
 
     if (!addSeparatorLine)
         return;
@@ -189,7 +192,9 @@ void NodeBase::addTitleLayout(QVBoxLayout* globalLayout, bool addSeparatorLine)
     lineTitel->setFrameShape(QFrame::HLine);
     lineTitel->setFrameShadow(QFrame::Sunken);
     lineTitel->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-    globalLayout->addWidget(lineTitel);
+    titleLayout->addWidget(lineTitel);
+
+    globalLayout->addLayout(titleLayout);
 }
 
 void NodeBase::addDimensionLayout(QVBoxLayout* globalLayout)
@@ -212,6 +217,8 @@ void NodeBase::addDimensionLayout(QVBoxLayout* globalLayout)
             return;
         case AXISALIGNEDCUBOIDALDOMAINFILTERNODE:
             return;
+    case SPHERICALDOMAINFILTERNODE:
+        return;
         case IDENTITYMAPNODE:
             return;
         default:

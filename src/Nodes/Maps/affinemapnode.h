@@ -24,7 +24,6 @@ private:
     QList<QGraphicsProxyWidget*> translationProxies;
     void addNewDimensionsLayoutRow(QVBoxLayout* dimensionsLayout, int index);
     void addMathsConnectors(int index);
-    QStringList getValues();
 
 private slots:
     void dimensionNameChanged(QString newOutput);

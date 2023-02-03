@@ -13,7 +13,7 @@ AxisAlignedCuboidalDomainFilterNode::AxisAlignedCuboidalDomainFilterNode(QString
         outputs = new QStringList(*inputs);
     createLayout();
 
-    QLabel* title = (QLabel*) this->layout()->itemAt(0)->widget();
+    QLabel* title = (QLabel*) this->layout()->findChild<QVBoxLayout*>("titleLayout")->itemAt(0)->widget();
     title->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     title->setFixedWidth(260);
 
