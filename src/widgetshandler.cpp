@@ -17,10 +17,10 @@
 #include "src/Nodes/Maps/optimalstressnode.h"
 #include "src/Nodes/Maps/andersonianstressnode.h"
 #include "src/Nodes/Maps/specialmapnode.h"
-#include "src/Nodes/Math/matrixnode.h"
+#include "src/Nodes/Math/affinematrixnode.h"
 #include "src/Nodes/Math/translationnode.h"
+#include "src/Nodes/Math/polynomialmatrixnode.h"
 #include "src/Nodes/rootnode.h"
-#include "src/helpers.h"
 #include <QMenu>
 
 WidgetsHandler::WidgetsHandler(QGraphicsScene* nodeScene)
@@ -95,6 +95,11 @@ void WidgetsHandler::deleteNode()
         qDebug() << "Could not delete node, no node selected";
         return;
     }
+
+    // remove maths nodes
+    NodeBase* node = (NodeBase*) ((QGraphicsProxyWidget*) nodeToRemove)->widget();
+    node->clearMathNodes();
+
     // remove parent to remove node & connectors
     nodeScene->removeItem(nodeToRemove->parentItem());
     QList<QGraphicsItem*> proxyChildren = nodeToRemove->parentItem()->childItems();
@@ -124,11 +129,11 @@ void WidgetsHandler::deleteProxy(QGraphicsProxyWidget* proxy)
     //qDebug() << "delete proxy done";
 }
 
-void WidgetsHandler::moveNodeNextTo(QGraphicsProxyWidget* parentProxyNode, QGraphicsProxyWidget* childProxyNode)
+void WidgetsHandler::moveNodeNextTo(QGraphicsProxyWidget* parentProxyNode, QGraphicsProxyWidget* childProxyNode, QPointF pos)
 {
     QRectF parentGeometry = ((NodeParentWidget*) parentProxyNode->parentWidget())->geometry();
-    int right = parentGeometry.right() + 100;
-    int top = parentGeometry.top();
+    int right = parentGeometry.right() + 100 + pos.x();
+    int top = parentGeometry.top() + pos.y();
     ((NodeParentWidget*) childProxyNode->parentWidget())->move(right, top);
 }
 
@@ -194,16 +199,16 @@ bool WidgetsHandler::deleteOutputConnector(QGraphicsProxyWidget* outputConnector
 
 void WidgetsHandler::addMathInputConnector(MathInputConnector* inputConnector, QGraphicsProxyWidget* proxyNode, QPointF pos)
 {
-    UNUSED(inputConnector);
-    UNUSED(proxyNode);
-    UNUSED(pos);
+    Q_UNUSED(inputConnector);
+    Q_UNUSED(proxyNode);
+    Q_UNUSED(pos);
 }
 
 void WidgetsHandler::addMathOutputConnector(MathOutputConnector* mathOutputConnector, QGraphicsProxyWidget* proxyNode, QPointF pos)
 {
     NodeBase* node = (NodeBase*) proxyNode->widget();
     /// TODO: to delete?
-    if (node->getTypeOfNode() != AFFINEMAPNODE)
+    if (node->getTypeOfNode() != AFFINEMAPNODE && node->getTypeOfNode() != POLYNOMIALMAPNODE)
     {
         connect(node, SIGNAL(transferOutputsRequested(QStringList*)), mathOutputConnector, SLOT(transferOutputs(QStringList*)));
         emit node->transferOutputsRequested(node->getOutputs());
@@ -225,34 +230,41 @@ void WidgetsHandler::addMathOutputConnector(MathOutputConnector* mathOutputConne
         int numberOfMathOutputConnectors = affineMapNode->getMathOutputConnectors()->size();
         if (numberOfMathOutputConnectors % 2 == 1)
         {
-            QGraphicsProxyWidget* matrixProxyNode = addMatrixNode(affineMapNode->getInputs());
+            QGraphicsProxyWidget* affineMatrixProxyNode = addAffineMatrixNode(affineMapNode->getInputs());
 
             // move node next to affine node
-            NodeParentWidget* nodeParentWidget = (NodeParentWidget*) proxyNode->parentWidget();
-            int right = nodeParentWidget->geometry().right();
-            int top = nodeParentWidget->geometry().top() + pos.y();
-            ((NodeParentWidget*) matrixProxyNode->parentWidget())->move(right + 100, top - 20);
+            moveNodeNextTo(proxyNode, affineMatrixProxyNode, QPointF(0, pos.y()));
 
-            MathInputConnector* matrixInputConnector = (MathInputConnector*) ((NodeBase*) matrixProxyNode->widget())->getInputConnector()->widget();
-            MathOutputConnector* matrixOutputConnector = (MathOutputConnector*) affineMapNode->getMathOutputConnectors()->at(numberOfMathOutputConnectors - 1)->widget();
-            affineMapNode->addMatrixProxy(matrixProxyNode);
-            createConnectorLine(matrixOutputConnector, matrixInputConnector);
+            MathInputConnector* affineMatrixInputConnector = (MathInputConnector*) ((NodeBase*) affineMatrixProxyNode->widget())->getInputConnector()->widget();
+            MathOutputConnector* affineMatrixOutputConnector = (MathOutputConnector*) affineMapNode->getMathOutputConnectors()->at(numberOfMathOutputConnectors - 1)->widget();
+            affineMapNode->addAffineMatrixProxy(affineMatrixProxyNode);
+            createConnectorLine(affineMatrixOutputConnector, affineMatrixInputConnector);
         }
         else
         {
             QGraphicsProxyWidget* translationProxyNode = addTranslationNode();
 
-            // move node next to affine node
-            NodeParentWidget* nodeParentWidget = (NodeParentWidget*) proxyNode->parentWidget();
-            int right = nodeParentWidget->geometry().right();
-            int top = nodeParentWidget->geometry().top() + pos.y();
-            ((NodeParentWidget*) translationProxyNode->parentWidget())->move(right + 100, top - 20);
+            // move node next to node
+            moveNodeNextTo(proxyNode, translationProxyNode, QPointF(0, pos.y()));
 
-            MathInputConnector* matrixInputConnector = (MathInputConnector*) ((NodeBase*) translationProxyNode->widget())->getInputConnector()->widget();
-            MathOutputConnector* matrixOutputConnector = (MathOutputConnector*) affineMapNode->getMathOutputConnectors()->at(numberOfMathOutputConnectors - 1)->widget();
+            MathInputConnector* translationInputConnector = (MathInputConnector*) ((NodeBase*) translationProxyNode->widget())->getInputConnector()->widget();
+            MathOutputConnector* translationOutputConnector = (MathOutputConnector*) affineMapNode->getMathOutputConnectors()->at(numberOfMathOutputConnectors - 1)->widget();
             affineMapNode->addTranslationProxy(translationProxyNode);
-            createConnectorLine(matrixOutputConnector, matrixInputConnector);
+            createConnectorLine(translationOutputConnector, translationInputConnector);
         }
+    }
+    else if(node->getTypeOfNode() == POLYNOMIALMAPNODE)
+    {
+        PolynomialMapNode* polynomialMapNode = (PolynomialMapNode*) node;
+        QGraphicsProxyWidget* polynomialMatrixProxyNode = addPolynomialMatrixNode(polynomialMapNode->getInputs(), polynomialMapNode->getDegree());
+
+            // move node next to node
+        moveNodeNextTo(proxyNode, polynomialMatrixProxyNode, QPointF(0, pos.y()));
+
+        MathInputConnector* polynomialMatrixInputConnector = (MathInputConnector*) ((NodeBase*) polynomialMatrixProxyNode->widget())->getInputConnector()->widget();
+        MathOutputConnector* polynomialMatrixOutputConnector = (MathOutputConnector*) polynomialMapNode->getMathOutputConnectors()->back()->widget();
+        polynomialMapNode->addPolynomialMatrixProxy(polynomialMatrixProxyNode);
+        createConnectorLine(polynomialMatrixOutputConnector, polynomialMatrixInputConnector);
     }
 }
 
@@ -465,7 +477,6 @@ QGraphicsProxyWidget* WidgetsHandler::addIdentityMapNode(QStringList* inputs)
 QGraphicsProxyWidget* WidgetsHandler::addAffineMapNode(QStringList* inputs, QMap<QString, QList<double>>* values)
 {
     AffineMapNode* affineMapNode = new AffineMapNode(inputs);
-
     QGraphicsProxyWidget* proxyNode = addNode(affineMapNode);
     affineMapNode->setValues(values);
 
@@ -483,10 +494,12 @@ QGraphicsProxyWidget* WidgetsHandler::addAffineMapNode(QStringList* inputs, QMap
     return proxyNode;
 }
 
-QGraphicsProxyWidget* WidgetsHandler::addPolynomialMapNode()
+QGraphicsProxyWidget* WidgetsHandler::addPolynomialMapNode(QStringList* inputs, QMap<QString, QList<double>>* values)
 {
-    PolynomialMapNode* polynomialMapNode = new PolynomialMapNode();
+    PolynomialMapNode* polynomialMapNode = new PolynomialMapNode(inputs);
     QGraphicsProxyWidget* proxyNode = addNode(polynomialMapNode);
+    polynomialMapNode->setValues(values);
+
     NodeParentWidget* nodeParentWidget = (NodeParentWidget*)proxyNode->parentWidget();
 
     // Add one input connector
@@ -627,9 +640,9 @@ QGraphicsProxyWidget* WidgetsHandler::addSpecialMapNode()
     return proxyNode;
 }
 
-QGraphicsProxyWidget* WidgetsHandler::addMatrixNode(QStringList* inputs)
+QGraphicsProxyWidget* WidgetsHandler::addAffineMatrixNode(QStringList* inputs)
 {
-    MatrixNode* matrixNode = new MatrixNode(inputs);
+    AffineMatrixNode* matrixNode = new AffineMatrixNode(inputs);
     QGraphicsProxyWidget* proxyNode = addNode(matrixNode);
     NodeParentWidget* nodeParentWidget = (NodeParentWidget*)proxyNode->parentWidget();
 
@@ -644,6 +657,19 @@ QGraphicsProxyWidget* WidgetsHandler::addTranslationNode()
 {
     TranslationNode* translationNode = new TranslationNode();
     QGraphicsProxyWidget* proxyNode = addNode(translationNode);
+    NodeParentWidget* nodeParentWidget = (NodeParentWidget*)proxyNode->parentWidget();
+
+    // Add one input connector
+    MathInputConnector* mathInputConnector = new MathInputConnector(nodeParentWidget);
+    addInputConnector(mathInputConnector, proxyNode, QPointF(-8, 20));
+
+    return proxyNode;
+}
+
+QGraphicsProxyWidget *WidgetsHandler::addPolynomialMatrixNode(QStringList *inputs, int degree)
+{
+    PolynomialMatrixNode* matrixNode = new PolynomialMatrixNode(inputs, degree);
+    QGraphicsProxyWidget* proxyNode = addNode(matrixNode);
     NodeParentWidget* nodeParentWidget = (NodeParentWidget*)proxyNode->parentWidget();
 
     // Add one input connector
@@ -675,8 +701,15 @@ void WidgetsHandler::connectNode(QGraphicsProxyWidget* proxyNode)
     if (node->getTypeOfNode() == AFFINEMAPNODE)
     {
         AffineMapNode* affineMapNode = (AffineMapNode*) node;
-        connect(affineMapNode, SIGNAL(addMathOutputConnectorRequested(QGraphicsProxyWidget*, QPointF)), this, SLOT(actionAddMathOutputConnector(QGraphicsProxyWidget*, QPointF)));
+        connect(affineMapNode, SIGNAL(addMathOutputConnectorRequested(QGraphicsProxyWidget*,QPointF)), this, SLOT(actionAddMathOutputConnector(QGraphicsProxyWidget*,QPointF)));
         connect(affineMapNode, SIGNAL(deleteNodeRequested(QGraphicsProxyWidget*)), this, SLOT(actionDeleteNode(QGraphicsProxyWidget*)));
+    }
+
+    if (node->getTypeOfNode() == POLYNOMIALMAPNODE)
+    {
+        PolynomialMapNode* polynomialMapNode = (PolynomialMapNode*) node;
+        connect(polynomialMapNode, SIGNAL(addMathOutputConnectorRequested(QGraphicsProxyWidget*,QPointF)), this, SLOT(actionAddMathOutputConnector(QGraphicsProxyWidget*,QPointF)));
+        connect(polynomialMapNode, SIGNAL(deleteNodeRequested(QGraphicsProxyWidget*)), this, SLOT(actionDeleteNode(QGraphicsProxyWidget*)));
     }
 }
 

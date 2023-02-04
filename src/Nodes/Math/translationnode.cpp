@@ -5,33 +5,11 @@
 
 TranslationNode::TranslationNode() : NodeBase(nullptr)
 {
-    this->typeOfNode = MATHNODE;
+    this->typeOfNode = AFFINEMATHNODE;
     setWindowTitle("Translation");
     createLayout();
 
-    setGeometry(QRect(0, 0, sizeHint().width(), sizeHint().height()));
-}
-
-TranslationNode::~TranslationNode()
-{
-
-}
-
-void TranslationNode::setValue(double value)
-{
-    QVBoxLayout* translationLayout = this->layout()->findChild<QVBoxLayout*>("translationLayout");
-    ((QDoubleSpinBox*) translationLayout->itemAt(0)->widget())->setValue(value);
-}
-
-void TranslationNode::createLayout()
-{
-    QVBoxLayout* globalLayout = new QVBoxLayout(this);
-    addTitleLayout(globalLayout, true);
-
-    // add a layout containing only one dimension
-    QVBoxLayout* translationLayout = new QVBoxLayout();
-    translationLayout->setObjectName("translationLayout");
-
+    QVBoxLayout* dimensionsLayout = this->layout()->findChild<QVBoxLayout*>("dimensionsLayout");
     QDoubleSpinBox* valueField = new QDoubleSpinBox();
     valueField->setObjectName("value");
     valueField->setButtonSymbols(QAbstractSpinBox::NoButtons);
@@ -40,21 +18,25 @@ void TranslationNode::createLayout()
     valueField->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
     valueField->setMaximumWidth(100);
     valueField->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
-    translationLayout->addWidget(valueField);
+    dimensionsLayout->addWidget(valueField);
 
-    globalLayout->addLayout(translationLayout);
-    this->setLayout(globalLayout);
+    setGeometry(QRect(0, 0, sizeHint().width(), sizeHint().height()));
+}
+
+void TranslationNode::setValue(double value)
+{
+    QVBoxLayout* translationLayout = this->layout()->findChild<QVBoxLayout*>("dimensionsLayout");
+    ((QDoubleSpinBox*) translationLayout->itemAt(0)->widget())->setValue(value);
 }
 
 void TranslationNode::saveNodeContent(YAML::Emitter* out)
 {
-    *out << YAML::Key;
     saveValues(out);
 }
 
 void TranslationNode::saveValues(YAML::Emitter* out)
 {
-    QVBoxLayout* translationLayout = this->layout()->findChild<QVBoxLayout*>("translationLayout");
+    QVBoxLayout* translationLayout = this->layout()->findChild<QVBoxLayout*>("dimensionsLayout");
     double value = ((QDoubleSpinBox*) translationLayout->itemAt(0)->widget())->value();
-    *out << value;
+    *out << YAML::Key << value;
 }

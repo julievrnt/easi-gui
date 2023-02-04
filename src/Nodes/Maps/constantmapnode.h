@@ -16,9 +16,6 @@ public:
 private:
     QMap<QString, double>* getValues();
 
-private slots:
-    void dimensionNameChanged(QString newOutput);
-
 protected:
     void addNewDimensionsLayoutRow(QVBoxLayout* dimensionsLayout, int index);
     void saveValues(YAML::Emitter* out);

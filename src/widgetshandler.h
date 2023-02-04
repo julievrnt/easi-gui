@@ -27,7 +27,7 @@ public:
     void addRoot();
     void deleteNode();
     void deleteProxy(QGraphicsProxyWidget* proxy);
-    void moveNodeNextTo(QGraphicsProxyWidget* parentProxyNode, QGraphicsProxyWidget* childProxyNode);
+    void moveNodeNextTo(QGraphicsProxyWidget* parentProxyNode, QGraphicsProxyWidget* childProxyNode, QPointF pos = QPointF(0,0));
     void connectNodes(NodeBase* parentNode, NodeBase* childNode);
 
     // basic functions to handle connectors
@@ -60,7 +60,7 @@ public:
     QGraphicsProxyWidget* addConstantMapNode(QStringList* outputs = nullptr, QList<double>* values = nullptr);
     QGraphicsProxyWidget* addIdentityMapNode(QStringList* inputs = nullptr);
     QGraphicsProxyWidget* addAffineMapNode(QStringList* inputs = nullptr, QMap<QString, QList<double>>* values = nullptr);
-    QGraphicsProxyWidget* addPolynomialMapNode();
+    QGraphicsProxyWidget* addPolynomialMapNode(QStringList* inputs = nullptr, QMap<QString, QList<double>>* values = nullptr);
     QGraphicsProxyWidget* addFunctionMapNode();
     QGraphicsProxyWidget* addASAGINode();
     QGraphicsProxyWidget* addSCECFileNode();
@@ -70,8 +70,9 @@ public:
     QGraphicsProxyWidget* addSpecialMapNode();
 
     // add math functions
-    QGraphicsProxyWidget* addMatrixNode(QStringList* inputs = nullptr);
+    QGraphicsProxyWidget* addAffineMatrixNode(QStringList* inputs = nullptr);
     QGraphicsProxyWidget* addTranslationNode();
+    QGraphicsProxyWidget* addPolynomialMatrixNode(QStringList* inputs = nullptr, int degree = 0);
 
 signals:
     void saveRequested(YAML::Emitter* out);

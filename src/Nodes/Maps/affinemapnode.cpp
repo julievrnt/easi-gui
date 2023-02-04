@@ -1,6 +1,6 @@
 #include "affinemapnode.h"
 #include "src/Connectors/outputs/mathoutputconnector.h"
-#include "src/Nodes/Math/matrixnode.h"
+#include "src/Nodes/Math/affinematrixnode.h"
 #include "src/Nodes/Math/translationnode.h"
 #include <QPushButton>
 #include <QLineEdit>
@@ -23,11 +23,6 @@ AffineMapNode::~AffineMapNode()
     // emit deleteNodeRequested(translationProxy);
 }
 
-QList<QGraphicsProxyWidget*>* AffineMapNode::getMathOutputConnectors() const
-{
-    return mathOutputConnectors;
-}
-
 void AffineMapNode::setValues(QMap<QString, QList<double> >* values)
 {
     if (values == nullptr)
@@ -48,7 +43,7 @@ void AffineMapNode::setValues(QMap<QString, QList<double> >* values)
         double translationValue = matrixAndTranslationValues.takeLast();
 
         // set matrix values
-        MatrixNode* matrixNode = (MatrixNode*) this->matrixProxies.at(i)->widget();
+        AffineMatrixNode* matrixNode = (AffineMatrixNode*) this->affineMatrixProxies.at(i)->widget();
         matrixNode->setValues(inputs, &matrixAndTranslationValues);
 
         // set translation values
@@ -59,9 +54,9 @@ void AffineMapNode::setValues(QMap<QString, QList<double> >* values)
     delete values;
 }
 
-void AffineMapNode::addMatrixProxy(QGraphicsProxyWidget* newMatrixProxy)
+void AffineMapNode::addAffineMatrixProxy(QGraphicsProxyWidget* newAffineMatrixProxy)
 {
-    matrixProxies.append(newMatrixProxy);
+    affineMatrixProxies.append(newAffineMatrixProxy);
 }
 
 void AffineMapNode::addTranslationProxy(QGraphicsProxyWidget* newTranslationProxy)
@@ -117,7 +112,7 @@ void AffineMapNode::removeMathsOfDimensionRow(int index)
     emit deleteOutputConnectorRequested(mathOutputConnectors->takeAt(index * 2));
     emit deleteOutputConnectorRequested(mathOutputConnectors->takeAt(index * 2));
 
-    emit deleteNodeRequested(matrixProxies.takeAt(index));
+    emit deleteNodeRequested(affineMatrixProxies.takeAt(index));
     emit deleteNodeRequested(translationProxies.takeAt(index));
 }
 
@@ -137,11 +132,20 @@ void AffineMapNode::performResize()
     }
 }
 
+void AffineMapNode::clearMathNodes()
+{
+    while(mathOutputConnectors->size()>0){
+        int index = this->layout()->findChild<QVBoxLayout*>("dimensionsLayout")->children().size() -1;
+        removeMathsOfDimensionRow(index);
+    }
+}
+
 void AffineMapNode::addDimensionsLayoutRowRequested(bool clicked)
 {
     NodeBase::addDimensionsLayoutRowRequested(clicked);
     QVBoxLayout* dimensionsLayout = this->layout()->findChild<QVBoxLayout*>("dimensionsLayout");
     addMathsConnectors(dimensionsLayout->children().size() - 1);
+    updateLayout();
 }
 
 void AffineMapNode::removeDimensionsLayoutRowRequested(bool clicked)
@@ -159,15 +163,6 @@ void AffineMapNode::updateLayout()
     }
 }
 
-void AffineMapNode::dimensionNameChanged(QString newOutput)
-{
-    QLineEdit* dimension = qobject_cast<QLineEdit*>(sender());
-    int index = dimension->objectName().toInt();
-    outputs->insert(index, newOutput);
-    outputs->removeAt(index + 1);
-    emit transferOutputsRequested(outputs);
-}
-
 void AffineMapNode::saveValues(YAML::Emitter* out)
 {
     QStringList dimensions(*outputs);
@@ -178,7 +173,7 @@ void AffineMapNode::saveValues(YAML::Emitter* out)
     for (int i = 0; i < dimensions.size(); i++)
     {
         int index = outputs->indexOf(dimensions[i]);
-        *out << YAML::Key << outputs->at(index).toStdString();
+        *out << YAML::Key << dimensions.at(i).toStdString();
         ((OutputConnector*) mathOutputConnectors->at(index * 2)->widget())->saveComponent(out);
     }
     *out << YAML::EndMap;
@@ -188,7 +183,8 @@ void AffineMapNode::saveValues(YAML::Emitter* out)
     for (int i = 0; i < dimensions.size(); i++)
     {
         int index = outputs->indexOf(dimensions[i]);
-        *out << YAML::Key << outputs->at(index).toStdString();
+        *out << YAML::Key << dimensions.at(i).toStdString();
+        *out << YAML::Value;
         ((OutputConnector*) mathOutputConnectors->at(index * 2 + 1)->widget())->saveComponent(out);
     }
     *out << YAML::EndMap;

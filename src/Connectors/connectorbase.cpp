@@ -1,5 +1,4 @@
 #include "connectorbase.h"
-#include "../helpers.h"
 #include <QPainter>
 #include <QPaintEvent>
 
@@ -146,13 +145,13 @@ void ConnectorBase::leaveEvent(QEvent* event)
 
 void ConnectorBase::mousePressEvent(QMouseEvent* event)
 {
-    UNUSED(event);
+    Q_UNUSED(event);
     // QWidget::mousePressEvent(event);
 }
 
 void ConnectorBase::mouseReleaseEvent(QMouseEvent* event)
 {
-    UNUSED(event);
+    Q_UNUSED(event);
     if (!canDisconnect)
         return;
     emit lineNoMoreDragged();

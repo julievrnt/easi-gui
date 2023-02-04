@@ -32,7 +32,8 @@ SOURCES += \
     src/Nodes/Maps/polynomialmapnode.cpp \
     src/Nodes/Maps/scecfilenode.cpp \
     src/Nodes/Maps/specialmapnode.cpp \
-    src/Nodes/Math/matrixnode.cpp \
+    src/Nodes/Math/affinematrixnode.cpp \
+    src/Nodes/Math/polynomialmatrixnode.cpp \
     src/Nodes/Math/translationnode.cpp \
     src/main.cpp \
     src/mainwindow.cpp \
@@ -66,14 +67,14 @@ HEADERS += \
     src/Nodes/Maps/polynomialmapnode.h \
     src/Nodes/Maps/scecfilenode.h \
     src/Nodes/Maps/specialmapnode.h \
-    src/Nodes/Math/matrixnode.h \
+    src/Nodes/Math/affinematrixnode.h \
+    src/Nodes/Math/polynomialmatrixnode.h \
     src/Nodes/Math/translationnode.h \
     src/mainwindow.h \
     src/Nodes/nodebase.h \
     src/Nodes/nodeparentwidget.h \
     src/Nodes/rootnode.h \
     src/Nodes/rootnodedialog.h \
-    src/helpers.h \
     src/widgetshandler.h
 
 FORMS += \

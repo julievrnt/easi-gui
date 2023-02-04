@@ -37,7 +37,8 @@
 #define SPECIALMAPNODE 17
 
 // other nodes
-#define MATHNODE 18
+#define AFFINEMATHNODE 18
+#define POLYNOMIALMATHNODE 19
 
 
 class NodeBase : public QWidget
@@ -55,8 +56,11 @@ public:
     QList<QGraphicsProxyWidget*>* getOutputConnectors() const;
     void addOutputConnector(QGraphicsProxyWidget* newOutputConnector);
     void addMathOutputConnector(QGraphicsProxyWidget* newMathOutputConnector);
+    QList<QGraphicsProxyWidget*>* getMathOutputConnectors() const;
     virtual OutputConnector* getFirstAvailableOutputConnector();
     virtual void performResize();
+
+    virtual void clearMathNodes();
 
     bool event(QEvent* event);
     void setProxyNode(QGraphicsProxyWidget* newProxyNode);
@@ -106,6 +110,7 @@ protected:
 protected slots:
     virtual void addDimensionsLayoutRowRequested(bool clicked);
     virtual void removeDimensionsLayoutRowRequested(bool clicked);
+    void dimensionNameChanged(QString newOutput);
     void addOutputConnectorButtonClicked(bool clicked);
     void deleteOutputConnectorButtonClicked(bool clicked);
     QPushButton* getRemoveButtonAtIndex(QVBoxLayout* dimensionsLayout, int index);

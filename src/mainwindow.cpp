@@ -1,7 +1,6 @@
 #include "mainwindow.h"
 #include "src/Nodes/rootnode.h"
 #include "ui_mainwindow.h"
-#include "helpers.h"
 #include "yaml-cpp/emitter.h"
 #include <QFile>
 #include <QMessageBox>
@@ -474,15 +473,35 @@ void MainWindow::openAffineMapNode(QGraphicsProxyWidget* parentProxyNode, YAML::
 
 void MainWindow::openPolynomialMapNode(QGraphicsProxyWidget* parentProxyNode, YAML::Node* node, QStringList* inputs)
 {
-    /// TODO
+    if (!(*node)["map"])
+    {
+        qDebug() << "ERROR: no map part in polynomial map";
+        return;
+    }
+
+    // outputs of Polynomial Map
+    QStringList* outputs = new QStringList();
+    // maps matrix and translation values to outputs
+    QMap<QString, QList<double>>* values = new QMap<QString, QList<double>>();
+    for (YAML::const_iterator it = (*node)["map"].begin(); it != (*node)["map"].end(); ++it)
+    {
+        QString output = QString::fromStdString(it->first.as<std::string>());
+        outputs->append(output);
+
+        QList<double> matrixValues;
+        for (size_t i = 0; i < it->second.size(); i++)
+            matrixValues.append(it->second[i].as<double>());
+        values->insert(output, matrixValues);
+    }
+
     // add node
-    QGraphicsProxyWidget* proxyNode = widgetsHandler->addPolynomialMapNode();
+    QGraphicsProxyWidget* proxyNode = widgetsHandler->addPolynomialMapNode(inputs, values);
     // move it next to parent node
     widgetsHandler->moveNodeNextTo(parentProxyNode, proxyNode);
     // connect them
     widgetsHandler->connectNodes((NodeBase*) parentProxyNode->widget(), (NodeBase*) proxyNode->widget());
 
-    openComponents(proxyNode, node, nullptr);
+    openComponents(proxyNode, node, outputs);
 }
 
 void MainWindow::openFunctionMapNode(QGraphicsProxyWidget* parentProxyNode, YAML::Node* node, QStringList* inputs)
@@ -580,8 +599,8 @@ void MainWindow::openSpecialMapNode(QGraphicsProxyWidget* parentProxyNode, YAML:
 
 void MainWindow::getNewFocusItem(QGraphicsItem* newFocusItem, QGraphicsItem* oldFocusItem, Qt::FocusReason reason)
 {
-    UNUSED(oldFocusItem);
-    UNUSED(reason);
+    Q_UNUSED(oldFocusItem);
+    Q_UNUSED(reason);
     if (newFocusItem == nullptr)
     {
         enableDisableIcons(false);

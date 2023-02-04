@@ -10,35 +10,26 @@ public:
     AffineMapNode(QStringList* inputs = nullptr);
     ~AffineMapNode();
 
-    QList<QGraphicsProxyWidget*>* getMathOutputConnectors() const;
-
     void setValues(QMap<QString, QList<double>>* values);
-    void addMatrixProxy(QGraphicsProxyWidget* newMatrixProxy);
+    void addAffineMatrixProxy(QGraphicsProxyWidget* newAffineMatrixProxy);
     void addTranslationProxy(QGraphicsProxyWidget* newTranslationProxy);
+
+    void performResize();
+    void clearMathNodes();
 
 signals:
     void addMathOutputConnectorRequested(QGraphicsProxyWidget* proxyNode, QPointF pos);
 
 private:
-    QList<QGraphicsProxyWidget*> matrixProxies;
+    QList<QGraphicsProxyWidget*> affineMatrixProxies;
     QList<QGraphicsProxyWidget*> translationProxies;
     void addNewDimensionsLayoutRow(QVBoxLayout* dimensionsLayout, int index);
     void addMathsConnectors(int index);
-
-private slots:
-    void dimensionNameChanged(QString newOutput);
+    void removeMathsOfDimensionRow(int index);
 
 protected:
     void updateLayout();
     void saveValues(YAML::Emitter* out);
-
-    // NodeBase interface
-protected:
-    void removeMathsOfDimensionRow(int index);
-
-    // NodeBase interface
-public:
-    void performResize();
 
     // NodeBase interface
 protected slots:

@@ -4,7 +4,6 @@
 #include <QLabel>
 #include <QHBoxLayout>
 #include <QPushButton>
-#include "../helpers.h"
 #include "../Connectors/outputs/outputconnector.h"
 
 NodeBase::NodeBase(QStringList* inputs, QStringList* outputs, QWidget* parent)
@@ -62,6 +61,11 @@ void NodeBase::addMathOutputConnector(QGraphicsProxyWidget* newMathOutputConnect
     mathOutputConnectors->append(newMathOutputConnector);
 }
 
+QList<QGraphicsProxyWidget *> *NodeBase::getMathOutputConnectors() const
+{
+    return mathOutputConnectors;
+}
+
 OutputConnector* NodeBase::getFirstAvailableOutputConnector()
 {
     foreach (QGraphicsProxyWidget* proxy, *outputConnectors)
@@ -85,6 +89,11 @@ void NodeBase::performResize()
         outputConnector->setX(x);
         outputConnector->setY(y);
     }
+}
+
+void NodeBase::clearMathNodes()
+{
+    // do nothing
 }
 
 QStringList* NodeBase::getInputs() const
@@ -166,7 +175,7 @@ void NodeBase::createLayout()
     else
         addTitleLayout(globalLayout, true);
     addDimensionLayout(globalLayout);
-    if (typeOfNode != ROOTNODE)
+    if (typeOfNode != ROOTNODE && typeOfNode != AFFINEMATHNODE && typeOfNode != POLYNOMIALMATHNODE)
         addComponentsLayout(globalLayout);
     this->setLayout(globalLayout);
 }
@@ -217,19 +226,23 @@ void NodeBase::addDimensionLayout(QVBoxLayout* globalLayout)
             return;
         case AXISALIGNEDCUBOIDALDOMAINFILTERNODE:
             return;
-    case SPHERICALDOMAINFILTERNODE:
-        return;
+        case SPHERICALDOMAINFILTERNODE:
+            return;
         case IDENTITYMAPNODE:
+            return;
+        case AFFINEMATHNODE:
+            return;
+        case POLYNOMIALMATHNODE:
             return;
         default:
             break;
     }
 
-
     // add button to add dimension
     QPushButton* addButton = new QPushButton();
     addButton->setText("+");
     connect(addButton, SIGNAL(clicked(bool)), this, SLOT(addDimensionsLayoutRowRequested(bool)));
+
     globalLayout->addWidget(addButton);
 }
 
@@ -293,8 +306,8 @@ void NodeBase::clearLayout(QLayout* layout, bool deleteWidgets)
 void NodeBase::addNewDimensionsLayoutRow(QVBoxLayout* dimensionsLayout, int index)
 {
     // needs to be implemented in subclasses
-    UNUSED(dimensionsLayout);
-    UNUSED(index);
+    Q_UNUSED(dimensionsLayout);
+    Q_UNUSED(index);
 }
 
 void NodeBase::removeLayoutRow(QVBoxLayout* dimensionsLayout, int index)
@@ -328,20 +341,20 @@ void NodeBase::saveNodeContent(YAML::Emitter* out)
 
 void NodeBase::saveValues(YAML::Emitter* out)
 {
-    UNUSED(out);
+    Q_UNUSED(out);
     return;
 }
 
 void NodeBase::addDimensionsLayoutRowRequested(bool clicked)
 {
-    UNUSED(clicked);
+    Q_UNUSED(clicked);
     QVBoxLayout* dimensionsLayout = this->layout()->findChild<QVBoxLayout*>("dimensionsLayout");
     addNewDimensionsLayoutRow(dimensionsLayout, dimensionsLayout->children().size());
 }
 
 void NodeBase::removeDimensionsLayoutRowRequested(bool clicked)
 {
-    UNUSED(clicked);
+    Q_UNUSED(clicked);
     QVBoxLayout* dimensionsLayout = this->layout()->findChild<QVBoxLayout*>("dimensionsLayout");
     QPushButton* removeButton = qobject_cast<QPushButton*>(sender());
     int index = removeButton->objectName().toInt();
@@ -361,15 +374,24 @@ void NodeBase::removeDimensionsLayoutRowRequested(bool clicked)
     performResize();
 }
 
+void NodeBase::dimensionNameChanged(QString newOutput)
+{
+    QLineEdit* dimension = qobject_cast<QLineEdit*>(sender());
+    int index = dimension->objectName().toInt();
+    outputs->insert(index, newOutput);
+    outputs->removeAt(index + 1);
+    emit transferOutputsRequested(outputs);
+}
+
 void NodeBase::addOutputConnectorButtonClicked(bool clicked)
 {
-    UNUSED(clicked);
+    Q_UNUSED(clicked);
     emit addOutputConnectorRequested(this->getProxyNode());
 }
 
 void NodeBase::deleteOutputConnectorButtonClicked(bool clicked)
 {
-    UNUSED(clicked);
+    Q_UNUSED(clicked);
     if (outputConnectors->size() > 1)
     {
         emit deleteOutputConnectorRequested(outputConnectors->takeLast());

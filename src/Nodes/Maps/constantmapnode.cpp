@@ -57,15 +57,6 @@ QMap<QString, double>*  ConstantMapNode::getValues()
     return values;
 }
 
-void ConstantMapNode::dimensionNameChanged(QString newOutput)
-{
-    QLineEdit* dimension = qobject_cast<QLineEdit*>(sender());
-    int index = dimension->objectName().toInt();
-    outputs->insert(index, newOutput);
-    outputs->removeAt(index + 1);
-    emit transferOutputsRequested(outputs);
-}
-
 void ConstantMapNode::addNewDimensionsLayoutRow(QVBoxLayout* dimensionsLayout, int index)
 {
     QHBoxLayout* row = new QHBoxLayout();

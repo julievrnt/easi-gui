@@ -1,7 +1,6 @@
 #include "mainwindow.h"
 
 #include <QApplication>
-#define UNUSED(x) ((x)=(x))
 
 int main(int argc, char* argv[])
 {
