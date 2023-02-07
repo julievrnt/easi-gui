@@ -10,6 +10,7 @@
 #include <QLabel>
 #include <QPushButton>
 #include <QLineEdit>
+#include <QDoubleSpinBox>
 #include "yaml-cpp/yaml.h"
 #include "../Connectors/outputs/outputconnector.h"
 
@@ -104,6 +105,8 @@ protected:
     void addRemoveButton(QLayout* layout, int index);
     void removeLayoutRow(QVBoxLayout* dimensionsLayout, int index);
     void addSeparatorLineInLayout(QLayout* layout);
+    QLabel* addLabel(QLayout* layout, QString text);
+    QDoubleSpinBox* addDoubleSpinBox(QLayout* layout);
 
     void clearLayout(QLayout* layout, bool deleteWidgets = true);
 

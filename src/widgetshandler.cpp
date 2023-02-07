@@ -626,9 +626,9 @@ QGraphicsProxyWidget* WidgetsHandler::addEvalModelNode()
     return proxyNode;
 }
 
-QGraphicsProxyWidget* WidgetsHandler::addOptimalStressNode()
+QGraphicsProxyWidget* WidgetsHandler::addOptimalStressNode(double mu_d, double mu_s, double strike, double dip, double rake, double cohesion, double s2ratio, double r, double effectiveConfiningStress)
 {
-    OptimalStressNode* optimalStressNode = new OptimalStressNode();
+    OptimalStressNode* optimalStressNode = new OptimalStressNode(mu_d, mu_s, strike, dip, rake, cohesion, s2ratio, r, effectiveConfiningStress);
     QGraphicsProxyWidget* proxyNode = addNode(optimalStressNode);
     NodeParentWidget* nodeParentWidget = (NodeParentWidget*)proxyNode->parentWidget();
 
@@ -644,9 +644,9 @@ QGraphicsProxyWidget* WidgetsHandler::addOptimalStressNode()
     return proxyNode;
 }
 
-QGraphicsProxyWidget* WidgetsHandler::addAndersonianStressNode()
+QGraphicsProxyWidget* WidgetsHandler::addAndersonianStressNode(double mu_d, double mu_s, double sh_max, double s_v, double cohesion, double s2ratio, double s, double sig_zz)
 {
-    AndersonianStressNode* andersonianStressNode = new AndersonianStressNode();
+    AndersonianStressNode* andersonianStressNode = new AndersonianStressNode(mu_d, mu_s, sh_max, s_v, cohesion, s2ratio, s, sig_zz);
     QGraphicsProxyWidget* proxyNode = addNode(andersonianStressNode);
     NodeParentWidget* nodeParentWidget = (NodeParentWidget*)proxyNode->parentWidget();
 

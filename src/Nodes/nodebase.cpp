@@ -5,6 +5,7 @@
 #include <QHBoxLayout>
 #include <QPushButton>
 #include "../Connectors/outputs/outputconnector.h"
+#include "float.h"
 
 NodeBase::NodeBase(QStringList* inputs, QStringList* outputs, QWidget* parent)
     : QWidget{parent}
@@ -182,13 +183,9 @@ void NodeBase::addTitleLayout(QVBoxLayout* globalLayout, bool hasTitleSeparatorL
     QVBoxLayout* titleLayout = new QVBoxLayout();
     titleLayout->setObjectName("titleLayout");
 
-    QLabel* title = new QLabel(this);
-    title->setText(this->windowTitle());
-    title->setAlignment(Qt::AlignCenter);
+    QLabel* title = addLabel(titleLayout, windowTitle());
     title->setStyleSheet("QLabel { background-color : rgb(70,70,70);}");
-    title->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Fixed);
     title->setFixedHeight(30);
-    titleLayout->addWidget(title);
 
     // add line to separate title from the rest
     if (hasTitleSeparatorLine)
@@ -226,11 +223,8 @@ void NodeBase::addComponentsLayout(QVBoxLayout* globalLayout)
     // add line to separate components from the rest
     addSeparatorLineInLayout(globalLayout);
 
-    QLabel* componentsLabel = new QLabel();
-    componentsLabel->setText("Components");
-    componentsLabel->setAlignment(Qt::AlignCenter);
-    componentsLabel->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::MinimumExpanding);
-    globalLayout->addWidget(componentsLabel);
+    QLabel* components = addLabel(globalLayout, "Components");
+    components->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::MinimumExpanding);
 
     // add buttons
     QHBoxLayout* buttonsLayout = new QHBoxLayout();
@@ -294,6 +288,30 @@ void NodeBase::addSeparatorLineInLayout(QLayout* layout)
     line->setFrameShadow(QFrame::Sunken);
     line->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
     layout->addWidget(line);
+}
+
+QLabel* NodeBase::addLabel(QLayout* layout, QString text)
+{
+    QLabel* label = new QLabel(text);
+    label->setAlignment(Qt::AlignCenter);
+    label->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Fixed);
+    layout->addWidget(label);
+
+    return label;
+}
+
+QDoubleSpinBox* NodeBase::addDoubleSpinBox(QLayout* layout)
+{
+    QDoubleSpinBox* valueField = new QDoubleSpinBox();
+    valueField->setButtonSymbols(QAbstractSpinBox::NoButtons);
+    valueField->setRange(-DBL_MAX, DBL_MAX);
+    valueField->setDecimals(3);
+    valueField->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+    valueField->setMaximumWidth(100);
+    valueField->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+    layout->addWidget(valueField);
+
+    return valueField;
 }
 
 void NodeBase::updateLayout()

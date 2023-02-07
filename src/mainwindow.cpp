@@ -311,7 +311,16 @@ void MainWindow::openIncludeNode(QGraphicsProxyWidget* parentProxyNode, YAML::No
 
 void MainWindow::openLayeredModelNode(QGraphicsProxyWidget* parentProxyNode, YAML::Node* node, QStringList* inputs)
 {
+    Q_UNUSED(inputs);
+    Q_UNUSED(node);
+    /// TODO
 
+    // add node
+    QGraphicsProxyWidget* proxyNode = widgetsHandler->addLayeredModel();
+    // move it next to parent node
+    widgetsHandler->moveNodeNextTo(parentProxyNode, proxyNode);
+    // connect them
+    widgetsHandler->connectNodes((NodeBase*) parentProxyNode->widget(), (NodeBase*) proxyNode->widget());
 }
 
 void MainWindow::openAnyNode(QGraphicsProxyWidget* parentProxyNode, YAML::Node* node, QStringList* inputs)
@@ -625,29 +634,60 @@ void MainWindow::openEvalModelNode(QGraphicsProxyWidget* parentProxyNode, YAML::
 void MainWindow::openOptimalStressNode(QGraphicsProxyWidget* parentProxyNode, YAML::Node* node, QStringList* inputs)
 {
     Q_UNUSED(inputs);
-    /// TODO
+
+    if (!(*node)["constants"])
+    {
+        qDebug() << "ERROR: no constants part in optimal stress";
+        return;
+    }
+
+    double mu_d = (*node)["constants"]["mu_d"].as<double>();
+    double mu_s = (*node)["constants"]["mu_s"].as<double>();
+    double strike = (*node)["constants"]["strike"].as<double>();
+    double dip = (*node)["constants"]["dip"].as<double>();
+    double rake = (*node)["constants"]["rake"].as<double>();
+    double cohesion = (*node)["constants"]["cohesion"].as<double>();
+    double s2ratio = (*node)["constants"]["s2ratio"].as<double>();
+    double r = (*node)["constants"]["R"].as<double>();
+    double effectiveConfiningStress = (*node)["constants"]["effectiveConfiningStress"].as<double>();
+
     // add node
-    QGraphicsProxyWidget* proxyNode = widgetsHandler->addOptimalStressNode();
+    QGraphicsProxyWidget* proxyNode = widgetsHandler->addOptimalStressNode(mu_d, mu_s, strike, dip, rake, cohesion, s2ratio, r, effectiveConfiningStress);
     // move it next to parent node
     widgetsHandler->moveNodeNextTo(parentProxyNode, proxyNode);
     // connect them
     widgetsHandler->connectNodes((NodeBase*) parentProxyNode->widget(), (NodeBase*) proxyNode->widget());
 
-    openComponents(proxyNode, node, nullptr);
+    openComponents(proxyNode, node, ((NodeBase*) proxyNode->widget())->getOutputs());
 }
 
 void MainWindow::openAndersonianStressNode(QGraphicsProxyWidget* parentProxyNode, YAML::Node* node, QStringList* inputs)
 {
     Q_UNUSED(inputs);
-    /// TODO
+
+    if (!(*node)["constants"])
+    {
+        qDebug() << "ERROR: no constants part in optimal stress";
+        return;
+    }
+
+    double mu_d = (*node)["constants"]["mu_d"].as<double>();
+    double mu_s = (*node)["constants"]["mu_s"].as<double>();
+    double sh_max = (*node)["constants"]["SH_max"].as<double>();
+    double s_v = (*node)["constants"]["S_v"].as<double>();
+    double cohesion = (*node)["constants"]["cohesion"].as<double>();
+    double s2ratio = (*node)["constants"]["s2ratio"].as<double>();
+    double s = (*node)["constants"]["S"].as<double>();
+    double sig_zz = (*node)["constants"]["sig_zz"].as<double>();
+
     // add node
-    QGraphicsProxyWidget* proxyNode = widgetsHandler->addAndersonianStressNode();
+    QGraphicsProxyWidget* proxyNode = widgetsHandler->addAndersonianStressNode(mu_d, mu_s, sh_max, s_v, cohesion, s2ratio, s, sig_zz);
     // move it next to parent node
     widgetsHandler->moveNodeNextTo(parentProxyNode, proxyNode);
     // connect them
     widgetsHandler->connectNodes((NodeBase*) parentProxyNode->widget(), (NodeBase*) proxyNode->widget());
 
-    openComponents(proxyNode, node, nullptr);
+    openComponents(proxyNode, node, ((NodeBase*) proxyNode->widget())->getOutputs());
 }
 
 void MainWindow::openSpecialMapNode(QGraphicsProxyWidget* parentProxyNode, YAML::Node* node, QStringList* inputs)

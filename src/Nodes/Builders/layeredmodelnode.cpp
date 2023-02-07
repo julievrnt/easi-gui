@@ -9,3 +9,13 @@ LayeredModelNode::LayeredModelNode()
 
     setGeometry(QRect(0, 0, sizeHint().width(), sizeHint().height()));
 }
+
+void LayeredModelNode::createLayout()
+{
+    NodeBase::createLayout();
+}
+
+void LayeredModelNode::saveValues(YAML::Emitter* out)
+{
+    Q_UNUSED(out);
+}
