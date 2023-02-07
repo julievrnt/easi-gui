@@ -5,7 +5,7 @@ AnyNode::AnyNode(QStringList* inputs) : NodeBase(inputs, inputs)
     typeOfNode = ANYNODE;
     localTag = "Any";
     this->setWindowTitle("Any");
-    createLayout();
+    createLayout(false, false);
 
     setGeometry(QRect(0, 0, sizeHint().width(), sizeHint().height()));
 }

@@ -4,7 +4,7 @@
 #include <QLabel>
 #include <QSpinBox>
 
-PolynomialMapNode::PolynomialMapNode(QStringList* inputs) : NodeBase(inputs)
+PolynomialMapNode::PolynomialMapNode(QStringList* inputs, QStringList* outputs) : NodeBase(inputs, outputs)
 {
     typeOfNode = POLYNOMIALMAPNODE;
     localTag = "PolynomialMap";
@@ -43,27 +43,23 @@ PolynomialMapNode::PolynomialMapNode(QStringList* inputs) : NodeBase(inputs)
     setGeometry(QRect(0, 0, sizeHint().width(), sizeHint().height()));
 }
 
-void PolynomialMapNode::setValues(QMap<QString, QList<double>> *values)
+void PolynomialMapNode::setValues(QMap<QString, QList<double>>* values)
 {
     if (values == nullptr)
         return;
-    outputs = new QStringList(values->keys());
-    outputs->sort();
-    emit transferOutputsRequested(outputs);
 
-    if(outputs->size() > 0)
+    if (outputs->size() != values->size())
+        qDebug() << "outputs and values sizes are different ";
+
+    if (outputs->size() > 0)
         degree = values->value(outputs->at(0)).size() - 1;
 
     // set degree value
     QHBoxLayout* degreeLayout = this->layout()->findChild<QHBoxLayout*>("degreeLayout");
     ((QSpinBox*) degreeLayout->itemAt(1)->widget())->setValue(degree);
 
-    // set polynomials
-    QVBoxLayout* dimensionsLayout = this->layout()->findChild<QVBoxLayout*>("dimensionsLayout");
-
     for (int i = 0; i < outputs->size(); i++)
     {
-        addNewDimensionsLayoutRow(dimensionsLayout, i);
         addMathConnector(i);
 
         // get matrix and translation values
@@ -77,7 +73,7 @@ void PolynomialMapNode::setValues(QMap<QString, QList<double>> *values)
     delete values;
 }
 
-void PolynomialMapNode::addPolynomialMatrixProxy(QGraphicsProxyWidget *newPolynomialMatrixProxy)
+void PolynomialMapNode::addPolynomialMatrixProxy(QGraphicsProxyWidget* newPolynomialMatrixProxy)
 {
     polynomialMatrixProxies.append(newPolynomialMatrixProxy);
 }
@@ -96,10 +92,11 @@ void PolynomialMapNode::removeMathOfDimensionRow(int index)
 
 void PolynomialMapNode::degreeHasChanged(int newDegree)
 {
-    if(inputs==nullptr || inputs->size() == 0)
+    if (inputs == nullptr || inputs->size() == 0)
         return;
 
-    foreach(QGraphicsProxyWidget* polynomialMatrixProxy, polynomialMatrixProxies){
+    foreach (QGraphicsProxyWidget* polynomialMatrixProxy, polynomialMatrixProxies)
+    {
         ((PolynomialMatrixNode*) polynomialMatrixProxy->widget())->setDegree(newDegree);
     }
 
@@ -120,7 +117,8 @@ void PolynomialMapNode::performResize()
 
 void PolynomialMapNode::clearMathNodes()
 {
-    while(mathOutputConnectors->size()>0){
+    while (mathOutputConnectors->size() > 0)
+    {
         removeMathOfDimensionRow(mathOutputConnectors->size() - 1);
     }
 }
@@ -135,7 +133,7 @@ void PolynomialMapNode::setDegree(int newDegree)
     degree = newDegree;
 }
 
-void PolynomialMapNode::addNewDimensionsLayoutRow(QVBoxLayout *dimensionsLayout, int index)
+void PolynomialMapNode::addNewDimensionsLayoutRow(QVBoxLayout* dimensionsLayout, int index)
 {
     QHBoxLayout* row = new QHBoxLayout();
 
@@ -185,7 +183,7 @@ void PolynomialMapNode::updateLayout()
     }
 }
 
-void PolynomialMapNode::saveValues(YAML::Emitter *out)
+void PolynomialMapNode::saveValues(YAML::Emitter* out)
 {
     *out << YAML::Key << "map";
     *out << YAML::BeginMap;
@@ -193,7 +191,7 @@ void PolynomialMapNode::saveValues(YAML::Emitter *out)
     QStringList dimensions(*outputs);
     dimensions.sort();
 
-    for(int i=0; i < dimensions.size(); i++)
+    for (int i = 0; i < dimensions.size(); i++)
     {
         int index = outputs->indexOf(dimensions[i]);
         *out << YAML::Key << dimensions.at(i).toStdString();

@@ -7,7 +7,7 @@ TranslationNode::TranslationNode() : NodeBase(nullptr)
 {
     this->typeOfNode = AFFINEMATHNODE;
     setWindowTitle("Translation");
-    createLayout();
+    createLayout(true, false, false);
 
     QVBoxLayout* dimensionsLayout = this->layout()->findChild<QVBoxLayout*>("dimensionsLayout");
     QDoubleSpinBox* valueField = new QDoubleSpinBox();

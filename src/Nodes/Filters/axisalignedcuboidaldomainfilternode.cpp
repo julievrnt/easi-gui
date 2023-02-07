@@ -11,7 +11,7 @@ AxisAlignedCuboidalDomainFilterNode::AxisAlignedCuboidalDomainFilterNode(QString
     setWindowTitle("Axis Aligned Cuboidal Domain Filter");
     if (inputs != nullptr)
         outputs = new QStringList(*inputs);
-    createLayout();
+    createLayout(true, false);
 
     QLabel* title = (QLabel*) this->layout()->findChild<QVBoxLayout*>("titleLayout")->itemAt(0)->widget();
     title->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);

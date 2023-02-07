@@ -31,6 +31,9 @@ MainWindow::MainWindow(QWidget* parent)
     connectActions();
 
     widgetsHandler = new WidgetsHandler(nodeScene);
+
+    /// REMOVE THIS IF YOU WANT TO IMPLEMENT IT
+    ui->actionAddSpecialMap->setVisible(false);
 }
 
 MainWindow::~MainWindow()
@@ -377,6 +380,7 @@ void MainWindow::openGroupFilterNode(QGraphicsProxyWidget* parentProxyNode, YAML
 void MainWindow::openSwitchNode(QGraphicsProxyWidget* parentProxyNode, YAML::Node* node, QStringList* inputs)
 {
     /// TODO
+    Q_UNUSED(inputs);
     // add node
     QGraphicsProxyWidget* proxyNode = widgetsHandler->addSwitchNode();
     // move it next to parent node
@@ -462,7 +466,7 @@ void MainWindow::openAffineMapNode(QGraphicsProxyWidget* parentProxyNode, YAML::
     }
 
     // add node
-    QGraphicsProxyWidget* proxyNode = widgetsHandler->addAffineMapNode(inputs, values);
+    QGraphicsProxyWidget* proxyNode = widgetsHandler->addAffineMapNode(inputs, outputs, values);
     // move it next to parent node
     widgetsHandler->moveNodeNextTo(parentProxyNode, proxyNode);
     // connect them
@@ -495,7 +499,7 @@ void MainWindow::openPolynomialMapNode(QGraphicsProxyWidget* parentProxyNode, YA
     }
 
     // add node
-    QGraphicsProxyWidget* proxyNode = widgetsHandler->addPolynomialMapNode(inputs, values);
+    QGraphicsProxyWidget* proxyNode = widgetsHandler->addPolynomialMapNode(inputs, outputs, values);
     // move it next to parent node
     widgetsHandler->moveNodeNextTo(parentProxyNode, proxyNode);
     // connect them
@@ -506,6 +510,7 @@ void MainWindow::openPolynomialMapNode(QGraphicsProxyWidget* parentProxyNode, YA
 
 void MainWindow::openFunctionMapNode(QGraphicsProxyWidget* parentProxyNode, YAML::Node* node, QStringList* inputs)
 {
+    Q_UNUSED(inputs);
     /// TODO
     // add node
     QGraphicsProxyWidget* proxyNode = widgetsHandler->addFunctionMapNode();
@@ -519,32 +524,62 @@ void MainWindow::openFunctionMapNode(QGraphicsProxyWidget* parentProxyNode, YAML
 
 void MainWindow::openASAGINode(QGraphicsProxyWidget* parentProxyNode, YAML::Node* node, QStringList* inputs)
 {
-    /// TODO
+    Q_UNUSED(inputs);
+
+    QStringList* outputs = new QStringList();
+    if ((*node)["parameters"])
+    {
+        for (size_t i = 0; i < (*node)["parameters"].size(); i++)
+            outputs->append(QString::fromStdString((*node)["parameters"][i].as<std::string>()));
+    }
+
+    QString file = "";
+    if (!(*node)["file"].IsNull())
+        file = QString::fromStdString((*node)["file"].as<std::string>());
+
+    QString var = "";
+    if (!(*node)["var"].IsNull())
+        var = QString::fromStdString((*node)["var"].as<std::string>());
+
+    QString interpolation = "linear";
+    if (!(*node)["interpolation"].IsNull())
+        interpolation = QString::fromStdString((*node)["interpolation"].as<std::string>());
+
     // add node
-    QGraphicsProxyWidget* proxyNode = widgetsHandler->addASAGINode();
+    QGraphicsProxyWidget* proxyNode = widgetsHandler->addASAGINode(outputs, file, var, interpolation);
     // move it next to parent node
     widgetsHandler->moveNodeNextTo(parentProxyNode, proxyNode);
     // connect them
     widgetsHandler->connectNodes((NodeBase*) parentProxyNode->widget(), (NodeBase*) proxyNode->widget());
 
-    openComponents(proxyNode, node, nullptr);
+    openComponents(proxyNode, node, outputs);
 }
 
 void MainWindow::openSCECFileNode(QGraphicsProxyWidget* parentProxyNode, YAML::Node* node, QStringList* inputs)
 {
-    /// TODO
+    Q_UNUSED(inputs);
+
+    QString file = "";
+    if (!(*node)["file"].IsNull())
+        file = QString::fromStdString((*node)["file"].as<std::string>());
+
+    QString interpolation = "linear";
+    if (!(*node)["interpolation"].IsNull())
+        interpolation = QString::fromStdString((*node)["interpolation"].as<std::string>());
+
     // add node
-    QGraphicsProxyWidget* proxyNode = widgetsHandler->addSCECFileNode();
+    QGraphicsProxyWidget* proxyNode = widgetsHandler->addSCECFileNode(file, interpolation);
     // move it next to parent node
     widgetsHandler->moveNodeNextTo(parentProxyNode, proxyNode);
     // connect them
     widgetsHandler->connectNodes((NodeBase*) parentProxyNode->widget(), (NodeBase*) proxyNode->widget());
 
-    openComponents(proxyNode, node, nullptr);
+    openComponents(proxyNode, node, ((NodeBase*) proxyNode->widget())->getOutputs());
 }
 
 void MainWindow::openEvalModelNode(QGraphicsProxyWidget* parentProxyNode, YAML::Node* node, QStringList* inputs)
 {
+    Q_UNUSED(inputs);
     /// TODO
     // add node
     QGraphicsProxyWidget* proxyNode = widgetsHandler->addEvalModelNode();
@@ -558,6 +593,7 @@ void MainWindow::openEvalModelNode(QGraphicsProxyWidget* parentProxyNode, YAML::
 
 void MainWindow::openOptimalStressNode(QGraphicsProxyWidget* parentProxyNode, YAML::Node* node, QStringList* inputs)
 {
+    Q_UNUSED(inputs);
     /// TODO
     // add node
     QGraphicsProxyWidget* proxyNode = widgetsHandler->addOptimalStressNode();
@@ -571,6 +607,7 @@ void MainWindow::openOptimalStressNode(QGraphicsProxyWidget* parentProxyNode, YA
 
 void MainWindow::openAndersonianStressNode(QGraphicsProxyWidget* parentProxyNode, YAML::Node* node, QStringList* inputs)
 {
+    Q_UNUSED(inputs);
     /// TODO
     // add node
     QGraphicsProxyWidget* proxyNode = widgetsHandler->addAndersonianStressNode();
@@ -584,6 +621,7 @@ void MainWindow::openAndersonianStressNode(QGraphicsProxyWidget* parentProxyNode
 
 void MainWindow::openSpecialMapNode(QGraphicsProxyWidget* parentProxyNode, YAML::Node* node, QStringList* inputs)
 {
+    Q_UNUSED(inputs);
     /// TODO
     // add node
     QGraphicsProxyWidget* proxyNode = widgetsHandler->addSpecialMapNode();

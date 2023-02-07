@@ -98,6 +98,8 @@ void WidgetsHandler::deleteNode()
 
     // remove maths nodes
     NodeBase* node = (NodeBase*) ((QGraphicsProxyWidget*) nodeToRemove)->widget();
+    if (node->getTypeOfNode() == ROOTNODE)
+        return;
     node->clearMathNodes();
 
     // remove parent to remove node & connectors
@@ -253,12 +255,12 @@ void WidgetsHandler::addMathOutputConnector(MathOutputConnector* mathOutputConne
             createConnectorLine(translationOutputConnector, translationInputConnector);
         }
     }
-    else if(node->getTypeOfNode() == POLYNOMIALMAPNODE)
+    else if (node->getTypeOfNode() == POLYNOMIALMAPNODE)
     {
         PolynomialMapNode* polynomialMapNode = (PolynomialMapNode*) node;
         QGraphicsProxyWidget* polynomialMatrixProxyNode = addPolynomialMatrixNode(polynomialMapNode->getInputs(), polynomialMapNode->getDegree());
 
-            // move node next to node
+        // move node next to node
         moveNodeNextTo(proxyNode, polynomialMatrixProxyNode, QPointF(0, pos.y()));
 
         MathInputConnector* polynomialMatrixInputConnector = (MathInputConnector*) ((NodeBase*) polynomialMatrixProxyNode->widget())->getInputConnector()->widget();
@@ -474,9 +476,9 @@ QGraphicsProxyWidget* WidgetsHandler::addIdentityMapNode(QStringList* inputs)
     return proxyNode;
 }
 
-QGraphicsProxyWidget* WidgetsHandler::addAffineMapNode(QStringList* inputs, QMap<QString, QList<double>>* values)
+QGraphicsProxyWidget* WidgetsHandler::addAffineMapNode(QStringList* inputs, QStringList* outputs, QMap<QString, QList<double>>* values)
 {
-    AffineMapNode* affineMapNode = new AffineMapNode(inputs);
+    AffineMapNode* affineMapNode = new AffineMapNode(inputs, outputs);
     QGraphicsProxyWidget* proxyNode = addNode(affineMapNode);
     affineMapNode->setValues(values);
 
@@ -494,9 +496,9 @@ QGraphicsProxyWidget* WidgetsHandler::addAffineMapNode(QStringList* inputs, QMap
     return proxyNode;
 }
 
-QGraphicsProxyWidget* WidgetsHandler::addPolynomialMapNode(QStringList* inputs, QMap<QString, QList<double>>* values)
+QGraphicsProxyWidget* WidgetsHandler::addPolynomialMapNode(QStringList* inputs, QStringList* outputs, QMap<QString, QList<double>>* values)
 {
-    PolynomialMapNode* polynomialMapNode = new PolynomialMapNode(inputs);
+    PolynomialMapNode* polynomialMapNode = new PolynomialMapNode(inputs, outputs);
     QGraphicsProxyWidget* proxyNode = addNode(polynomialMapNode);
     polynomialMapNode->setValues(values);
 
@@ -532,9 +534,9 @@ QGraphicsProxyWidget* WidgetsHandler::addFunctionMapNode()
     return proxyNode;
 }
 
-QGraphicsProxyWidget* WidgetsHandler::addASAGINode()
+QGraphicsProxyWidget* WidgetsHandler::addASAGINode(QStringList* outputs, QString filePath, QString var, QString interpolation)
 {
-    ASAGINode* asagiNode = new ASAGINode();
+    ASAGINode* asagiNode = new ASAGINode(outputs, filePath, var, interpolation);
     QGraphicsProxyWidget* proxyNode = addNode(asagiNode);
     NodeParentWidget* nodeParentWidget = (NodeParentWidget*)proxyNode->parentWidget();
 
@@ -550,9 +552,9 @@ QGraphicsProxyWidget* WidgetsHandler::addASAGINode()
     return proxyNode;
 }
 
-QGraphicsProxyWidget* WidgetsHandler::addSCECFileNode()
+QGraphicsProxyWidget* WidgetsHandler::addSCECFileNode(QString filePath, QString interpolation)
 {
-    SCECFileNode* scecFileNode = new SCECFileNode();
+    SCECFileNode* scecFileNode = new SCECFileNode(filePath, interpolation);
     QGraphicsProxyWidget* proxyNode = addNode(scecFileNode);
     NodeParentWidget* nodeParentWidget = (NodeParentWidget*)proxyNode->parentWidget();
 
@@ -666,7 +668,7 @@ QGraphicsProxyWidget* WidgetsHandler::addTranslationNode()
     return proxyNode;
 }
 
-QGraphicsProxyWidget *WidgetsHandler::addPolynomialMatrixNode(QStringList *inputs, int degree)
+QGraphicsProxyWidget* WidgetsHandler::addPolynomialMatrixNode(QStringList* inputs, int degree)
 {
     PolynomialMatrixNode* matrixNode = new PolynomialMatrixNode(inputs, degree);
     QGraphicsProxyWidget* proxyNode = addNode(matrixNode);
@@ -701,14 +703,14 @@ void WidgetsHandler::connectNode(QGraphicsProxyWidget* proxyNode)
     if (node->getTypeOfNode() == AFFINEMAPNODE)
     {
         AffineMapNode* affineMapNode = (AffineMapNode*) node;
-        connect(affineMapNode, SIGNAL(addMathOutputConnectorRequested(QGraphicsProxyWidget*,QPointF)), this, SLOT(actionAddMathOutputConnector(QGraphicsProxyWidget*,QPointF)));
+        connect(affineMapNode, SIGNAL(addMathOutputConnectorRequested(QGraphicsProxyWidget*, QPointF)), this, SLOT(actionAddMathOutputConnector(QGraphicsProxyWidget*, QPointF)));
         connect(affineMapNode, SIGNAL(deleteNodeRequested(QGraphicsProxyWidget*)), this, SLOT(actionDeleteNode(QGraphicsProxyWidget*)));
     }
 
     if (node->getTypeOfNode() == POLYNOMIALMAPNODE)
     {
         PolynomialMapNode* polynomialMapNode = (PolynomialMapNode*) node;
-        connect(polynomialMapNode, SIGNAL(addMathOutputConnectorRequested(QGraphicsProxyWidget*,QPointF)), this, SLOT(actionAddMathOutputConnector(QGraphicsProxyWidget*,QPointF)));
+        connect(polynomialMapNode, SIGNAL(addMathOutputConnectorRequested(QGraphicsProxyWidget*, QPointF)), this, SLOT(actionAddMathOutputConnector(QGraphicsProxyWidget*, QPointF)));
         connect(polynomialMapNode, SIGNAL(deleteNodeRequested(QGraphicsProxyWidget*)), this, SLOT(actionDeleteNode(QGraphicsProxyWidget*)));
     }
 }

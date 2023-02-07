@@ -7,7 +7,7 @@ class PolynomialMapNode : public NodeBase
 {
     Q_OBJECT
 public:
-    PolynomialMapNode(QStringList* inputs = nullptr);
+    PolynomialMapNode(QStringList* inputs = nullptr, QStringList* outputs = nullptr);
 
     void setValues(QMap<QString, QList<double>>* values);
     void addPolynomialMatrixProxy(QGraphicsProxyWidget* newPolynomialMatrixProxy);
@@ -32,11 +32,11 @@ private slots:
 
     // NodeBase interface
 protected:
-    void addNewDimensionsLayoutRow(QVBoxLayout *dimensionsLayout, int index);
+    void addNewDimensionsLayoutRow(QVBoxLayout* dimensionsLayout, int index);
     void addDimensionsLayoutRowRequested(bool clicked);
     void removeDimensionsLayoutRowRequested(bool clicked);
     void updateLayout();
-    void saveValues(YAML::Emitter *out);
+    void saveValues(YAML::Emitter* out);
 };
 
 #endif // POLYNOMIALMAPNODE_H

@@ -93,12 +93,13 @@ protected:
     void saveComponents(YAML::Emitter* out);
 
     // layouts for all nodes
-    void createLayout();
-    void addTitleLayout(QVBoxLayout* globalLayout, bool addSeparatorLine);
-    void addDimensionLayout(QVBoxLayout* globalLayout);
+    void createLayout(bool hasTitleSeparatorLine = true, bool hasAddButton = true, bool hasComponentsLayout = true);
+    void addTitleLayout(QVBoxLayout* globalLayout, bool hasTitleSeparatorLine);
+    void addDimensionLayout(QVBoxLayout* globalLayout, bool hasAddButton);
     void addComponentsLayout(QVBoxLayout* globalLayout);
     void addRemoveButton(QLayout* layout, int index);
     void removeLayoutRow(QVBoxLayout* dimensionsLayout, int index);
+    void addSeparatorLineInLayout(QLayout* layout);
 
     void clearLayout(QLayout* layout, bool deleteWidgets = true);
 

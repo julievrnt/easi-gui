@@ -27,7 +27,7 @@ public:
     void addRoot();
     void deleteNode();
     void deleteProxy(QGraphicsProxyWidget* proxy);
-    void moveNodeNextTo(QGraphicsProxyWidget* parentProxyNode, QGraphicsProxyWidget* childProxyNode, QPointF pos = QPointF(0,0));
+    void moveNodeNextTo(QGraphicsProxyWidget* parentProxyNode, QGraphicsProxyWidget* childProxyNode, QPointF pos = QPointF(0, 0));
     void connectNodes(NodeBase* parentNode, NodeBase* childNode);
 
     // basic functions to handle connectors
@@ -59,11 +59,11 @@ public:
     // add map functions
     QGraphicsProxyWidget* addConstantMapNode(QStringList* outputs = nullptr, QList<double>* values = nullptr);
     QGraphicsProxyWidget* addIdentityMapNode(QStringList* inputs = nullptr);
-    QGraphicsProxyWidget* addAffineMapNode(QStringList* inputs = nullptr, QMap<QString, QList<double>>* values = nullptr);
-    QGraphicsProxyWidget* addPolynomialMapNode(QStringList* inputs = nullptr, QMap<QString, QList<double>>* values = nullptr);
+    QGraphicsProxyWidget* addAffineMapNode(QStringList* inputs = nullptr, QStringList* outputs = nullptr, QMap<QString, QList<double>>* values = nullptr);
+    QGraphicsProxyWidget* addPolynomialMapNode(QStringList* inputs = nullptr, QStringList* outputs = nullptr, QMap<QString, QList<double>>* values = nullptr);
     QGraphicsProxyWidget* addFunctionMapNode();
-    QGraphicsProxyWidget* addASAGINode();
-    QGraphicsProxyWidget* addSCECFileNode();
+    QGraphicsProxyWidget* addASAGINode(QStringList* outputs = nullptr, QString filePath = "", QString var = "data", QString interpolation = "linear");
+    QGraphicsProxyWidget* addSCECFileNode(QString filePath = "", QString interpolation = "linear");
     QGraphicsProxyWidget* addEvalModelNode();
     QGraphicsProxyWidget* addOptimalStressNode();
     QGraphicsProxyWidget* addAndersonianStressNode();

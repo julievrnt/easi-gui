@@ -61,7 +61,7 @@ void NodeBase::addMathOutputConnector(QGraphicsProxyWidget* newMathOutputConnect
     mathOutputConnectors->append(newMathOutputConnector);
 }
 
-QList<QGraphicsProxyWidget *> *NodeBase::getMathOutputConnectors() const
+QList<QGraphicsProxyWidget*>* NodeBase::getMathOutputConnectors() const
 {
     return mathOutputConnectors;
 }
@@ -167,20 +167,17 @@ void NodeBase::saveComponents(YAML::Emitter* out)
         *out << YAML::EndSeq;
 }
 
-void NodeBase::createLayout()
+void NodeBase::createLayout(bool hasTitleSeparatorLine, bool hasAddButton, bool hasComponentsLayout)
 {
     QVBoxLayout* globalLayout = new QVBoxLayout(this);
-    if (typeOfNode == ANYNODE || typeOfNode == IDENTITYMAPNODE)
-        addTitleLayout(globalLayout, false);
-    else
-        addTitleLayout(globalLayout, true);
-    addDimensionLayout(globalLayout);
-    if (typeOfNode != ROOTNODE && typeOfNode != AFFINEMATHNODE && typeOfNode != POLYNOMIALMATHNODE)
+    addTitleLayout(globalLayout, hasTitleSeparatorLine);
+    addDimensionLayout(globalLayout, hasAddButton);
+    if (hasComponentsLayout)
         addComponentsLayout(globalLayout);
-    this->setLayout(globalLayout);
+    setLayout(globalLayout);
 }
 
-void NodeBase::addTitleLayout(QVBoxLayout* globalLayout, bool addSeparatorLine)
+void NodeBase::addTitleLayout(QVBoxLayout* globalLayout, bool hasTitleSeparatorLine)
 {
     QVBoxLayout* titleLayout = new QVBoxLayout();
     titleLayout->setObjectName("titleLayout");
@@ -193,20 +190,14 @@ void NodeBase::addTitleLayout(QVBoxLayout* globalLayout, bool addSeparatorLine)
     title->setFixedHeight(30);
     titleLayout->addWidget(title);
 
-    if (!addSeparatorLine)
-        return;
-
     // add line to separate title from the rest
-    QFrame* lineTitel = new QFrame(this);
-    lineTitel->setFrameShape(QFrame::HLine);
-    lineTitel->setFrameShadow(QFrame::Sunken);
-    lineTitel->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-    titleLayout->addWidget(lineTitel);
+    if (hasTitleSeparatorLine)
+        addSeparatorLineInLayout(titleLayout);
 
     globalLayout->addLayout(titleLayout);
 }
 
-void NodeBase::addDimensionLayout(QVBoxLayout* globalLayout)
+void NodeBase::addDimensionLayout(QVBoxLayout* globalLayout, bool hasAddButton)
 {
     // add an empty layout that will contain the dimensions
     QVBoxLayout* dimensionsLayout = new QVBoxLayout();
@@ -220,27 +211,11 @@ void NodeBase::addDimensionLayout(QVBoxLayout* globalLayout)
     }
     globalLayout->addLayout(dimensionsLayout);
 
-    switch (typeOfNode)
-    {
-        case ANYNODE:
-            return;
-        case AXISALIGNEDCUBOIDALDOMAINFILTERNODE:
-            return;
-        case SPHERICALDOMAINFILTERNODE:
-            return;
-        case IDENTITYMAPNODE:
-            return;
-        case AFFINEMATHNODE:
-            return;
-        case POLYNOMIALMATHNODE:
-            return;
-        default:
-            break;
-    }
+    if (!hasAddButton)
+        return;
 
     // add button to add dimension
-    QPushButton* addButton = new QPushButton();
-    addButton->setText("+");
+    QPushButton* addButton = new QPushButton("+");
     connect(addButton, SIGNAL(clicked(bool)), this, SLOT(addDimensionsLayoutRowRequested(bool)));
 
     globalLayout->addWidget(addButton);
@@ -249,11 +224,7 @@ void NodeBase::addDimensionLayout(QVBoxLayout* globalLayout)
 void NodeBase::addComponentsLayout(QVBoxLayout* globalLayout)
 {
     // add line to separate components from the rest
-    QFrame* lineComponents = new QFrame(this);
-    lineComponents->setFrameShape(QFrame::HLine);
-    lineComponents->setFrameShadow(QFrame::Sunken);
-    lineComponents->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-    globalLayout->addWidget(lineComponents);
+    addSeparatorLineInLayout(globalLayout);
 
     QLabel* componentsLabel = new QLabel();
     componentsLabel->setText("Components");
@@ -263,10 +234,8 @@ void NodeBase::addComponentsLayout(QVBoxLayout* globalLayout)
 
     // add buttons
     QHBoxLayout* buttonsLayout = new QHBoxLayout();
-    QPushButton* addButton = new QPushButton();
-    addButton->setText("Add");
-    QPushButton* deleteButton = new QPushButton();
-    deleteButton->setText("Delete");
+    QPushButton* addButton = new QPushButton("Add");
+    QPushButton* deleteButton = new QPushButton("Delete");
 
     buttonsLayout->addWidget(addButton);
     buttonsLayout->addWidget(deleteButton);
@@ -281,9 +250,8 @@ void NodeBase::addComponentsLayout(QVBoxLayout* globalLayout)
 void NodeBase::addRemoveButton(QLayout* layout, int index)
 {
     // add button to remove dimension
-    QPushButton* removeButton = new QPushButton();
+    QPushButton* removeButton = new QPushButton("-");
     removeButton->setObjectName(QString::number(index));
-    removeButton->setText("-");
     connect(removeButton, SIGNAL(clicked(bool)), this, SLOT(removeDimensionsLayoutRowRequested(bool)));
     layout->addWidget(removeButton);
 }
@@ -317,6 +285,15 @@ void NodeBase::removeLayoutRow(QVBoxLayout* dimensionsLayout, int index)
     clearLayout(layoutToRemove, true);
     dimensionsLayout->removeItem(layoutToRemove);
     delete layoutToRemove;
+}
+
+void NodeBase::addSeparatorLineInLayout(QLayout* layout)
+{
+    QFrame* line = new QFrame(this);
+    line->setFrameShape(QFrame::HLine);
+    line->setFrameShadow(QFrame::Sunken);
+    line->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+    layout->addWidget(line);
 }
 
 void NodeBase::updateLayout()

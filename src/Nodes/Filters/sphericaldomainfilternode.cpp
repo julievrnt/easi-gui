@@ -10,7 +10,7 @@ SphericalDomainFilterNode::SphericalDomainFilterNode(QStringList* inputs) : Node
     setWindowTitle("Spherical Domain Filter");
     if (inputs != nullptr)
         outputs = new QStringList(*inputs);
-    createLayout();
+    createLayout(true, false);
 
     QVBoxLayout* globalLayout = (QVBoxLayout*) this->layout();
 
@@ -39,23 +39,24 @@ SphericalDomainFilterNode::SphericalDomainFilterNode(QStringList* inputs) : Node
     line->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
     radiusAndLineLayout->addWidget(line);
 
-    globalLayout->insertLayout(1,radiusAndLineLayout);
+    globalLayout->insertLayout(1, radiusAndLineLayout);
 
     setGeometry(QRect(0, 0, sizeHint().width(), sizeHint().height()));
 }
 
-SphericalDomainFilterNode::SphericalDomainFilterNode(QStringList *inputs, QList<double> *values) : SphericalDomainFilterNode(inputs)
+SphericalDomainFilterNode::SphericalDomainFilterNode(QStringList* inputs, QList<double>* values) : SphericalDomainFilterNode(inputs)
 {
-    if(values == nullptr || values->size() == 0)
+    if (values == nullptr || values->size() == 0)
         return;
 
     QHBoxLayout* radiusLayout = this->layout()->findChild<QHBoxLayout*>("radiusLayout");
     ((QDoubleSpinBox*) radiusLayout->itemAt(1)->widget())->setValue(values->at(0));
 
     QVBoxLayout* dimensionsLayout = this->layout()->findChild<QVBoxLayout*>("dimensionsLayout");
-    for(int i=1; i < values->size(); i++){
-        QHBoxLayout* row = (QHBoxLayout*) dimensionsLayout->children().at(i-1);
-        ((QLabel*) row->itemAt(0)->widget())->setText(outputs->at(i-1));
+    for (int i = 1; i < values->size(); i++)
+    {
+        QHBoxLayout* row = (QHBoxLayout*) dimensionsLayout->children().at(i - 1);
+        ((QLabel*) row->itemAt(0)->widget())->setText(outputs->at(i - 1));
         ((QDoubleSpinBox*) row->itemAt(1)->widget())->setValue(values->at(i));
     }
 
@@ -64,21 +65,21 @@ SphericalDomainFilterNode::SphericalDomainFilterNode(QStringList *inputs, QList<
 
 QMap<QString, double>* SphericalDomainFilterNode::getCenterValues()
 {
-   QMap<QString, double>* centerValues = new QMap<QString, double>();
+    QMap<QString, double>* centerValues = new QMap<QString, double>();
 
-   QObjectList dimensionsLayout = this->layout()->findChild<QVBoxLayout*>("dimensionsLayout")->children();
-   foreach (QObject* row, dimensionsLayout)
-   {
-       QHBoxLayout* layout = (QHBoxLayout*) row;
-       QString name = ((QLabel*) layout->itemAt(0)->widget())->text();
-       double value = ((QDoubleSpinBox*) layout->itemAt(1)->widget())->value();
-       centerValues->insert(name, value);
-   }
+    QObjectList dimensionsLayout = this->layout()->findChild<QVBoxLayout*>("dimensionsLayout")->children();
+    foreach (QObject* row, dimensionsLayout)
+    {
+        QHBoxLayout* layout = (QHBoxLayout*) row;
+        QString name = ((QLabel*) layout->itemAt(0)->widget())->text();
+        double value = ((QDoubleSpinBox*) layout->itemAt(1)->widget())->value();
+        centerValues->insert(name, value);
+    }
 
-   return centerValues;
+    return centerValues;
 }
 
-void SphericalDomainFilterNode::addNewDimensionsLayoutRow(QVBoxLayout *dimensionsLayout, int index)
+void SphericalDomainFilterNode::addNewDimensionsLayoutRow(QVBoxLayout* dimensionsLayout, int index)
 {
     QHBoxLayout* row = new QHBoxLayout();
 
@@ -127,7 +128,7 @@ void SphericalDomainFilterNode::updateLayout()
     emit transferOutputsRequested(outputs);
 }
 
-void SphericalDomainFilterNode::saveValues(YAML::Emitter *out)
+void SphericalDomainFilterNode::saveValues(YAML::Emitter* out)
 {
     QHBoxLayout* radiusLayout = this->layout()->findChild<QHBoxLayout*>("radiusLayout");
     double radiusValue = ((QDoubleSpinBox*) radiusLayout->itemAt(1)->widget())->value();
@@ -142,7 +143,8 @@ void SphericalDomainFilterNode::saveValues(YAML::Emitter *out)
     (*out) << YAML::Key << "center";
     (*out) << YAML::BeginMap;
 
-    for(int i=0; i < centerNames.size(); i++){
+    for (int i = 0; i < centerNames.size(); i++)
+    {
         (*out) << YAML::Key << centerNames[i].toStdString();
         (*out) << YAML::Value << centerValues->value(centerNames[i]);
     }

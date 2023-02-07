@@ -5,7 +5,7 @@
 #include <QPushButton>
 #include <QLineEdit>
 
-AffineMapNode::AffineMapNode(QStringList* inputs) : NodeBase(inputs)
+AffineMapNode::AffineMapNode(QStringList* inputs, QStringList* outputs) : NodeBase(inputs, outputs)
 {
     typeOfNode = AFFINEMAPNODE;
     localTag = "AffineMap";
@@ -27,15 +27,12 @@ void AffineMapNode::setValues(QMap<QString, QList<double> >* values)
 {
     if (values == nullptr)
         return;
-    outputs = new QStringList(values->keys());
-    outputs->sort();
-    emit transferOutputsRequested(outputs);
 
-    QVBoxLayout* dimensionsLayout = this->layout()->findChild<QVBoxLayout*>("dimensionsLayout");
+    if (outputs->size() != values->size())
+        qDebug() << "outputs and values sizes are different";
 
     for (int i = 0; i < outputs->size(); i++)
     {
-        addNewDimensionsLayoutRow(dimensionsLayout, i);
         addMathsConnectors(i);
 
         // get matrix and translation values
@@ -134,8 +131,9 @@ void AffineMapNode::performResize()
 
 void AffineMapNode::clearMathNodes()
 {
-    while(mathOutputConnectors->size()>0){
-        int index = this->layout()->findChild<QVBoxLayout*>("dimensionsLayout")->children().size() -1;
+    while (mathOutputConnectors->size() > 0)
+    {
+        int index = this->layout()->findChild<QVBoxLayout*>("dimensionsLayout")->children().size() - 1;
         removeMathsOfDimensionRow(index);
     }
 }

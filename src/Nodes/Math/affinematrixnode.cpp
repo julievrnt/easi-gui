@@ -8,7 +8,7 @@ AffineMatrixNode::AffineMatrixNode(QStringList* inputs) : NodeBase(inputs)
 {
     this->typeOfNode = AFFINEMATHNODE;
     setWindowTitle("Matrix");
-    createLayout();
+    createLayout(true, false, false);
 
     setGeometry(QRect(0, 0, sizeHint().width(), sizeHint().height()));
 }
@@ -30,7 +30,8 @@ void AffineMatrixNode::setValues(QStringList* inputs, QList<double>* values)
 
     QVBoxLayout* dimensionsLayout = this->layout()->findChild<QVBoxLayout*>("dimensionsLayout");
 
-    for(int i=0; i < inputs->size(); i++){
+    for (int i = 0; i < inputs->size(); i++)
+    {
         addNewDimensionsLayoutRow(dimensionsLayout, i);
         QHBoxLayout* row = (QHBoxLayout*) dimensionsLayout->children().at(i);
         int index = inputs->indexOf(((QLabel*) row->itemAt(0)->widget())->text());
@@ -38,7 +39,7 @@ void AffineMatrixNode::setValues(QStringList* inputs, QList<double>* values)
     }
 }
 
-void AffineMatrixNode::addNewDimensionsLayoutRow(QVBoxLayout *dimensionsLayout, int index)
+void AffineMatrixNode::addNewDimensionsLayoutRow(QVBoxLayout* dimensionsLayout, int index)
 {
     QHBoxLayout* row = new QHBoxLayout();
 
@@ -118,7 +119,7 @@ void AffineMatrixNode::saveNodeContent(YAML::Emitter* out)
 void AffineMatrixNode::saveValues(YAML::Emitter* out)
 {
     QList<double>* values = getValues();
-    *out << YAML::Flow<< YAML::BeginSeq;
+    *out << YAML::Flow << YAML::BeginSeq;
     for (int i = 0; i < values->size(); i++)
         *out << values->at(i);
     *out << YAML::EndSeq << YAML::Block;

@@ -6,7 +6,6 @@
 #include <QGraphicsProxyWidget>
 #include <QMap>
 #include <QStringList>
-#include "src/Nodes/nodebase.h"
 #include "widgetshandler.h"
 
 QT_BEGIN_NAMESPACE
