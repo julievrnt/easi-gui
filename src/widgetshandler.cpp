@@ -1,6 +1,8 @@
 #include "widgetshandler.h"
 #include "src/Connectors/connectorlineparentwidget.h"
 #include "src/Connectors/outputs/mathoutputconnector.h"
+#include "src/Nodes/Builders/includenode.h"
+#include "src/Nodes/Builders/layeredmodelnode.h"
 #include "src/Nodes/Filters/anynode.h"
 #include "src/Nodes/Filters/axisalignedcuboidaldomainfilternode.h"
 #include "src/Nodes/Filters/sphericaldomainfilternode.h"
@@ -341,6 +343,42 @@ void WidgetsHandler::createActions()
 /// ===========================================================================
 /// =================== BASIC FUNCTIONS TO HANDLE CONNECTORS ==================
 /// ===========================================================================
+
+
+/// ===========================================================================
+/// ========================== ADD BUILDER FUNCTIONS ==========================
+/// ===========================================================================
+
+QGraphicsProxyWidget* WidgetsHandler::addInclude(QString filePath)
+{
+    IncludeNode* includeNode = new IncludeNode(filePath);
+    QGraphicsProxyWidget* proxyNode = addNode(includeNode);
+    NodeParentWidget* nodeParentWidget = (NodeParentWidget*)proxyNode->parentWidget();
+
+    // Add one input connector
+    InputConnector* inputConnector = new InputConnector(nodeParentWidget);
+    addInputConnector(inputConnector, proxyNode, QPointF(-8, 20));
+
+    return proxyNode;
+}
+
+QGraphicsProxyWidget* WidgetsHandler::addLayeredModel()
+{
+    LayeredModelNode* layeredModelNode = new LayeredModelNode();
+    QGraphicsProxyWidget* proxyNode = addNode(layeredModelNode);
+    NodeParentWidget* nodeParentWidget = (NodeParentWidget*)proxyNode->parentWidget();
+
+    // Add one input connector
+    InputConnector* inputConnector = new InputConnector(nodeParentWidget);
+    addInputConnector(inputConnector, proxyNode, QPointF(-8, 20));
+
+    // Add one output connector
+    OutputConnector* outputConnector = new OutputConnector(nodeParentWidget);
+    QPointF pos(layeredModelNode->geometry().width() - 7, layeredModelNode->geometry().height() - 58);
+    addOutputConnector(outputConnector, proxyNode, pos);
+
+    return proxyNode;
+}
 
 
 /// ===========================================================================

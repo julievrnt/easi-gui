@@ -46,6 +46,10 @@ private:
     void openNode(QGraphicsProxyWidget* parentProxyNode, YAML::Node* node, QStringList* inputs);
     void openComponents(QGraphicsProxyWidget* parentProxyNode, YAML::Node* node, QStringList* inputs);
 
+    // open builder nodes
+    void openIncludeNode(QGraphicsProxyWidget* parentProxyNode, YAML::Node* node, QStringList* inputs);
+    void openLayeredModelNode(QGraphicsProxyWidget* parentProxyNode, YAML::Node* node, QStringList* inputs);
+
     // open filter nodes
     void openAnyNode(QGraphicsProxyWidget* parentProxyNode, YAML::Node* node, QStringList* inputs);
     void openAxisAlignedCuboidalDomainFilterNode(QGraphicsProxyWidget* parentProxyNode, YAML::Node* node, QStringList* inputs);
@@ -69,6 +73,10 @@ private:
 private slots:
     void getNewFocusItem(QGraphicsItem* newFocusItem, QGraphicsItem* oldFocusItem, Qt::FocusReason reason);
     void stateChanged();
+
+    // action add builders
+    void actionAddInclude();
+    void actionAddLayeredModel();
 
     // action add filters
     void actionAddAny();

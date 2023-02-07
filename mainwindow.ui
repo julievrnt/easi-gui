@@ -92,10 +92,18 @@
     <addaction name="actionCopy"/>
     <addaction name="actionPaste"/>
    </widget>
+   <widget class="QMenu" name="menuAdd_Builders">
+    <property name="title">
+     <string>Add Builders</string>
+    </property>
+    <addaction name="actionAddLayeredModel"/>
+    <addaction name="actionAddInclude"/>
+   </widget>
    <addaction name="menuFile"/>
    <addaction name="menuEdit"/>
    <addaction name="menuAdd_map"/>
    <addaction name="menuAdd_Filter"/>
+   <addaction name="menuAdd_Builders"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <widget class="QToolBar" name="toolBar">
@@ -340,6 +348,16 @@
   <action name="actionAddSpecialMap">
    <property name="text">
     <string>Special Map</string>
+   </property>
+  </action>
+  <action name="actionAddInclude">
+   <property name="text">
+    <string>Include</string>
+   </property>
+  </action>
+  <action name="actionAddLayeredModel">
+   <property name="text">
+    <string>Layered Model</string>
    </property>
   </action>
  </widget>

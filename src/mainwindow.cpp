@@ -45,6 +45,10 @@ MainWindow::~MainWindow()
 
 void MainWindow::connectActions()
 {
+    // add builder actions
+    connect(ui->actionAddLayeredModel, SIGNAL(triggered(bool)), this, SLOT(actionAddLayeredModel()));
+    connect(ui->actionAddInclude, SIGNAL(triggered(bool)), this, SLOT(actionAddInclude()));
+
     // add filter actions
     connect(ui->actionAddAny, SIGNAL(triggered(bool)), this, SLOT(actionAddAny()));
     connect(ui->actionAddAxisAlignedCuboidalDomainFilter, SIGNAL(triggered(bool)), this, SLOT(actionAddAxisAlignedCuboidalDomainFilter()));
@@ -222,11 +226,17 @@ void MainWindow::enableDisableIcons(bool enable)
 void MainWindow::openNode(QGraphicsProxyWidget* parentProxyNode, YAML::Node* node, QStringList* outputs)
 {
     QString tagOfNode = QString::fromStdString((*node).Tag());
-    //qDebug() << tagOfNode;
+    qDebug() << tagOfNode;
 
     // read tag of node
-    //filters
-    if (tagOfNode == "!Any")
+    // builders
+    if (tagOfNode == "!LayeredModel")
+        openLayeredModelNode(parentProxyNode, node, outputs);
+    else if (tagOfNode == "!Include")
+        openIncludeNode(parentProxyNode, node, outputs);
+
+    // filters
+    else if (tagOfNode == "!Any")
         openAnyNode(parentProxyNode, node, outputs);
     else if (tagOfNode == "!AxisAlignedCuboidalDomainFilter")
         openAxisAlignedCuboidalDomainFilterNode(parentProxyNode, node, outputs);
@@ -281,6 +291,27 @@ void MainWindow::openComponents(QGraphicsProxyWidget* parentProxyNode, YAML::Nod
     }
     else
         qDebug() << "components of " << parentProxyNode << " is neither a map nor a sequence";
+}
+
+void MainWindow::openIncludeNode(QGraphicsProxyWidget* parentProxyNode, YAML::Node* node, QStringList* inputs)
+{
+    Q_UNUSED(inputs);
+
+    QString file = "";
+    if (!(*node).IsNull())
+        file = QString::fromStdString((*node).as<std::string>());
+
+    // add node
+    QGraphicsProxyWidget* proxyNode = widgetsHandler->addInclude(file);
+    // move it next to parent node
+    widgetsHandler->moveNodeNextTo(parentProxyNode, proxyNode);
+    // connect them
+    widgetsHandler->connectNodes((NodeBase*) parentProxyNode->widget(), (NodeBase*) proxyNode->widget());
+}
+
+void MainWindow::openLayeredModelNode(QGraphicsProxyWidget* parentProxyNode, YAML::Node* node, QStringList* inputs)
+{
+
 }
 
 void MainWindow::openAnyNode(QGraphicsProxyWidget* parentProxyNode, YAML::Node* node, QStringList* inputs)
@@ -751,6 +782,16 @@ void MainWindow::actionAddAndersonianStress()
 void MainWindow::actionAddSpecialMap()
 {
     widgetsHandler->addSpecialMapNode();
+}
+
+void MainWindow::actionAddInclude()
+{
+    widgetsHandler->addInclude();
+}
+
+void MainWindow::actionAddLayeredModel()
+{
+    widgetsHandler->addLayeredModel();
 }
 
 

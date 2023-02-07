@@ -49,6 +49,10 @@ public:
     void removeNewConnectorLine();
     void checkConnectionBetweenConnectorAndLine(ConnectorBase* connector);
 
+    // add builder functions
+    QGraphicsProxyWidget* addInclude(QString filePath = "");
+    QGraphicsProxyWidget* addLayeredModel();
+
     // add filter functions
     QGraphicsProxyWidget* addAnyNode(QStringList* inputs = nullptr);
     QGraphicsProxyWidget* addAxisAlignedCuboidalDomainFilterNode(QStringList* inputs = nullptr, QList<double>* values = nullptr);

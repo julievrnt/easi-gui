@@ -16,6 +16,8 @@ SOURCES += \
     src/Connectors/inputs/mathinputconnector.cpp \
     src/Connectors/outputs/mathoutputconnector.cpp \
     src/Connectors/outputs/outputconnector.cpp \
+    src/Nodes/Builders/includenode.cpp \
+    src/Nodes/Builders/layeredmodelnode.cpp \
     src/Nodes/Filters/anynode.cpp \
     src/Nodes/Filters/axisalignedcuboidaldomainfilternode.cpp \
     src/Nodes/Filters/groupfilternode.cpp \
@@ -51,6 +53,8 @@ HEADERS += \
     src/Connectors/inputs/mathinputconnector.h \
     src/Connectors/outputs/mathoutputconnector.h \
     src/Connectors/outputs/outputconnector.h \
+    src/Nodes/Builders/includenode.h \
+    src/Nodes/Builders/layeredmodelnode.h \
     src/Nodes/Filters/anynode.h \
     src/Nodes/Filters/axisalignedcuboidaldomainfilternode.h \
     src/Nodes/Filters/groupfilternode.h \
