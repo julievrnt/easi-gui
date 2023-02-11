@@ -80,10 +80,11 @@ public:
                                                    double s = 0, double sig_zz = 0);
     QGraphicsProxyWidget* addSpecialMapNode();
 
-    // add math functions
+    // add other node functions
     QGraphicsProxyWidget* addAffineMatrixNode(QStringList* inputs = nullptr);
     QGraphicsProxyWidget* addTranslationNode();
     QGraphicsProxyWidget* addPolynomialMatrixNode(QStringList* inputs = nullptr, int degree = 0);
+    QGraphicsProxyWidget* addSwitchComponentNode(QStringList* inputs = nullptr, QStringList* outputs = nullptr);
 
 signals:
     void saveRequested(YAML::Emitter* out);

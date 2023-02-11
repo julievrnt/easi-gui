@@ -22,7 +22,7 @@ SOURCES += \
     src/Nodes/Filters/axisalignedcuboidaldomainfilternode.cpp \
     src/Nodes/Filters/groupfilternode.cpp \
     src/Nodes/Filters/sphericaldomainfilternode.cpp \
-    src/Nodes/Filters/swtichnode.cpp \
+    src/Nodes/Filters/switchnode.cpp \
     src/Nodes/Maps/affinemapnode.cpp \
     src/Nodes/Maps/andersonianstressnode.cpp \
     src/Nodes/Maps/asaginode.cpp \
@@ -34,9 +34,10 @@ SOURCES += \
     src/Nodes/Maps/polynomialmapnode.cpp \
     src/Nodes/Maps/scecfilenode.cpp \
     src/Nodes/Maps/specialmapnode.cpp \
-    src/Nodes/Math/affinematrixnode.cpp \
-    src/Nodes/Math/polynomialmatrixnode.cpp \
-    src/Nodes/Math/translationnode.cpp \
+    src/Nodes/Extra/affinematrixnode.cpp \
+    src/Nodes/Extra/polynomialmatrixnode.cpp \
+    src/Nodes/Extra/translationnode.cpp \
+    src/Nodes/Extra/switchcomponentnode.cpp \
     src/main.cpp \
     src/mainwindow.cpp \
     src/Nodes/nodebase.cpp \
@@ -59,7 +60,7 @@ HEADERS += \
     src/Nodes/Filters/axisalignedcuboidaldomainfilternode.h \
     src/Nodes/Filters/groupfilternode.h \
     src/Nodes/Filters/sphericaldomainfilternode.h \
-    src/Nodes/Filters/swtichnode.h \
+    src/Nodes/Filters/switchnode.h \
     src/Nodes/Maps/affinemapnode.h \
     src/Nodes/Maps/andersonianstressnode.h \
     src/Nodes/Maps/asaginode.h \
@@ -71,9 +72,10 @@ HEADERS += \
     src/Nodes/Maps/polynomialmapnode.h \
     src/Nodes/Maps/scecfilenode.h \
     src/Nodes/Maps/specialmapnode.h \
-    src/Nodes/Math/affinematrixnode.h \
-    src/Nodes/Math/polynomialmatrixnode.h \
-    src/Nodes/Math/translationnode.h \
+    src/Nodes/Extra/affinematrixnode.h \
+    src/Nodes/Extra/polynomialmatrixnode.h \
+    src/Nodes/Extra/translationnode.h \
+    src/Nodes/Extra/switchcomponentnode.h \
     src/mainwindow.h \
     src/Nodes/nodebase.h \
     src/Nodes/nodeparentwidget.h \

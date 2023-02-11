@@ -44,6 +44,7 @@
 // other nodes
 #define AFFINEMATHNODE 20
 #define POLYNOMIALMATHNODE 21
+#define SWITCHCOMPONENTNODE 22
 
 
 class NodeBase : public QWidget
@@ -74,7 +75,7 @@ public:
 signals:
     void nodeContextMenuRequested(QPoint pos);
     void resized(QRectF rect);
-    OutputConnector* addOutputConnectorRequested(QGraphicsProxyWidget* proxyNode);
+    OutputConnector* addOutputConnectorRequested(QGraphicsProxyWidget* proxyNode, QPointF pos = QPointF(0,0));
     void deleteOutputConnectorRequested(QGraphicsProxyWidget* outputConnectorProxy);
     void transferOutputsRequested(QStringList* outputs);
     void deleteNodeRequested(QGraphicsProxyWidget* proxyNode);
@@ -109,6 +110,8 @@ protected:
     QDoubleSpinBox* addDoubleSpinBox(QLayout* layout);
 
     void clearLayout(QLayout* layout, bool deleteWidgets = true);
+
+    virtual void deleteOutputConnector();
 
     virtual void addNewDimensionsLayoutRow(QVBoxLayout* dimensionsLayout, int index);
     virtual void updateLayout();

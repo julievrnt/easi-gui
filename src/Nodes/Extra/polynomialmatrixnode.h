@@ -10,7 +10,6 @@ public:
     PolynomialMatrixNode(QStringList* inputs = nullptr, int degree = 0);
 
     void setValues(QStringList* inputs, QList<double>* values);
-
     void setDegree(int newDegree);
 
 private:

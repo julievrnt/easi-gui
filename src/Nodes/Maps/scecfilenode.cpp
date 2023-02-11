@@ -90,7 +90,7 @@ void SCECFileNode::addInterpolationLayout(QVBoxLayout* globalLayout)
 
 QString SCECFileNode::getFilePath()
 {
-    QString filePath = QFileDialog::getOpenFileName(this, tr("Open File"), "/home/juliehbr", tr("NetCDF files (*.nc *.cdf)"));
+    QString filePath = QFileDialog::getOpenFileName(this, tr("Open File"), "/home/juliehbr", tr("Text files (*.txt)"));
     return filePath;
 }
 

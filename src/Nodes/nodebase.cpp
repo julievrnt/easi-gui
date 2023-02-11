@@ -265,6 +265,15 @@ void NodeBase::clearLayout(QLayout* layout, bool deleteWidgets)
     }
 }
 
+void NodeBase::deleteOutputConnector()
+{
+    if (outputConnectors->size() > 1)
+    {
+        emit deleteOutputConnectorRequested(outputConnectors->takeLast());
+        performResize();
+    }
+}
+
 void NodeBase::addNewDimensionsLayoutRow(QVBoxLayout* dimensionsLayout, int index)
 {
     // needs to be implemented in subclasses
@@ -381,17 +390,13 @@ void NodeBase::dimensionNameChanged(QString newOutput)
 void NodeBase::addOutputConnectorButtonClicked(bool clicked)
 {
     Q_UNUSED(clicked);
-    emit addOutputConnectorRequested(this->getProxyNode());
+    emit addOutputConnectorRequested(getProxyNode());
 }
 
 void NodeBase::deleteOutputConnectorButtonClicked(bool clicked)
 {
     Q_UNUSED(clicked);
-    if (outputConnectors->size() > 1)
-    {
-        emit deleteOutputConnectorRequested(outputConnectors->takeLast());
-        performResize();
-    }
+    deleteOutputConnector();
 }
 
 void NodeBase::renameNextRemoveButtons(QVBoxLayout* dimensionsLayout, int index)

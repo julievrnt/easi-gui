@@ -24,7 +24,6 @@ private:
 
     QString getFilePath();
     QStringList* getParameters();
-    void setParameters(QStringList* parameters);
 
 private slots:
     void selectFile(bool clicked);

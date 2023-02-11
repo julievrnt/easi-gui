@@ -1,6 +1,6 @@
 #include "polynomialmapnode.h"
 #include "src/Connectors/outputs/mathoutputconnector.h"
-#include "src/Nodes/Math/polynomialmatrixnode.h"
+#include "src/Nodes/Extra/polynomialmatrixnode.h"
 #include <QLabel>
 #include <QSpinBox>
 
@@ -17,10 +17,7 @@ PolynomialMapNode::PolynomialMapNode(QStringList* inputs, QStringList* outputs) 
     QHBoxLayout* degreeLayout = new QHBoxLayout();
     degreeLayout->setObjectName("degreeLayout");
 
-    QLabel* degree = new QLabel("degree");
-    degree->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-    degree->setAlignment(Qt::AlignCenter);
-    degreeLayout->addWidget(degree);
+    addLabel(degreeLayout, "degree");
 
     QSpinBox* degreeValue = new QSpinBox();
     degreeValue->setButtonSymbols(QAbstractSpinBox::NoButtons);

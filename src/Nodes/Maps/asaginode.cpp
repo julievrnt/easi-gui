@@ -48,17 +48,11 @@ void ASAGINode::addFileLayout(QVBoxLayout* globalLayout)
     QHBoxLayout* fileLayout = new QHBoxLayout();
     fileLayout->setObjectName("fileLayout");
 
-    QLabel* fileLabel = new QLabel("file");
-    fileLabel->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-    fileLabel->setAlignment(Qt::AlignCenter);
-    fileLayout->addWidget(fileLabel);
+    addLabel(fileLayout, "file");
 
-    QLabel* filePath = new QLabel(this->filePath);
-    filePath->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+    QLabel* filePath = addLabel(fileLayout,this->filePath);
     filePath->setFixedHeight(30);
-    filePath->setAlignment(Qt::AlignCenter);
     filePath->setStyleSheet("QLabel { background-color : #242424; }");
-    fileLayout->addWidget(filePath);
 
     QPushButton* selectFileButton = new QPushButton("select file");
     connect(selectFileButton, SIGNAL(clicked(bool)), this, SLOT(selectFile(bool)));
@@ -69,15 +63,11 @@ void ASAGINode::addFileLayout(QVBoxLayout* globalLayout)
 void ASAGINode::addParametersLayout(QVBoxLayout* globalLayout)
 {
     QVBoxLayout* parametersLayout = new QVBoxLayout();
-
     addSeparatorLineInLayout(parametersLayout);
 
-    QLabel* parametersLabel = new QLabel("parameters");
-    parametersLabel->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-    parametersLabel->setAlignment(Qt::AlignCenter);
-    parametersLayout->addWidget(parametersLabel);
-
+    addLabel(parametersLayout, "parameters");
     addDimensionLayout(parametersLayout, true);
+
     addSeparatorLineInLayout(parametersLayout);
     globalLayout->addLayout(parametersLayout);
 }
@@ -87,10 +77,7 @@ void ASAGINode::addVarLayout(QVBoxLayout* globalLayout)
     QHBoxLayout* varLayout = new QHBoxLayout();
     varLayout->setObjectName("varLayout");
 
-    QLabel* varLabel = new QLabel("var");
-    varLabel->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-    varLabel->setAlignment(Qt::AlignCenter);
-    varLayout->addWidget(varLabel);
+    addLabel(varLayout, "var");
 
     QLineEdit* var = new QLineEdit(this->var);
     var->setPlaceholderText("data");
@@ -107,10 +94,7 @@ void ASAGINode::addInterpolationLayout(QVBoxLayout* globalLayout)
     QHBoxLayout* interpolationLayout = new QHBoxLayout();
     interpolationLayout->setObjectName("interpolationLayout");
 
-    QLabel* interpolationLabel = new QLabel("interpolation");
-    interpolationLabel->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-    interpolationLabel->setAlignment(Qt::AlignCenter);
-    interpolationLayout->addWidget(interpolationLabel);
+    addLabel(interpolationLayout, "interpolation");
 
     QComboBox* interpolation = new QComboBox();
     interpolation->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);

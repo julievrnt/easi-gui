@@ -1,7 +1,7 @@
 #include "affinemapnode.h"
 #include "src/Connectors/outputs/mathoutputconnector.h"
-#include "src/Nodes/Math/affinematrixnode.h"
-#include "src/Nodes/Math/translationnode.h"
+#include "src/Nodes/Extra/affinematrixnode.h"
+#include "src/Nodes/Extra/translationnode.h"
 #include <QPushButton>
 #include <QLineEdit>
 
@@ -133,8 +133,7 @@ void AffineMapNode::clearMathNodes()
 {
     while (mathOutputConnectors->size() > 0)
     {
-        int index = this->layout()->findChild<QVBoxLayout*>("dimensionsLayout")->children().size() - 1;
-        removeMathsOfDimensionRow(index);
+        removeMathsOfDimensionRow((mathOutputConnectors->size() - 1)/2);
     }
 }
 

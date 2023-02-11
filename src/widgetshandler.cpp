@@ -7,7 +7,7 @@
 #include "src/Nodes/Filters/axisalignedcuboidaldomainfilternode.h"
 #include "src/Nodes/Filters/sphericaldomainfilternode.h"
 #include "src/Nodes/Filters/groupfilternode.h"
-#include "src/Nodes/Filters/swtichnode.h"
+#include "src/Nodes/Filters/switchnode.h"
 #include "src/Nodes/Maps/constantmapnode.h"
 #include "src/Nodes/Maps/identitymapnode.h"
 #include "src/Nodes/Maps/affinemapnode.h"
@@ -19,9 +19,10 @@
 #include "src/Nodes/Maps/optimalstressnode.h"
 #include "src/Nodes/Maps/andersonianstressnode.h"
 #include "src/Nodes/Maps/specialmapnode.h"
-#include "src/Nodes/Math/affinematrixnode.h"
-#include "src/Nodes/Math/translationnode.h"
-#include "src/Nodes/Math/polynomialmatrixnode.h"
+#include "src/Nodes/Extra/affinematrixnode.h"
+#include "src/Nodes/Extra/translationnode.h"
+#include "src/Nodes/Extra/polynomialmatrixnode.h"
+#include "src/Nodes/Extra/switchcomponentnode.h"
 #include "src/Nodes/rootnode.h"
 #include <QMenu>
 
@@ -103,6 +104,8 @@ void WidgetsHandler::deleteNode()
     if (node->getTypeOfNode() == ROOTNODE)
         return;
     node->clearMathNodes();
+    if (node->getTypeOfNode() == SWITCHNODE)
+        ((SwitchNode*) node)->clearSwitchComponentNodes();
 
     // remove parent to remove node & connectors
     nodeScene->removeItem(nodeToRemove->parentItem());
@@ -176,6 +179,21 @@ void WidgetsHandler::addOutputConnector(OutputConnector* outputConnector, QGraph
     node->performResize();
 
     connectConnector(outputConnector, proxyNode);
+
+    // if switch node, add switch component node
+    if (node->getTypeOfNode() == SWITCHNODE)
+    {
+        SwitchNode* switchNode = (SwitchNode*) node;
+        QGraphicsProxyWidget* switchComponentProxy = addSwitchComponentNode(switchNode->getInputs(), switchNode->getOutputs());
+
+        // move node next to node
+        moveNodeNextTo(proxyNode, switchComponentProxy, QPointF(0, pos.y()));
+
+        InputConnector* switchComponentInputConnector = (InputConnector*) ((NodeBase*) switchComponentProxy->widget())->getInputConnector()->widget();
+        OutputConnector* switchComponentOutputConnector = (OutputConnector*) switchNode->getOutputConnectors()->back()->widget();
+        switchNode->addSwitchComponentProxy(switchComponentProxy);
+        createConnectorLine(switchComponentOutputConnector, switchComponentInputConnector);
+    }
 }
 
 void WidgetsHandler::connectConnector(ConnectorBase* connector, QGraphicsProxyWidget* proxyNode)
@@ -458,7 +476,7 @@ QGraphicsProxyWidget* WidgetsHandler::addGroupFilterNode(QStringList* inputs, QL
 
 QGraphicsProxyWidget* WidgetsHandler::addSwitchNode()
 {
-    SwtichNode* swtichNode = new SwtichNode();
+    SwitchNode* swtichNode = new SwitchNode();
     QGraphicsProxyWidget* proxyNode = addNode(swtichNode);
     NodeParentWidget* nodeParentWidget = (NodeParentWidget*)proxyNode->parentWidget();
 
@@ -715,6 +733,23 @@ QGraphicsProxyWidget* WidgetsHandler::addPolynomialMatrixNode(QStringList* input
     // Add one input connector
     MathInputConnector* mathInputConnector = new MathInputConnector(nodeParentWidget);
     addInputConnector(mathInputConnector, proxyNode, QPointF(-8, 20));
+
+    return proxyNode;
+}
+
+QGraphicsProxyWidget *WidgetsHandler::addSwitchComponentNode(QStringList *inputs, QStringList *outputs)
+{
+    SwitchComponentNode* switchComponentNode = new SwitchComponentNode(inputs, outputs);
+    QGraphicsProxyWidget* proxyNode = addNode(switchComponentNode);
+    NodeParentWidget* nodeParentWidget = (NodeParentWidget*)proxyNode->parentWidget();
+
+    // Add one input connector
+    InputConnector* inputConnector = new InputConnector(nodeParentWidget);
+    addInputConnector(inputConnector, proxyNode, QPointF(-8, 20));
+
+    // Add one output connector
+    OutputConnector* outputConnector = new OutputConnector(nodeParentWidget);
+    addOutputConnector(outputConnector, proxyNode, QPointF(switchComponentNode->geometry().width() - 7, 20));
 
     return proxyNode;
 }
