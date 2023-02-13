@@ -13,9 +13,9 @@ SwitchComponentNode::SwitchComponentNode(QStringList* inputs, QStringList* outpu
     setGeometry(QRect(0, 0, sizeHint().width(), sizeHint().height()));
 }
 
-void SwitchComponentNode::setParameters(QStringList *parameters)
+void SwitchComponentNode::setParameters(QStringList* parameters)
 {
-    if(parameters == nullptr)
+    if (parameters == nullptr)
         return;
     else
         this->parameters = parameters;
@@ -23,8 +23,7 @@ void SwitchComponentNode::setParameters(QStringList *parameters)
     QVBoxLayout* dimensionsLayout = this->layout()->findChild<QVBoxLayout*>("dimensionsLayout");
     for (int i = 0; i < parameters->size(); i++)
     {
-        QHBoxLayout* row = (QHBoxLayout*) dimensionsLayout->children().at(i);
-        ((QLineEdit*) row->itemAt(0)->widget())->setText(parameters->at(i));
+        addNewDimensionsLayoutRow(dimensionsLayout, i);
     }
 }
 
@@ -32,8 +31,8 @@ void SwitchComponentNode::performResize()
 {
     setGeometry(QRect(0, 0, sizeHint().width(), sizeHint().height()));
     emit resized(this->geometry());
-    if(outputConnectors->size()>0)
-    outputConnectors->at(0)->setX(sizeHint().width() - 7);
+    if (outputConnectors->size() > 0)
+        outputConnectors->at(0)->setX(sizeHint().width() - 7);
 }
 
 void SwitchComponentNode::createLayout()
@@ -44,7 +43,7 @@ void SwitchComponentNode::createLayout()
     setLayout(globalLayout);
 }
 
-void SwitchComponentNode::addParametersLayout(QVBoxLayout *globalLayout)
+void SwitchComponentNode::addParametersLayout(QVBoxLayout* globalLayout)
 {
     QVBoxLayout* parametersLayout = new QVBoxLayout();
     addLabel(parametersLayout, "parameters");
@@ -52,7 +51,7 @@ void SwitchComponentNode::addParametersLayout(QVBoxLayout *globalLayout)
     globalLayout->addLayout(parametersLayout);
 }
 
-void SwitchComponentNode::addParameterLayout(QVBoxLayout *parametersLayout)
+void SwitchComponentNode::addParameterLayout(QVBoxLayout* parametersLayout)
 {
     // add an empty layout that will contain the dimensions
     QVBoxLayout* dimensionsLayout = new QVBoxLayout();
@@ -79,7 +78,7 @@ void SwitchComponentNode::updateLayout()
     emit transferOutputsRequested(outputs);
 }
 
-void SwitchComponentNode::addNewDimensionsLayoutRow(QVBoxLayout *dimensionsLayout, int index)
+void SwitchComponentNode::addNewDimensionsLayoutRow(QVBoxLayout* dimensionsLayout, int index)
 {
     QHBoxLayout* row = new QHBoxLayout();
 
@@ -98,7 +97,7 @@ void SwitchComponentNode::addNewDimensionsLayoutRow(QVBoxLayout *dimensionsLayou
     dimensionsLayout->insertLayout(index, row);
 }
 
-void SwitchComponentNode::saveNodeContent(YAML::Emitter *out)
+void SwitchComponentNode::saveNodeContent(YAML::Emitter* out)
 {
     saveValues(out);
     if (!((OutputConnector*) outputConnectors->at(0)->widget())->getConnectorLineConnected())
@@ -107,7 +106,7 @@ void SwitchComponentNode::saveNodeContent(YAML::Emitter *out)
     ((OutputConnector*) outputConnectors->at(0)->widget())->saveComponent(out);
 }
 
-void SwitchComponentNode::saveValues(YAML::Emitter *out)
+void SwitchComponentNode::saveValues(YAML::Emitter* out)
 {
     *out << YAML::Key;
     *out << YAML::Flow << YAML::BeginSeq;

@@ -474,10 +474,10 @@ QGraphicsProxyWidget* WidgetsHandler::addGroupFilterNode(QStringList* inputs, QL
     return proxyNode;
 }
 
-QGraphicsProxyWidget* WidgetsHandler::addSwitchNode()
+QGraphicsProxyWidget* WidgetsHandler::addSwitchNode(QStringList* inputs, QStringList* outputs, QList<QStringList*> values)
 {
-    SwitchNode* swtichNode = new SwitchNode();
-    QGraphicsProxyWidget* proxyNode = addNode(swtichNode);
+    SwitchNode* switchNode = new SwitchNode(inputs, outputs);
+    QGraphicsProxyWidget* proxyNode = addNode(switchNode);
     NodeParentWidget* nodeParentWidget = (NodeParentWidget*)proxyNode->parentWidget();
 
     // Add one input connector
@@ -486,8 +486,10 @@ QGraphicsProxyWidget* WidgetsHandler::addSwitchNode()
 
     // Add one output connector
     OutputConnector* outputConnector = new OutputConnector(nodeParentWidget);
-    QPointF pos(swtichNode->geometry().width() - 7, swtichNode->geometry().height() - 58);
+    QPointF pos(switchNode->geometry().width() - 7, switchNode->geometry().height() - 58);
     addOutputConnector(outputConnector, proxyNode, pos);
+
+    switchNode->setValues(values);
 
     return proxyNode;
 }
@@ -737,7 +739,7 @@ QGraphicsProxyWidget* WidgetsHandler::addPolynomialMatrixNode(QStringList* input
     return proxyNode;
 }
 
-QGraphicsProxyWidget *WidgetsHandler::addSwitchComponentNode(QStringList *inputs, QStringList *outputs)
+QGraphicsProxyWidget* WidgetsHandler::addSwitchComponentNode(QStringList* inputs, QStringList* outputs)
 {
     SwitchComponentNode* switchComponentNode = new SwitchComponentNode(inputs, outputs);
     QGraphicsProxyWidget* proxyNode = addNode(switchComponentNode);

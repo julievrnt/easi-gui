@@ -10,6 +10,7 @@ public:
     SwitchNode(QStringList* inputs = nullptr, QStringList* outputs = nullptr);
 
     void setValues(QList<QStringList*> values);
+    const QList<QGraphicsProxyWidget*>& getSwitchComponentProxies() const;
     void addSwitchComponentProxy(QGraphicsProxyWidget* newSwitchComponentProxy);
     void clearSwitchComponentNodes();
 
@@ -22,7 +23,7 @@ private:
 protected:
     void deleteOutputConnector();
     void updateLayout();
-    void saveNodeContent(YAML::Emitter *out);
+    void saveNodeContent(YAML::Emitter* out);
     void saveValues(YAML::Emitter* out);
 };
 

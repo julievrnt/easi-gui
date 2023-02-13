@@ -1,5 +1,6 @@
 #include "mainwindow.h"
 #include "src/Nodes/rootnode.h"
+#include "src/Nodes/Filters/switchnode.h"
 #include "ui_mainwindow.h"
 #include "yaml-cpp/emitter.h"
 #include <QFile>
@@ -419,16 +420,44 @@ void MainWindow::openGroupFilterNode(QGraphicsProxyWidget* parentProxyNode, YAML
 
 void MainWindow::openSwitchNode(QGraphicsProxyWidget* parentProxyNode, YAML::Node* node, QStringList* inputs)
 {
-    /// TODO
-    Q_UNUSED(inputs);
+    if (!node->IsMap())
+    {
+        qDebug() << "Switch node is not a map!";
+        return;
+    }
+
+    QList<QStringList*> values;
+    for (YAML::iterator it = node->begin(); it != node->end(); ++it)
+    {
+        QStringList* parameters = new QStringList();
+        for (size_t i = 0; i < it->first.size(); i++)
+            parameters->append(QString::fromStdString(it->first[i].as<std::string>()));
+        values.append(parameters);
+    }
+
     // add node
-    QGraphicsProxyWidget* proxyNode = widgetsHandler->addSwitchNode();
+    QGraphicsProxyWidget* proxyNode = widgetsHandler->addSwitchNode(inputs, inputs, values);
+
     // move it next to parent node
     widgetsHandler->moveNodeNextTo(parentProxyNode, proxyNode);
     // connect them
     widgetsHandler->connectNodes((NodeBase*) parentProxyNode->widget(), (NodeBase*) proxyNode->widget());
 
-    openComponents(proxyNode, node, nullptr);
+    SwitchNode* switchNode = (SwitchNode*) proxyNode->widget();
+    QList<QGraphicsProxyWidget*> switchComponentProxies = switchNode->getSwitchComponentProxies();
+    if (values.size() != switchComponentProxies.size())
+    {
+        qDebug() << "Open switch node: values.size() != switchComponentProxies.size()";
+        return;
+    }
+
+    YAML::iterator it = node->begin();
+    for (int i = 0; i < switchComponentProxies.size(); i++)
+    {
+        YAML::Node componentNode = it->second;
+        openNode(switchComponentProxies.at(i), &componentNode, inputs);
+        it++;
+    }
 }
 
 void MainWindow::openConstantMapNode(QGraphicsProxyWidget* parentProxyNode, YAML::Node* node)

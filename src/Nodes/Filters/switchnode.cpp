@@ -7,19 +7,20 @@ SwitchNode::SwitchNode(QStringList* inputs, QStringList* outputs) : NodeBase(inp
     localTag = "Switch";
     setWindowTitle("Switch");
     createLayout(false, false, true);
-    
+
     setGeometry(QRect(0, 0, sizeHint().width(), sizeHint().height()));
 }
 
-void SwitchNode::setValues(QList<QStringList *> values)
+void SwitchNode::setValues(QList<QStringList*> values)
 {
     if (values.isEmpty())
         return;
 
-    while(outputConnectors->size() < values.size())
+    while (outputConnectors->size() < values.size())
         emit addOutputConnectorRequested(getProxyNode());
 
-    for (int i = 1; i < values.size(); i++){
+    for (int i = 0; i < values.size(); i++)
+    {
         // get parameters for component
         QStringList* parameters = values.at(i);
 
@@ -29,15 +30,20 @@ void SwitchNode::setValues(QList<QStringList *> values)
     }
 }
 
-void SwitchNode::addSwitchComponentProxy(QGraphicsProxyWidget *newSwitchComponentProxy)
+void SwitchNode::addSwitchComponentProxy(QGraphicsProxyWidget* newSwitchComponentProxy)
 {
     switchComponentProxies.append(newSwitchComponentProxy);
 }
 
 void SwitchNode::clearSwitchComponentNodes()
 {
-    while(switchComponentProxies.size()>0)
-        removeComponentOfDimensionRow(switchComponentProxies.size()-1);
+    while (switchComponentProxies.size() > 0)
+        removeComponentOfDimensionRow(switchComponentProxies.size() - 1);
+}
+
+const QList<QGraphicsProxyWidget*>& SwitchNode::getSwitchComponentProxies() const
+{
+    return switchComponentProxies;
 }
 
 void SwitchNode::removeComponentOfDimensionRow(int index)
@@ -48,7 +54,7 @@ void SwitchNode::removeComponentOfDimensionRow(int index)
 void SwitchNode::deleteOutputConnector()
 {
     NodeBase::deleteOutputConnector();
-    if(switchComponentProxies.size()>0)
+    if (switchComponentProxies.size() > 0)
         removeComponentOfDimensionRow(switchComponentProxies.size() - 1);
 }
 
@@ -58,7 +64,7 @@ void SwitchNode::updateLayout()
     emit transferOutputsRequested(outputs);
 }
 
-void SwitchNode::saveNodeContent(YAML::Emitter *out)
+void SwitchNode::saveNodeContent(YAML::Emitter* out)
 {
     *out << YAML::LocalTag(localTag.toStdString());
     *out << YAML::BeginMap;
@@ -66,7 +72,7 @@ void SwitchNode::saveNodeContent(YAML::Emitter *out)
     *out << YAML::EndMap;
 }
 
-void SwitchNode::saveValues(YAML::Emitter *out)
+void SwitchNode::saveValues(YAML::Emitter* out)
 {
     if (!((OutputConnector*) outputConnectors->at(0)->widget())->getConnectorLineConnected())
         return;
