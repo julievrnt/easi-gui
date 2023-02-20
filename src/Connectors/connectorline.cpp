@@ -43,14 +43,20 @@ void ConnectorLine::connectLineToConnector(ConnectorBase* connector)
         if (inputConnector != nullptr)
             return;
 
+        if (outputConnector != nullptr)
+        {
+            // don't connect two connectors from the same node
+            if (outputConnector->getNodeParentWidget() == connector->getNodeParentWidget())
+                return;
 
-        // don't connect two connectors from the same node
-        if (outputConnector != nullptr && outputConnector->getNodeParentWidget() == connector->getNodeParentWidget())
-            return;
+            // turn none input connector into eval input connector if output connector is eval
+            if (connector->getSubtypeOfConnector() == NONE && outputConnector->getSubtypeOfConnector() == EVAL)
+                connector->setSubtypeOfConnector(EVAL);
 
-        // don't connect two connectors with different subtypes
-        if (outputConnector != nullptr && connector->getSubtypeOfConnector() != outputConnector->getSubtypeOfConnector())
-            return;
+            // don't connect two connectors with different subtypes
+            if (connector->getSubtypeOfConnector() != outputConnector->getSubtypeOfConnector())
+                return;
+        }
 
         inputConnector = (InputConnector*) connector;
         inputConnectorPoint = inputConnector->getCenterPos();
@@ -63,13 +69,16 @@ void ConnectorLine::connectLineToConnector(ConnectorBase* connector)
         if (outputConnector != nullptr)
             return;
 
-        // don't connect two connectors from the same node
-        if (inputConnector != nullptr && inputConnector->getNodeParentWidget() == connector->getNodeParentWidget())
-            return;
+        if (inputConnector != nullptr)
+        {
+            // don't connect two connectors from the same node
+            if (inputConnector->getNodeParentWidget() == connector->getNodeParentWidget())
+                return;
 
-        // don't connect two connectors with different subtypes
-        if (inputConnector != nullptr && connector->getSubtypeOfConnector() != inputConnector->getSubtypeOfConnector())
-            return;
+            // don't connect two connectors with different subtypes
+            if (connector->getSubtypeOfConnector() != inputConnector->getSubtypeOfConnector())
+                return;
+        }
 
         outputConnector = (OutputConnector*) connector;
         outputConnectorPoint = outputConnector->getCenterPos();
@@ -118,7 +127,11 @@ void ConnectorLine::disconnectLineFromConnector(ConnectorBase* connector)
     disconnect(connector, SIGNAL(deleteConnectorLineRequested()), this, SLOT(deleteConnectorLine()));
 
     if (connector->getTypeOfConnector() == INPUTCONNECTOR)
+    {
         disconnect(this, SIGNAL(transferOutputsRequested(QStringList*)), inputConnector, SLOT(transferOutputs(QStringList*)));
+        if (connector->getSubtypeOfConnector() == EVAL)
+            connector->setSubtypeOfConnector(NONE);
+    }
     else if (connector->getTypeOfConnector() == OUTPUTCONNECTOR)
         disconnect(outputConnector, SIGNAL(transferOutputsRequested(QStringList*)), this, SLOT(transferOutputs(QStringList*)));
     else
@@ -136,11 +149,11 @@ void ConnectorLine::paintEvent(QPaintEvent* event)
     {
         switch (inputConnector->getSubtypeOfConnector())
         {
-            case NONE :
-                linePen.setColor(Qt::green);
-                break;
             case MATH :
                 linePen.setColor(Qt::darkMagenta);
+                break;
+            case EVAL :
+                linePen.setColor(Qt::red);
                 break;
             default :
                 linePen.setColor(Qt::green);

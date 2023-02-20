@@ -13,6 +13,7 @@
 // subtypes
 #define NONE 0
 #define MATH 1
+#define EVAL 2
 
 class ConnectorBase : public QWidget
 {
@@ -36,6 +37,8 @@ public:
     bool getConnectorLineConnected() const;
 
     int getSubtypeOfConnector() const;
+
+    void setSubtypeOfConnector(int newSubtypeOfConnector);
 
 signals:
     void lineDragged();

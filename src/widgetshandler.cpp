@@ -145,7 +145,14 @@ void WidgetsHandler::moveNodeNextTo(QGraphicsProxyWidget* parentProxyNode, QGrap
 
 void WidgetsHandler::connectNodes(NodeBase* parentNode, NodeBase* childNode)
 {
-    OutputConnector* outputConnector = parentNode->getFirstAvailableOutputConnector();
+    OutputConnector* outputConnector ;
+    if (parentNode->getTypeOfNode() == EVALMODELNODE && !((EvalModelNode*) parentNode)->getOutputConnectorModel()->getConnectorLineConnected())
+    {
+        // assume that model is set before components
+        outputConnector = ((EvalModelNode*) parentNode)->getOutputConnectorModel();
+    }
+    else
+        outputConnector = parentNode->getFirstAvailableOutputConnector();
     InputConnector* inputConnector = (InputConnector*) childNode->getInputConnector()->widget();
     createConnectorLine(outputConnector, inputConnector);
 }
@@ -167,10 +174,15 @@ void WidgetsHandler::addInputConnector(InputConnector* inputConnector, QGraphics
 void WidgetsHandler::addOutputConnector(OutputConnector* outputConnector, QGraphicsProxyWidget* proxyNode, QPointF pos)
 {
     NodeBase* node = (NodeBase*) proxyNode->widget();
-    if (node->getTypeOfNode() != AFFINEMAPNODE && node->getTypeOfNode() != POLYNOMIALMAPNODE)
+    if (outputConnector->getSubtypeOfConnector() != EVAL && outputConnector->getSubtypeOfConnector() != MATH)
     {
         connect(node, SIGNAL(transferOutputsRequested(QStringList*)), outputConnector, SLOT(transferOutputs(QStringList*)));
         emit node->transferOutputsRequested(node->getOutputs());
+    }
+    else if (outputConnector->getSubtypeOfConnector() == EVAL)
+    {
+        connect((EvalModelNode*) node, SIGNAL(transferInputsRequested(QStringList*)), outputConnector, SLOT(transferOutputs(QStringList*)));
+        emit ((EvalModelNode*) node)->transferInputsRequested(node->getOutputs());
     }
 
     outputConnector->setGeometry(pos.x(), pos.y(), 15, 15);
@@ -179,6 +191,8 @@ void WidgetsHandler::addOutputConnector(OutputConnector* outputConnector, QGraph
     outputConnectorProxy->setParentItem(proxyNode->parentItem());
     if (outputConnector->getSubtypeOfConnector() == MATH)
         node->addMathOutputConnector(outputConnectorProxy);
+    else if (outputConnector->getSubtypeOfConnector() ==  EVAL)
+        ((EvalModelNode*) node)->setOutputConnectorModel(outputConnectorProxy);
     else
         node->addOutputConnector(outputConnectorProxy);
     node->performResize();
@@ -612,15 +626,19 @@ QGraphicsProxyWidget* WidgetsHandler::addSCECFileNode(QString filePath, QString 
     return proxyNode;
 }
 
-QGraphicsProxyWidget* WidgetsHandler::addEvalModelNode()
+QGraphicsProxyWidget* WidgetsHandler::addEvalModelNode(QStringList* inputs, QStringList* outputs)
 {
-    EvalModelNode* evalModelNode = new EvalModelNode();
+    EvalModelNode* evalModelNode = new EvalModelNode(inputs, outputs);
     QGraphicsProxyWidget* proxyNode = addNode(evalModelNode);
     NodeParentWidget* nodeParentWidget = (NodeParentWidget*)proxyNode->parentWidget();
 
     // Add one input connector
     InputConnector* inputConnector = new InputConnector(nodeParentWidget);
     addInputConnector(inputConnector, proxyNode, QPointF(-8, 20));
+
+    // Add output connector for model
+    OutputConnector* modelOutputConnector = new OutputConnector(nodeParentWidget, EVAL);
+    addOutputConnector(modelOutputConnector, proxyNode, QPointF(evalModelNode->geometry().width() - 7, 58));
 
     // Add one output connector
     OutputConnector* outputConnector = new OutputConnector(nodeParentWidget);

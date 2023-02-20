@@ -443,6 +443,7 @@ void MainWindow::openSwitchNode(QGraphicsProxyWidget* parentProxyNode, YAML::Nod
     // connect them
     widgetsHandler->connectNodes((NodeBase*) parentProxyNode->widget(), (NodeBase*) proxyNode->widget());
 
+    // connect each "component" to a switch component node
     SwitchNode* switchNode = (SwitchNode*) proxyNode->widget();
     QList<QGraphicsProxyWidget*> switchComponentProxies = switchNode->getSwitchComponentProxies();
     if (values.size() != switchComponentProxies.size())
@@ -648,16 +649,26 @@ void MainWindow::openSCECFileNode(QGraphicsProxyWidget* parentProxyNode, YAML::N
 
 void MainWindow::openEvalModelNode(QGraphicsProxyWidget* parentProxyNode, YAML::Node* node, QStringList* inputs)
 {
-    Q_UNUSED(inputs);
-    /// TODO
+    QStringList* outputs = new QStringList();
+    if ((*node)["parameters"])
+    {
+        for (size_t i = 0; i < (*node)["parameters"].size(); i++)
+            outputs->append(QString::fromStdString((*node)["parameters"][i].as<std::string>()));
+    }
+
     // add node
-    QGraphicsProxyWidget* proxyNode = widgetsHandler->addEvalModelNode();
+    QGraphicsProxyWidget* proxyNode = widgetsHandler->addEvalModelNode(inputs, outputs);
     // move it next to parent node
     widgetsHandler->moveNodeNextTo(parentProxyNode, proxyNode);
     // connect them
     widgetsHandler->connectNodes((NodeBase*) parentProxyNode->widget(), (NodeBase*) proxyNode->widget());
 
-    openComponents(proxyNode, node, nullptr);
+    // add model
+    YAML::Node model = (*node)["model"];
+    if (!model.Tag().empty())
+        openNode(proxyNode, &model, inputs);
+
+    openComponents(proxyNode, node, outputs);
 }
 
 void MainWindow::openOptimalStressNode(QGraphicsProxyWidget* parentProxyNode, YAML::Node* node, QStringList* inputs)

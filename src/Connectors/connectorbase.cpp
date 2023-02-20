@@ -91,6 +91,11 @@ void ConnectorBase::transferOutputs(QStringList* outputs)
     outputsChanged();
 }
 
+void ConnectorBase::setSubtypeOfConnector(int newSubtypeOfConnector)
+{
+    subtypeOfConnector = newSubtypeOfConnector;
+}
+
 int ConnectorBase::getSubtypeOfConnector() const
 {
     return subtypeOfConnector;
@@ -111,11 +116,11 @@ void ConnectorBase::paintEvent(QPaintEvent* event)
     {
         switch (subtypeOfConnector)
         {
-            case NONE :
-                painter.setBrush(Qt::green);
-                break;
             case MATH :
                 painter.setBrush(Qt::darkMagenta);
+                break;
+            case EVAL:
+                painter.setBrush(Qt::red);
                 break;
             default :
                 painter.setBrush(Qt::green);

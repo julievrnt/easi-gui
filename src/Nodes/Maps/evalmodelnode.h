@@ -12,6 +12,11 @@ public:
     void setOutputConnectorModel(QGraphicsProxyWidget* newOutputConnectorModel);
     void performResize();
 
+    OutputConnector* getOutputConnectorModel() const;
+
+signals:
+    void transferInputsRequested(QStringList* inputs);
+
 private:
     QGraphicsProxyWidget* outputConnectorModel;
     void createLayout();

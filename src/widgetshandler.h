@@ -62,7 +62,7 @@ public:
     QGraphicsProxyWidget* addFunctionMapNode();
     QGraphicsProxyWidget* addASAGINode(QStringList* outputs = nullptr, QString filePath = "", QString var = "data", QString interpolation = "linear");
     QGraphicsProxyWidget* addSCECFileNode(QString filePath = "", QString interpolation = "linear");
-    QGraphicsProxyWidget* addEvalModelNode();
+    QGraphicsProxyWidget* addEvalModelNode(QStringList* inputs = nullptr, QStringList* outputs = nullptr);
     QGraphicsProxyWidget* addOptimalStressNode(double mu_d = 0., double mu_s = 0.,
                                                double strike = 0., double dip = 0.,
                                                double rake = 0., double cohesion = 0.,

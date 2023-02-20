@@ -1,11 +1,14 @@
 #include "evalmodelnode.h"
 #include "src/Connectors/outputs/outputconnector.h"
 
-EvalModelNode::EvalModelNode(QStringList* inputs, QStringList* outputs)
+EvalModelNode::EvalModelNode(QStringList* inputs, QStringList* outputs) : NodeBase(inputs, outputs)
 {
     typeOfNode = EVALMODELNODE;
     localTag = "EvalModel";
     setWindowTitle("Eval Model");
+    removeButtonIndex = 1;
+    dimensionLineEditIndex = 0;
+    outputConnectorModel = nullptr;
     createLayout();
 
     setGeometry(QRect(0, 0, sizeHint().width(), sizeHint().height()));
@@ -18,7 +21,14 @@ void EvalModelNode::setOutputConnectorModel(QGraphicsProxyWidget* newOutputConne
 
 void EvalModelNode::performResize()
 {
+    NodeBase::performResize();
+    if (outputConnectorModel != nullptr)
+        outputConnectorModel->setX(outputConnectorModel->parentWidget()->geometry().width() - 7);
+}
 
+OutputConnector* EvalModelNode::getOutputConnectorModel() const
+{
+    return (OutputConnector*) outputConnectorModel->widget();
 }
 
 void EvalModelNode::createLayout()
@@ -51,7 +61,6 @@ void EvalModelNode::addParametersLayout(QVBoxLayout* globalLayout)
     addLabel(parametersLayout, "parameters");
     addDimensionLayout(parametersLayout, true);
 
-    addSeparatorLineInLayout(parametersLayout);
     globalLayout->addLayout(parametersLayout);
 }
 
@@ -76,10 +85,20 @@ void EvalModelNode::addNewDimensionsLayoutRow(QVBoxLayout* dimensionsLayout, int
 
 void EvalModelNode::updateLayout()
 {
-    //((OutputConnector*) outputConnectorModel->widget())->transferOutputs(inputs);
+    emit transferInputsRequested(inputs);
 }
 
 void EvalModelNode::saveValues(YAML::Emitter* out)
 {
+    *out << YAML::Key << "parameters";
+    *out << YAML::Value << YAML::Flow << YAML::BeginSeq;
+    for (int i = 0; i < outputs->size(); i++)
+        *out << outputs->at(i).toStdString();
+    *out << YAML::EndSeq << YAML::Block;
 
+    *out << YAML::Key << "model" << YAML::Value;
+    if (outputConnectorModel != nullptr && ((OutputConnector*) outputConnectorModel->widget())->getConnectorLineConnected())
+        ((OutputConnector*) outputConnectorModel->widget())->saveComponent(out);
+    else
+        *out << YAML::BeginMap << YAML::EndMap;
 }
