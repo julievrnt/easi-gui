@@ -1,5 +1,4 @@
 #include "affinemapnode.h"
-#include "src/Connectors/outputs/mathoutputconnector.h"
 #include "src/Nodes/Extra/affinematrixnode.h"
 #include "src/Nodes/Extra/translationnode.h"
 #include <QPushButton>
@@ -133,7 +132,7 @@ void AffineMapNode::clearMathNodes()
 {
     while (mathOutputConnectors->size() > 0)
     {
-        removeMathsOfDimensionRow((mathOutputConnectors->size() - 1)/2);
+        removeMathsOfDimensionRow((mathOutputConnectors->size() - 1) / 2);
     }
 }
 
@@ -156,7 +155,7 @@ void AffineMapNode::updateLayout()
 {
     foreach (QGraphicsProxyWidget* mathOutputConnector, (*mathOutputConnectors))
     {
-        emit ((MathOutputConnector*) mathOutputConnector->widget())->transferOutputsRequested(inputs);
+        emit ((OutputConnector*) mathOutputConnector->widget())->transferOutputsRequested(inputs);
     }
 }
 

@@ -7,7 +7,7 @@ class OutputConnector : public ConnectorBase
 {
     Q_OBJECT
 public:
-    OutputConnector(NodeParentWidget* nodeParentWidget);
+    OutputConnector(NodeParentWidget* nodeParentWidget, int subtype = NONE);
 
     void saveComponent(YAML::Emitter* out);
     bool isFree();

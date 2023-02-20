@@ -8,8 +8,6 @@
 #include "src/Connectors/connectorline.h"
 #include "src/Nodes/nodebase.h"
 #include "src/Connectors/connectorbase.h"
-#include "src/Connectors/inputs/mathinputconnector.h"
-#include "src/Connectors/outputs/mathoutputconnector.h"
 
 class WidgetsHandler : public QObject
 {
@@ -35,10 +33,6 @@ public:
     void addOutputConnector(OutputConnector* outputConnector, QGraphicsProxyWidget* proxyNode, QPointF pos);
     void connectConnector(ConnectorBase* connector, QGraphicsProxyWidget* connectorProxy);
     bool deleteOutputConnector(QGraphicsProxyWidget* outputConnectorProxy);
-
-    // special types of connectors
-    void addMathInputConnector(MathInputConnector* mathIutputConnector, QGraphicsProxyWidget* proxyNode, QPointF pos);
-    void addMathOutputConnector(MathOutputConnector* mathOutputConnector, QGraphicsProxyWidget* proxyNode, QPointF pos);
 
     // basic functions to handle connector lines
     void addConnectorLineToScene(ConnectorLine* connectorLine);

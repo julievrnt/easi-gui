@@ -18,7 +18,6 @@ ConnectorLine::ConnectorLine(OutputConnector* outputConnector, InputConnector* i
 
     connectLineToConnector(outputConnector);
     connectLineToConnector(inputConnector);
-
     setAttribute(Qt::WA_TranslucentBackground);
     isDone = true;
 }

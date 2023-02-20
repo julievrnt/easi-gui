@@ -13,8 +13,6 @@ SOURCES += \
     src/Connectors/connectorline.cpp \
     src/Connectors/connectorlineparentwidget.cpp \
     src/Connectors/inputs/inputconnector.cpp \
-    src/Connectors/inputs/mathinputconnector.cpp \
-    src/Connectors/outputs/mathoutputconnector.cpp \
     src/Connectors/outputs/outputconnector.cpp \
     src/Nodes/Builders/includenode.cpp \
     src/Nodes/Builders/layeredmodelnode.cpp \
@@ -51,8 +49,6 @@ HEADERS += \
     src/Connectors/connectorline.h \
     src/Connectors/connectorlineparentwidget.h \
     src/Connectors/inputs/inputconnector.h \
-    src/Connectors/inputs/mathinputconnector.h \
-    src/Connectors/outputs/mathoutputconnector.h \
     src/Connectors/outputs/outputconnector.h \
     src/Nodes/Builders/includenode.h \
     src/Nodes/Builders/layeredmodelnode.h \

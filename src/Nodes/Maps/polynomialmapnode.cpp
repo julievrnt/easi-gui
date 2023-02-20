@@ -1,5 +1,4 @@
 #include "polynomialmapnode.h"
-#include "src/Connectors/outputs/mathoutputconnector.h"
 #include "src/Nodes/Extra/polynomialmatrixnode.h"
 #include <QLabel>
 #include <QSpinBox>
@@ -176,7 +175,7 @@ void PolynomialMapNode::updateLayout()
 {
     foreach (QGraphicsProxyWidget* mathOutputConnector, (*mathOutputConnectors))
     {
-        emit ((MathOutputConnector*) mathOutputConnector->widget())->transferOutputsRequested(inputs);
+        emit ((OutputConnector*) mathOutputConnector->widget())->transferOutputsRequested(inputs);
     }
 }
 

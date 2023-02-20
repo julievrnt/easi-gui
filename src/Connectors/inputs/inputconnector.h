@@ -7,7 +7,7 @@ class InputConnector : public ConnectorBase
 {
     Q_OBJECT
 public:
-    InputConnector(NodeParentWidget* nodeParentWidget);
+    InputConnector(NodeParentWidget* nodeParentWidget, int subtype = NONE);
 
 private slots:
     void save(YAML::Emitter* out);
