@@ -79,6 +79,7 @@ public:
     QGraphicsProxyWidget* addTranslationNode();
     QGraphicsProxyWidget* addPolynomialMatrixNode(QStringList* inputs = nullptr, int degree = 0);
     QGraphicsProxyWidget* addSwitchComponentNode(QStringList* inputs = nullptr, QStringList* outputs = nullptr);
+    QGraphicsProxyWidget* addFunctionNode(QStringList* inputs = nullptr);
 
 signals:
     void saveRequested(YAML::Emitter* out);
@@ -105,6 +106,7 @@ private slots:
     OutputConnector* actionAddOutputConnector(QGraphicsProxyWidget* proxyNode);
     void actionDeleteOutputConnector(QGraphicsProxyWidget* outputConnectorProxy);
     void actionAddMathOutputConnector(QGraphicsProxyWidget* proxyNode, QPointF pos);
+    void actionAddFunctionOutputConnector(QGraphicsProxyWidget* proxyNode, QPointF pos);
     void actionDeleteNode(QGraphicsProxyWidget* proxyNode);
 };
 

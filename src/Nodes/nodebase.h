@@ -45,6 +45,7 @@
 #define AFFINEMATHNODE 20
 #define POLYNOMIALMATHNODE 21
 #define SWITCHCOMPONENTNODE 22
+#define FUNCTIONNODE 23
 
 
 class NodeBase : public QWidget
@@ -59,14 +60,20 @@ public:
 
     QGraphicsProxyWidget* getInputConnector() const;
     void setInputConnector(QGraphicsProxyWidget* newInputConnector);
+
     QList<QGraphicsProxyWidget*>* getOutputConnectors() const;
     void addOutputConnector(QGraphicsProxyWidget* newOutputConnector);
-    void addMathOutputConnector(QGraphicsProxyWidget* newMathOutputConnector);
-    QList<QGraphicsProxyWidget*>* getMathOutputConnectors() const;
-    virtual OutputConnector* getFirstAvailableOutputConnector();
-    virtual void performResize();
 
-    virtual void clearMathNodes();
+    QList<QGraphicsProxyWidget*>* getMathOutputConnectors() const;
+    void addMathOutputConnector(QGraphicsProxyWidget* newMathOutputConnector);
+
+    QList<QGraphicsProxyWidget*>* getFunctionOutputConnectors() const;
+    void addFunctionOutputConnector(QGraphicsProxyWidget* newFunctionOutputConnector);
+
+    virtual OutputConnector* getFirstAvailableOutputConnector();
+
+    virtual void performResize();
+    virtual void clearNodes();
 
     bool event(QEvent* event);
     void setProxyNode(QGraphicsProxyWidget* newProxyNode);
@@ -91,6 +98,7 @@ protected:
     QGraphicsProxyWidget* inputConnector;
     QList<QGraphicsProxyWidget*>* outputConnectors;
     QList<QGraphicsProxyWidget*>* mathOutputConnectors;
+    QList<QGraphicsProxyWidget*>* functionOutputConnectors;
     void mousePressEvent(QMouseEvent* event);
     void paintEvent(QPaintEvent* event);
 

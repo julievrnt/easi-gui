@@ -1,11 +1,8 @@
 #include "inputconnector.h"
 
-InputConnector::InputConnector(NodeParentWidget* nodeParentWidget, int subtype) : ConnectorBase(nodeParentWidget)
+InputConnector::InputConnector(NodeParentWidget* nodeParentWidget, int subtype, bool canDisconnect) : ConnectorBase(nodeParentWidget, subtype, canDisconnect)
 {
     this->typeOfConnector = INPUTCONNECTOR;
-    subtypeOfConnector = subtype;
-    if (subtype == MATH)
-        canDisconnect = false;
 }
 
 void InputConnector::save(YAML::Emitter* out)

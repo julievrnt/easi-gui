@@ -12,14 +12,15 @@
 
 // subtypes
 #define NONE 0
-#define MATH 1
-#define EVAL 2
+#define SPECIALCOMPONENT 1
+#define MATH 2
+#define EVAL 3
 
 class ConnectorBase : public QWidget
 {
     Q_OBJECT
 public:
-    explicit ConnectorBase(NodeParentWidget* nodeParentWidget, QWidget* parent = nullptr);
+    explicit ConnectorBase(NodeParentWidget* nodeParentWidget, int subtype, bool canDisconnect);
     ~ConnectorBase();
 
     QStringList* getOutputs() const;
@@ -67,7 +68,7 @@ protected:
     int typeOfConnector;
     int subtypeOfConnector;
     QPointF centerPos;
-    bool canDisconnect = true;
+    bool canDisconnect;
     bool connectorLineCreated;
     bool connectorLineConnected;
 

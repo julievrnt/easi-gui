@@ -15,7 +15,6 @@ ConnectorLine::ConnectorLine(ConnectorBase* connector)
 ConnectorLine::ConnectorLine(OutputConnector* outputConnector, InputConnector* inputConnector)
 {
     getOtherConnectorTimer = new QTimer();
-
     connectLineToConnector(outputConnector);
     connectLineToConnector(inputConnector);
     setAttribute(Qt::WA_TranslucentBackground);
@@ -149,6 +148,9 @@ void ConnectorLine::paintEvent(QPaintEvent* event)
     {
         switch (inputConnector->getSubtypeOfConnector())
         {
+        case SPECIALCOMPONENT:
+            linePen.setColor(Qt::blue);
+            break;
             case MATH :
                 linePen.setColor(Qt::darkMagenta);
                 break;

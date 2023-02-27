@@ -1,11 +1,8 @@
 #include "outputconnector.h"
 
-OutputConnector::OutputConnector(NodeParentWidget* nodeParentWidget, int subtype) : ConnectorBase(nodeParentWidget)
+OutputConnector::OutputConnector(NodeParentWidget* nodeParentWidget, int subtype, bool canDisconnect) : ConnectorBase(nodeParentWidget, subtype, canDisconnect)
 {
     this->typeOfConnector = OUTPUTCONNECTOR;
-    this->subtypeOfConnector = subtype;
-    if (subtype == MATH)
-        canDisconnect = false;
 }
 
 void OutputConnector::saveComponent(YAML::Emitter* out)

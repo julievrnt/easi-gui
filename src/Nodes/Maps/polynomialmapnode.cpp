@@ -111,7 +111,7 @@ void PolynomialMapNode::performResize()
     }
 }
 
-void PolynomialMapNode::clearMathNodes()
+void PolynomialMapNode::clearNodes()
 {
     while (mathOutputConnectors->size() > 0)
     {

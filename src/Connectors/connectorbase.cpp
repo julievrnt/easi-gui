@@ -2,13 +2,13 @@
 #include <QPainter>
 #include <QPaintEvent>
 
-ConnectorBase::ConnectorBase(NodeParentWidget* nodeParentWidget, QWidget* parent)
-    : QWidget{parent}
+ConnectorBase::ConnectorBase(NodeParentWidget* nodeParentWidget, int subtype, bool canDisconnect)
 {
     this->typeOfConnector = CONNECTOR;
-    this->subtypeOfConnector = NONE;
-    this->outputs = nullptr;
+    this->subtypeOfConnector = subtype;
     this->nodeParentWidget = nodeParentWidget;
+    this->canDisconnect = canDisconnect;
+    this->outputs = nullptr;
     highlight = false;
     connectorLineCreated = false;
     connectorLineConnected = false;
@@ -116,6 +116,9 @@ void ConnectorBase::paintEvent(QPaintEvent* event)
     {
         switch (subtypeOfConnector)
         {
+            case SPECIALCOMPONENT :
+                painter.setBrush(Qt::blue);
+                break;
             case MATH :
                 painter.setBrush(Qt::darkMagenta);
                 break;

@@ -22,6 +22,7 @@
 #include "src/Nodes/Extra/translationnode.h"
 #include "src/Nodes/Extra/polynomialmatrixnode.h"
 #include "src/Nodes/Extra/switchcomponentnode.h"
+#include "src/Nodes/Extra/functionnode.h"
 #include "src/Nodes/rootnode.h"
 #include <QMenu>
 
@@ -102,9 +103,7 @@ void WidgetsHandler::deleteNode()
     NodeBase* node = (NodeBase*) ((QGraphicsProxyWidget*) nodeToRemove)->widget();
     if (node->getTypeOfNode() == ROOTNODE)
         return;
-    node->clearMathNodes();
-    if (node->getTypeOfNode() == SWITCHNODE)
-        ((SwitchNode*) node)->clearSwitchComponentNodes();
+    node->clearNodes();
 
     // remove parent to remove node & connectors
     nodeScene->removeItem(nodeToRemove->parentItem());
@@ -193,6 +192,8 @@ void WidgetsHandler::addOutputConnector(OutputConnector* outputConnector, QGraph
         node->addMathOutputConnector(outputConnectorProxy);
     else if (outputConnector->getSubtypeOfConnector() ==  EVAL)
         ((EvalModelNode*) node)->setOutputConnectorModel(outputConnectorProxy);
+    else if (outputConnector->getSubtypeOfConnector() == SPECIALCOMPONENT && node->getTypeOfNode() == FUNCTIONMAPNODE)
+        ((FunctionMapNode*) node)->addFunctionOutputConnector(outputConnectorProxy);
     else
         node->addOutputConnector(outputConnectorProxy);
     node->performResize();
@@ -246,10 +247,8 @@ void WidgetsHandler::addOutputConnector(OutputConnector* outputConnector, QGraph
             createConnectorLine(polynomialMatrixOutputConnector, polynomialMatrixInputConnector);
         }
     }
-    else
-    {
-        // if switch node, add switch component node
-        if (node->getTypeOfNode() == SWITCHNODE)
+    else {// if switch node, add switch component node
+    if (node->getTypeOfNode() == SWITCHNODE)
         {
             SwitchNode* switchNode = (SwitchNode*) node;
             QGraphicsProxyWidget* switchComponentProxy = addSwitchComponentNode(switchNode->getInputs(), switchNode->getOutputs());
@@ -262,6 +261,19 @@ void WidgetsHandler::addOutputConnector(OutputConnector* outputConnector, QGraph
             switchNode->addSwitchComponentProxy(switchComponentProxy);
             createConnectorLine(switchComponentOutputConnector, switchComponentInputConnector);
         }
+    else if(node->getTypeOfNode() == FUNCTIONMAPNODE)
+    {
+            FunctionMapNode* functionMapNode = (FunctionMapNode*) node;
+            QGraphicsProxyWidget* functionNodeProxy = addFunctionNode(functionMapNode->getInputs());
+
+            // move node next to node
+            moveNodeNextTo(proxyNode, functionNodeProxy, QPointF(0, pos.y()));
+
+            InputConnector* functionInputConnector = (InputConnector*) ((NodeBase*) functionNodeProxy->widget())->getInputConnector()->widget();
+            OutputConnector* functionOutputConnector = (OutputConnector*) functionMapNode->getFunctionOutputConnectors()->back()->widget();
+            functionMapNode->addFunctionNodeProxy(functionNodeProxy);
+            createConnectorLine(functionOutputConnector, functionInputConnector);
+    }
     }
 }
 
@@ -483,7 +495,7 @@ QGraphicsProxyWidget* WidgetsHandler::addSwitchNode(QStringList* inputs, QString
     addInputConnector(inputConnector, proxyNode, QPointF(-8, 20));
 
     // Add one output connector
-    OutputConnector* outputConnector = new OutputConnector(nodeParentWidget);
+    OutputConnector* outputConnector = new OutputConnector(nodeParentWidget, SPECIALCOMPONENT, false);
     QPointF pos(switchNode->geometry().width() - 7, switchNode->geometry().height() - 58);
     addOutputConnector(outputConnector, proxyNode, pos);
 
@@ -709,7 +721,7 @@ QGraphicsProxyWidget* WidgetsHandler::addAffineMatrixNode(QStringList* inputs)
     NodeParentWidget* nodeParentWidget = (NodeParentWidget*)proxyNode->parentWidget();
 
     // Add one input connector
-    InputConnector* mathInputConnector = new InputConnector(nodeParentWidget, MATH);
+    InputConnector* mathInputConnector = new InputConnector(nodeParentWidget, MATH, false);
     addInputConnector(mathInputConnector, proxyNode, QPointF(-8, 20));
 
     return proxyNode;
@@ -722,7 +734,7 @@ QGraphicsProxyWidget* WidgetsHandler::addTranslationNode()
     NodeParentWidget* nodeParentWidget = (NodeParentWidget*)proxyNode->parentWidget();
 
     // Add one input connector
-    InputConnector* mathInputConnector = new InputConnector(nodeParentWidget, MATH);
+    InputConnector* mathInputConnector = new InputConnector(nodeParentWidget, MATH, false);
     addInputConnector(mathInputConnector, proxyNode, QPointF(-8, 20));
 
     return proxyNode;
@@ -735,7 +747,7 @@ QGraphicsProxyWidget* WidgetsHandler::addPolynomialMatrixNode(QStringList* input
     NodeParentWidget* nodeParentWidget = (NodeParentWidget*)proxyNode->parentWidget();
 
     // Add one input connector
-    InputConnector* mathInputConnector = new InputConnector(nodeParentWidget, MATH);
+    InputConnector* mathInputConnector = new InputConnector(nodeParentWidget, MATH, false);
     addInputConnector(mathInputConnector, proxyNode, QPointF(-8, 20));
 
     return proxyNode;
@@ -748,12 +760,25 @@ QGraphicsProxyWidget* WidgetsHandler::addSwitchComponentNode(QStringList* inputs
     NodeParentWidget* nodeParentWidget = (NodeParentWidget*)proxyNode->parentWidget();
 
     // Add one input connector
-    InputConnector* inputConnector = new InputConnector(nodeParentWidget);
+    InputConnector* inputConnector = new InputConnector(nodeParentWidget, SPECIALCOMPONENT, false);
     addInputConnector(inputConnector, proxyNode, QPointF(-8, 20));
 
     // Add one output connector
     OutputConnector* outputConnector = new OutputConnector(nodeParentWidget);
     addOutputConnector(outputConnector, proxyNode, QPointF(switchComponentNode->geometry().width() - 7, 20));
+
+    return proxyNode;
+}
+
+QGraphicsProxyWidget *WidgetsHandler::addFunctionNode(QStringList *inputs)
+{
+    FunctionNode* functionNode = new FunctionNode(inputs);
+    QGraphicsProxyWidget* proxyNode = addNode(functionNode);
+    NodeParentWidget* nodeParentWidget = (NodeParentWidget*)proxyNode->parentWidget();
+
+    // Add one input connector
+    InputConnector* functionInputConnector = new InputConnector(nodeParentWidget, SPECIALCOMPONENT, false);
+    addInputConnector(functionInputConnector, proxyNode, QPointF(-8, 20));
 
     return proxyNode;
 }
@@ -796,6 +821,13 @@ void WidgetsHandler::connectNode(QGraphicsProxyWidget* proxyNode)
         SwitchNode* switchNode = (SwitchNode*) node;
         connect(switchNode, SIGNAL(deleteNodeRequested(QGraphicsProxyWidget*)), this, SLOT(actionDeleteNode(QGraphicsProxyWidget*)));
     }
+
+    if(node->getTypeOfNode() == FUNCTIONMAPNODE)
+    {
+        FunctionMapNode* functionMapNode = (FunctionMapNode*) node;
+        connect(functionMapNode, SIGNAL(addFunctionOutputConnectorRequested(QGraphicsProxyWidget*, QPointF)), this, SLOT(actionAddFunctionOutputConnector(QGraphicsProxyWidget*, QPointF)));
+        connect(functionMapNode, SIGNAL(deleteNodeRequested(QGraphicsProxyWidget*)), this, SLOT(actionDeleteNode(QGraphicsProxyWidget*)));
+    }
 }
 
 void WidgetsHandler::nodeContextMenu(QPoint pos)
@@ -837,8 +869,12 @@ OutputConnector* WidgetsHandler::actionAddOutputConnector(QGraphicsProxyWidget* 
         qDebug() << "Could not add output connector...";
         return nullptr;
     }
-    OutputConnector* outputConnector = new OutputConnector((NodeParentWidget*)proxyNode->parentWidget());
     NodeBase* node = (NodeBase*) proxyNode->widget();
+    OutputConnector* outputConnector;
+    if(node->getTypeOfNode() == SWITCHNODE)
+        outputConnector = new OutputConnector((NodeParentWidget*)proxyNode->parentWidget(), SPECIALCOMPONENT, false);
+    else
+        outputConnector = new OutputConnector((NodeParentWidget*)proxyNode->parentWidget());
     QPointF pos(node->geometry().width() - 7, node->geometry().height() - 58);
     addOutputConnector(outputConnector, proxyNode, pos);
     return outputConnector;
@@ -851,7 +887,13 @@ void WidgetsHandler::actionDeleteOutputConnector(QGraphicsProxyWidget* outputCon
 
 void WidgetsHandler::actionAddMathOutputConnector(QGraphicsProxyWidget* proxyNode, QPointF pos)
 {
-    OutputConnector* mathOutputConnector = new OutputConnector((NodeParentWidget*) proxyNode->parentWidget(), MATH);
+    OutputConnector* mathOutputConnector = new OutputConnector((NodeParentWidget*) proxyNode->parentWidget(), MATH, false);
+    addOutputConnector(mathOutputConnector, proxyNode, pos);
+}
+
+void WidgetsHandler::actionAddFunctionOutputConnector(QGraphicsProxyWidget *proxyNode, QPointF pos)
+{
+    OutputConnector* mathOutputConnector = new OutputConnector((NodeParentWidget*) proxyNode->parentWidget(), SPECIALCOMPONENT, false);
     addOutputConnector(mathOutputConnector, proxyNode, pos);
 }
 

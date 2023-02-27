@@ -13,7 +13,7 @@ public:
     void addPolynomialMatrixProxy(QGraphicsProxyWidget* newPolynomialMatrixProxy);
 
     void performResize();
-    void clearMathNodes();
+    void clearNodes();
 
     int getDegree() const;
     void setDegree(int newDegree);

@@ -57,14 +57,24 @@ void NodeBase::addOutputConnector(QGraphicsProxyWidget* newOutputConnector)
     outputConnectors->append(newOutputConnector);
 }
 
+QList<QGraphicsProxyWidget*>* NodeBase::getMathOutputConnectors() const
+{
+    return mathOutputConnectors;
+}
+
 void NodeBase::addMathOutputConnector(QGraphicsProxyWidget* newMathOutputConnector)
 {
     mathOutputConnectors->append(newMathOutputConnector);
 }
 
-QList<QGraphicsProxyWidget*>* NodeBase::getMathOutputConnectors() const
+QList<QGraphicsProxyWidget *> *NodeBase::getFunctionOutputConnectors() const
 {
-    return mathOutputConnectors;
+    return functionOutputConnectors;
+}
+
+void NodeBase::addFunctionOutputConnector(QGraphicsProxyWidget *newFunctionOutputConnector)
+{
+    functionOutputConnectors->append(newFunctionOutputConnector);
 }
 
 OutputConnector* NodeBase::getFirstAvailableOutputConnector()
@@ -92,7 +102,7 @@ void NodeBase::performResize()
     }
 }
 
-void NodeBase::clearMathNodes()
+void NodeBase::clearNodes()
 {
     // do nothing
 }

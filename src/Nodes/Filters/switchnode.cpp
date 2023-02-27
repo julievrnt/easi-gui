@@ -35,7 +35,7 @@ void SwitchNode::addSwitchComponentProxy(QGraphicsProxyWidget* newSwitchComponen
     switchComponentProxies.append(newSwitchComponentProxy);
 }
 
-void SwitchNode::clearSwitchComponentNodes()
+void SwitchNode::clearNodes()
 {
     while (switchComponentProxies.size() > 0)
         removeComponentOfDimensionRow(switchComponentProxies.size() - 1);
@@ -54,7 +54,7 @@ void SwitchNode::removeComponentOfDimensionRow(int index)
 void SwitchNode::deleteOutputConnector()
 {
     NodeBase::deleteOutputConnector();
-    if (switchComponentProxies.size() > 0)
+    if (switchComponentProxies.size() > 1)
         removeComponentOfDimensionRow(switchComponentProxies.size() - 1);
 }
 

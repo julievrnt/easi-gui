@@ -12,7 +12,7 @@ public:
     void setValues(QList<QStringList*> values);
     const QList<QGraphicsProxyWidget*>& getSwitchComponentProxies() const;
     void addSwitchComponentProxy(QGraphicsProxyWidget* newSwitchComponentProxy);
-    void clearSwitchComponentNodes();
+    void clearNodes();
 
 private:
     QList<QGraphicsProxyWidget*> switchComponentProxies;

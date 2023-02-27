@@ -8,9 +8,9 @@ AffineMapNode::AffineMapNode(QStringList* inputs, QStringList* outputs) : NodeBa
 {
     typeOfNode = AFFINEMAPNODE;
     localTag = "AffineMap";
+    setWindowTitle("Affine Map");
     removeButtonIndex = 0;
     dimensionLineEditIndex = 1;
-    setWindowTitle("Affine Map");
     createLayout();
 
     setGeometry(QRect(0, 0, sizeHint().width(), sizeHint().height()));
