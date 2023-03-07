@@ -59,7 +59,7 @@ public:
     QGraphicsProxyWidget* addIdentityMapNode(QStringList* inputs = nullptr);
     QGraphicsProxyWidget* addAffineMapNode(QStringList* inputs = nullptr, QStringList* outputs = nullptr, QMap<QString, QList<double>>* values = nullptr);
     QGraphicsProxyWidget* addPolynomialMapNode(QStringList* inputs = nullptr, QStringList* outputs = nullptr, QMap<QString, QList<double>>* values = nullptr);
-    QGraphicsProxyWidget* addFunctionMapNode();
+    QGraphicsProxyWidget* addFunctionMapNode(QStringList* inputs = nullptr, QStringList* outputs = nullptr, QMap<QString, QString>* values = nullptr);
     QGraphicsProxyWidget* addASAGINode(QStringList* outputs = nullptr, QString filePath = "", QString var = "data", QString interpolation = "linear");
     QGraphicsProxyWidget* addSCECFileNode(QString filePath = "", QString interpolation = "linear");
     QGraphicsProxyWidget* addEvalModelNode(QStringList* inputs = nullptr, QStringList* outputs = nullptr);

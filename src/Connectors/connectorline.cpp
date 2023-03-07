@@ -148,9 +148,9 @@ void ConnectorLine::paintEvent(QPaintEvent* event)
     {
         switch (inputConnector->getSubtypeOfConnector())
         {
-        case SPECIALCOMPONENT:
-            linePen.setColor(Qt::blue);
-            break;
+            case SPECIALCOMPONENT:
+                linePen.setColor(Qt::blue);
+                break;
             case MATH :
                 linePen.setColor(Qt::darkMagenta);
                 break;

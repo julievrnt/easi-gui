@@ -580,16 +580,27 @@ void MainWindow::openPolynomialMapNode(QGraphicsProxyWidget* parentProxyNode, YA
 
 void MainWindow::openFunctionMapNode(QGraphicsProxyWidget* parentProxyNode, YAML::Node* node, QStringList* inputs)
 {
-    Q_UNUSED(inputs);
-    /// TODO
+    if (!(*node)["map"])
+    {
+        qDebug() << "ERROR: no map part in function map";
+        return;
+    }
+
+    QMap<QString, QString>* values = new QMap<QString, QString>();
+    for (YAML::iterator it = (*node)["map"].begin(); it != (*node)["map"].end(); it++)
+    {
+        values->insert(QString::fromStdString(it->first.as<std::string>()), QString::fromStdString(it->second.as<std::string>()));
+    }
+    QStringList* outputs = new QStringList(values->keys());
+
     // add node
-    QGraphicsProxyWidget* proxyNode = widgetsHandler->addFunctionMapNode();
+    QGraphicsProxyWidget* proxyNode = widgetsHandler->addFunctionMapNode(inputs, outputs, values);
     // move it next to parent node
     widgetsHandler->moveNodeNextTo(parentProxyNode, proxyNode);
     // connect them
     widgetsHandler->connectNodes((NodeBase*) parentProxyNode->widget(), (NodeBase*) proxyNode->widget());
 
-    openComponents(proxyNode, node, nullptr);
+    openComponents(proxyNode, node, outputs);
 }
 
 void MainWindow::openASAGINode(QGraphicsProxyWidget* parentProxyNode, YAML::Node* node, QStringList* inputs)

@@ -79,10 +79,13 @@ public:
     void setProxyNode(QGraphicsProxyWidget* newProxyNode);
     QGraphicsProxyWidget* getProxyNode() const;
 
+    void setOutputConnectorModel(QGraphicsProxyWidget* newOutputConnectorModel);
+    OutputConnector* getOutputConnectorModel() const;
+
 signals:
     void nodeContextMenuRequested(QPoint pos);
     void resized(QRectF rect);
-    OutputConnector* addOutputConnectorRequested(QGraphicsProxyWidget* proxyNode, QPointF pos = QPointF(0,0));
+    OutputConnector* addOutputConnectorRequested(QGraphicsProxyWidget* proxyNode, QPointF pos = QPointF(0, 0));
     void deleteOutputConnectorRequested(QGraphicsProxyWidget* outputConnectorProxy);
     void transferOutputsRequested(QStringList* outputs);
     void deleteNodeRequested(QGraphicsProxyWidget* proxyNode);
@@ -99,6 +102,7 @@ protected:
     QList<QGraphicsProxyWidget*>* outputConnectors;
     QList<QGraphicsProxyWidget*>* mathOutputConnectors;
     QList<QGraphicsProxyWidget*>* functionOutputConnectors;
+    QGraphicsProxyWidget* outputConnectorModel;
     void mousePressEvent(QMouseEvent* event);
     void paintEvent(QPaintEvent* event);
 

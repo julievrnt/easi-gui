@@ -13,7 +13,7 @@ FunctionMapNode::FunctionMapNode(QStringList* inputs, QStringList* outputs) : No
     setGeometry(QRect(0, 0, sizeHint().width(), sizeHint().height()));
 }
 
-void FunctionMapNode::setValues(QMap<QString, QString> *values)
+void FunctionMapNode::setValues(QMap<QString, QString>* values)
 {
     if (values == nullptr)
         return;
@@ -36,7 +36,7 @@ void FunctionMapNode::setValues(QMap<QString, QString> *values)
     delete values;
 }
 
-void FunctionMapNode::addFunctionNodeProxy(QGraphicsProxyWidget *newFunctionNodeProxy)
+void FunctionMapNode::addFunctionNodeProxy(QGraphicsProxyWidget* newFunctionNodeProxy)
 {
     functionNodeProxies.append(newFunctionNodeProxy);
 }
@@ -44,6 +44,12 @@ void FunctionMapNode::addFunctionNodeProxy(QGraphicsProxyWidget *newFunctionNode
 void FunctionMapNode::performResize()
 {
     NodeBase::performResize();
+    for (int i = 0; i < functionOutputConnectors->size(); i++)
+    {
+        int x = sizeHint().width() - 7;
+        int y = 70 + i * 46;
+        functionOutputConnectors->at(i)->setPos(x, y);
+    }
 }
 
 void FunctionMapNode::clearNodes()
@@ -54,7 +60,7 @@ void FunctionMapNode::clearNodes()
 
 void FunctionMapNode::addFunctionConnector(int index)
 {
-    QPointF posMatrix(sizeHint().width() - 7, 110 + index * 46);
+    QPointF posMatrix(sizeHint().width() - 7, 70 + index * 46);
     emit addFunctionOutputConnectorRequested(proxyNode, posMatrix);
 }
 
@@ -64,7 +70,7 @@ void FunctionMapNode::removeFunctionOfDimensionRow(int index)
     emit deleteNodeRequested(functionNodeProxies.takeAt(index));
 }
 
-void FunctionMapNode::addNewDimensionsLayoutRow(QVBoxLayout *dimensionsLayout, int index)
+void FunctionMapNode::addNewDimensionsLayoutRow(QVBoxLayout* dimensionsLayout, int index)
 {
     QHBoxLayout* row = new QHBoxLayout();
 
@@ -109,7 +115,7 @@ void FunctionMapNode::updateLayout()
     }
 }
 
-void FunctionMapNode::saveValues(YAML::Emitter *out)
+void FunctionMapNode::saveValues(YAML::Emitter* out)
 {
     *out << YAML::Key << "map";
     *out << YAML::BeginMap;

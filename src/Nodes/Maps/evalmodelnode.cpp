@@ -14,21 +14,11 @@ EvalModelNode::EvalModelNode(QStringList* inputs, QStringList* outputs) : NodeBa
     setGeometry(QRect(0, 0, sizeHint().width(), sizeHint().height()));
 }
 
-void EvalModelNode::setOutputConnectorModel(QGraphicsProxyWidget* newOutputConnectorModel)
-{
-    outputConnectorModel = newOutputConnectorModel;
-}
-
 void EvalModelNode::performResize()
 {
     NodeBase::performResize();
     if (outputConnectorModel != nullptr)
         outputConnectorModel->setX(outputConnectorModel->parentWidget()->geometry().width() - 7);
-}
-
-OutputConnector* EvalModelNode::getOutputConnectorModel() const
-{
-    return (OutputConnector*) outputConnectorModel->widget();
 }
 
 void EvalModelNode::createLayout()

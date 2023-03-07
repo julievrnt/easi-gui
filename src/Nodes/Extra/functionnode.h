@@ -9,14 +9,19 @@ class FunctionNode : public NodeBase
 public:
     FunctionNode(QStringList* inputs = nullptr);
 
-    void setValue(QStringList* inputs, QString values);
+    void setValue(QStringList* inputs, QString value);
 
 private:
-    void addNewDimensionsLayoutRow(QVBoxLayout *dimensionsLayout, int index);
+    void createLayout();
+    void addInputsLayout(QVBoxLayout* globalLayout);
+    void addFunctionLayout(QVBoxLayout* globalLayout);
     void updateLayout();
     void saveNodeContent(YAML::Emitter* out);
     void saveValues(YAML::Emitter* out);
     QString getValue();
+
+private slots:
+    void inputButtonClicked(bool clicked);
 };
 
 #endif // FUNCTIONNODE_H

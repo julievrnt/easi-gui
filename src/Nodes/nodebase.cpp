@@ -23,6 +23,7 @@ NodeBase::NodeBase(QStringList* inputs, QStringList* outputs, QWidget* parent)
     this->setWindowTitle("Node Base");
     outputConnectors = new QList<QGraphicsProxyWidget*>();
     mathOutputConnectors = new QList<QGraphicsProxyWidget*>();
+    functionOutputConnectors = new QList<QGraphicsProxyWidget*>();
     setAttribute(Qt::WA_TranslucentBackground);
     setObjectName("Node");
 }
@@ -67,12 +68,12 @@ void NodeBase::addMathOutputConnector(QGraphicsProxyWidget* newMathOutputConnect
     mathOutputConnectors->append(newMathOutputConnector);
 }
 
-QList<QGraphicsProxyWidget *> *NodeBase::getFunctionOutputConnectors() const
+QList<QGraphicsProxyWidget*>* NodeBase::getFunctionOutputConnectors() const
 {
     return functionOutputConnectors;
 }
 
-void NodeBase::addFunctionOutputConnector(QGraphicsProxyWidget *newFunctionOutputConnector)
+void NodeBase::addFunctionOutputConnector(QGraphicsProxyWidget* newFunctionOutputConnector)
 {
     functionOutputConnectors->append(newFunctionOutputConnector);
 }
@@ -115,6 +116,18 @@ QStringList* NodeBase::getInputs() const
 QGraphicsProxyWidget* NodeBase::getProxyNode() const
 {
     return proxyNode;
+}
+
+void NodeBase::setOutputConnectorModel(QGraphicsProxyWidget* newOutputConnectorModel)
+{
+    outputConnectorModel = newOutputConnectorModel;
+}
+
+OutputConnector* NodeBase::getOutputConnectorModel() const
+{
+    if (outputConnectorModel == nullptr)
+        return nullptr;
+    return (OutputConnector*) outputConnectorModel->widget();
 }
 
 void NodeBase::setProxyNode(QGraphicsProxyWidget* newProxyNode)
