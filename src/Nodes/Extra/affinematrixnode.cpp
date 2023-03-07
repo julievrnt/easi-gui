@@ -29,10 +29,10 @@ void AffineMatrixNode::setValues(QStringList* inputs, QList<double>* values)
     this->inputs = inputs;
 
     QVBoxLayout* dimensionsLayout = this->layout()->findChild<QVBoxLayout*>("dimensionsLayout");
-
+    while (dimensionsLayout->children().size() < inputs->size())
+        addNewDimensionsLayoutRow(dimensionsLayout, dimensionsLayout->children().size());
     for (int i = 0; i < inputs->size(); i++)
     {
-        addNewDimensionsLayoutRow(dimensionsLayout, i);
         QHBoxLayout* row = (QHBoxLayout*) dimensionsLayout->children().at(i);
         int index = inputs->indexOf(((QLabel*) row->itemAt(0)->widget())->text());
         ((QDoubleSpinBox*) row->itemAt(1)->widget())->setValue(values->at(index));

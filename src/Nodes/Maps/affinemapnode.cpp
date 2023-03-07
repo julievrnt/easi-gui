@@ -124,11 +124,10 @@ void AffineMapNode::performResize()
         else
             y += 81;
         mathOutputConnectors->at(i)->setPos(x, y);
-
     }
 }
 
-void AffineMapNode::clearMathNodes()
+void AffineMapNode::clearNodes()
 {
     while (mathOutputConnectors->size() > 0)
     {

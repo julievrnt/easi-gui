@@ -146,7 +146,7 @@ void WidgetsHandler::moveNodeNextTo(QGraphicsProxyWidget* parentProxyNode, QGrap
 void WidgetsHandler::connectNodes(NodeBase* parentNode, NodeBase* childNode)
 {
     OutputConnector* outputConnector ;
-    if (parentNode->getTypeOfNode() == EVALMODELNODE && ! parentNode->getOutputConnectorModel()->getConnectorLineConnected())
+    if ((parentNode->getTypeOfNode() == EVALMODELNODE || parentNode->getTypeOfNode() == LAYEREDMODELNODE) && !parentNode->getOutputConnectorModel()->getConnectorLineConnected())
     {
         // assume that model is set before components
         outputConnector = parentNode->getOutputConnectorModel();
@@ -174,15 +174,33 @@ void WidgetsHandler::addInputConnector(InputConnector* inputConnector, QGraphics
 void WidgetsHandler::addOutputConnector(OutputConnector* outputConnector, QGraphicsProxyWidget* proxyNode, QPointF pos)
 {
     NodeBase* node = (NodeBase*) proxyNode->widget();
-    if (outputConnector->getSubtypeOfConnector() == NONE || (outputConnector->getSubtypeOfConnector() == SPECIALCOMPONENT && node->getTypeOfNode() != FUNCTIONMAPNODE && node->getTypeOfNode() != LUAMAPNODE))
+    if (outputConnector->getSubtypeOfConnector() == NONE)
+    {
+        connect(node, SIGNAL(transferOutputsRequested(QStringList*)), outputConnector, SLOT(transferOutputs(QStringList*)));
+        emit node->transferOutputsRequested(node->getOutputs());
+    }
+    else if (outputConnector->getSubtypeOfConnector() == SPECIALCOMPONENT && node->getTypeOfNode() != FUNCTIONMAPNODE && node->getTypeOfNode() != LUAMAPNODE)
+    {
+        connect(node, SIGNAL(transferOutputsRequested(QStringList*)), outputConnector, SLOT(transferOutputs(QStringList*)));
+        emit node->transferOutputsRequested(node->getOutputs());
+    }
+    else if (outputConnector->getSubtypeOfConnector() == MATH && node->getTypeOfNode() == LAYEREDMODELNODE)
     {
         connect(node, SIGNAL(transferOutputsRequested(QStringList*)), outputConnector, SLOT(transferOutputs(QStringList*)));
         emit node->transferOutputsRequested(node->getOutputs());
     }
     else if (outputConnector->getSubtypeOfConnector() == EVAL)
     {
-        connect((EvalModelNode*) node, SIGNAL(transferInputsRequested(QStringList*)), outputConnector, SLOT(transferOutputs(QStringList*)));
-        emit ((EvalModelNode*) node)->transferInputsRequested(node->getOutputs());
+        if (node->getTypeOfNode() == EVALMODELNODE)
+        {
+            connect((EvalModelNode*) node, SIGNAL(transferInputsRequested(QStringList*)), outputConnector, SLOT(transferOutputs(QStringList*)));
+            emit ((EvalModelNode*) node)->transferInputsRequested(node->getOutputs());
+        }
+        else
+        {
+            connect((LayeredModelNode*) node, SIGNAL(transferInputsRequested(QStringList*)), outputConnector, SLOT(transferOutputs(QStringList*)));
+            emit ((LayeredModelNode*) node)->transferInputsRequested(node->getOutputs());
+        }
     }
 
     outputConnector->setGeometry(pos.x(), pos.y(), 15, 15);
@@ -192,11 +210,21 @@ void WidgetsHandler::addOutputConnector(OutputConnector* outputConnector, QGraph
     if (outputConnector->getSubtypeOfConnector() == MATH)
         node->addMathOutputConnector(outputConnectorProxy);
     else if (outputConnector->getSubtypeOfConnector() ==  EVAL)
-        ((EvalModelNode*) node)->setOutputConnectorModel(outputConnectorProxy);
-    else if (outputConnector->getSubtypeOfConnector() == SPECIALCOMPONENT && node->getTypeOfNode() == FUNCTIONMAPNODE)
-        ((FunctionMapNode*) node)->addFunctionOutputConnector(outputConnectorProxy);
-    else if (outputConnector->getSubtypeOfConnector() == SPECIALCOMPONENT && node->getTypeOfNode() == LUAMAPNODE)
-        ((LuaMapNode*) node)->addFunctionOutputConnector(outputConnectorProxy);
+    {
+        if (node->getTypeOfNode() == EVALMODELNODE)
+            ((EvalModelNode*) node)->setOutputConnectorModel(outputConnectorProxy);
+        else
+            ((LayeredModelNode*) node)->setOutputConnectorModel(outputConnectorProxy);
+    }
+    else if (outputConnector->getSubtypeOfConnector() == SPECIALCOMPONENT)
+    {
+        if (node->getTypeOfNode() == FUNCTIONMAPNODE)
+            ((FunctionMapNode*) node)->addFunctionOutputConnector(outputConnectorProxy);
+        else if (node->getTypeOfNode() == LUAMAPNODE)
+            ((LuaMapNode*) node)->addFunctionOutputConnector(outputConnectorProxy);
+        else if (node->getTypeOfNode() == SWITCHNODE)
+            node->addOutputConnector(outputConnectorProxy);
+    }
     else
         node->addOutputConnector(outputConnectorProxy);
     node->performResize();
@@ -248,6 +276,19 @@ void WidgetsHandler::addOutputConnector(OutputConnector* outputConnector, QGraph
             OutputConnector* polynomialMatrixOutputConnector = (OutputConnector*) polynomialMapNode->getMathOutputConnectors()->back()->widget();
             polynomialMapNode->addPolynomialMatrixProxy(polynomialMatrixProxyNode);
             createConnectorLine(polynomialMatrixOutputConnector, polynomialMatrixInputConnector);
+        }
+        else if (node->getTypeOfNode() == LAYEREDMODELNODE)
+        {
+            LayeredModelNode* layeredModelNode = (LayeredModelNode*) node;
+            QGraphicsProxyWidget* matrixProxyNode = addAffineMatrixNode(layeredModelNode->getOutputs());
+
+            // move node next to node
+            moveNodeNextTo(proxyNode, matrixProxyNode, QPointF(0, pos.y()));
+
+            InputConnector* matrixInputConnector = (InputConnector*) ((NodeBase*) matrixProxyNode->widget())->getInputConnector()->widget();
+            OutputConnector* matrixOutputConnector = (OutputConnector*) layeredModelNode->getMathOutputConnectors()->back()->widget();
+            layeredModelNode->addNodeProxy(matrixProxyNode);
+            createConnectorLine(matrixOutputConnector, matrixInputConnector);
         }
     }
     else  // if switch node, add switch component node
@@ -394,7 +435,7 @@ void WidgetsHandler::createActions()
 /// ========================== ADD BUILDER FUNCTIONS ==========================
 /// ===========================================================================
 
-QGraphicsProxyWidget* WidgetsHandler::addInclude(QString filePath)
+QGraphicsProxyWidget* WidgetsHandler::addIncludeNode(QString filePath)
 {
     IncludeNode* includeNode = new IncludeNode(filePath);
     QGraphicsProxyWidget* proxyNode = addNode(includeNode);
@@ -407,20 +448,20 @@ QGraphicsProxyWidget* WidgetsHandler::addInclude(QString filePath)
     return proxyNode;
 }
 
-QGraphicsProxyWidget* WidgetsHandler::addLayeredModel()
+QGraphicsProxyWidget* WidgetsHandler::addLayeredModelNode(QStringList* inputs, QStringList* outputs, QMap<double, QList<double>>* values, QString interpolation)
 {
-    LayeredModelNode* layeredModelNode = new LayeredModelNode();
+    LayeredModelNode* layeredModelNode = new LayeredModelNode(inputs, outputs, interpolation);
     QGraphicsProxyWidget* proxyNode = addNode(layeredModelNode);
+    layeredModelNode->setValues(values);
     NodeParentWidget* nodeParentWidget = (NodeParentWidget*)proxyNode->parentWidget();
 
     // Add one input connector
     InputConnector* inputConnector = new InputConnector(nodeParentWidget);
     addInputConnector(inputConnector, proxyNode, QPointF(-8, 20));
 
-    // Add one output connector
-    OutputConnector* outputConnector = new OutputConnector(nodeParentWidget);
-    QPointF pos(layeredModelNode->geometry().width() - 7, layeredModelNode->geometry().height() - 58);
-    addOutputConnector(outputConnector, proxyNode, pos);
+    // Add output connector for map
+    OutputConnector* modelOutputConnector = new OutputConnector(nodeParentWidget, EVAL);
+    addOutputConnector(modelOutputConnector, proxyNode, QPointF(layeredModelNode->geometry().width() - 7, 58));
 
     return proxyNode;
 }
@@ -878,6 +919,13 @@ void WidgetsHandler::connectNode(QGraphicsProxyWidget* proxyNode)
     {
         LuaMapNode* luaMapNode = (LuaMapNode*) node;
         connect(luaMapNode, SIGNAL(deleteNodeRequested(QGraphicsProxyWidget*)), this, SLOT(actionDeleteNode(QGraphicsProxyWidget*)));
+    }
+
+    if (node->getTypeOfNode() == LAYEREDMODELNODE)
+    {
+        LayeredModelNode* layeredModelNode = (LayeredModelNode*) node;
+        connect(layeredModelNode, SIGNAL(addMathOutputConnectorRequested(QGraphicsProxyWidget*, QPointF)), this, SLOT(actionAddMathOutputConnector(QGraphicsProxyWidget*, QPointF)));
+        connect(layeredModelNode, SIGNAL(deleteNodeRequested(QGraphicsProxyWidget*)), this, SLOT(actionDeleteNode(QGraphicsProxyWidget*)));
     }
 }
 

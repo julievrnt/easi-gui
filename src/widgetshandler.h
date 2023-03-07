@@ -44,8 +44,8 @@ public:
     void checkConnectionBetweenConnectorAndLine(ConnectorBase* connector);
 
     // add builder functions
-    QGraphicsProxyWidget* addInclude(QString filePath = "");
-    QGraphicsProxyWidget* addLayeredModel();
+    QGraphicsProxyWidget* addIncludeNode(QString filePath = "");
+    QGraphicsProxyWidget* addLayeredModelNode(QStringList* inputs = nullptr, QStringList* outputs = nullptr, QMap<double, QList<double>>* values = nullptr, QString interpolation = "");
 
     // add filter functions
     QGraphicsProxyWidget* addAnyNode(QStringList* inputs = nullptr);

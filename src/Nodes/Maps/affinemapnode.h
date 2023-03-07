@@ -15,7 +15,7 @@ public:
     void addTranslationProxy(QGraphicsProxyWidget* newTranslationProxy);
 
     void performResize();
-    void clearMathNodes();
+    void clearNodes();
 
 signals:
     void addMathOutputConnectorRequested(QGraphicsProxyWidget* proxyNode, QPointF pos);

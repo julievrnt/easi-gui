@@ -305,7 +305,7 @@ void MainWindow::openIncludeNode(QGraphicsProxyWidget* parentProxyNode, YAML::No
         file = QString::fromStdString((*node).as<std::string>());
 
     // add node
-    QGraphicsProxyWidget* proxyNode = widgetsHandler->addInclude(file);
+    QGraphicsProxyWidget* proxyNode = widgetsHandler->addIncludeNode(file);
     // move it next to parent node
     widgetsHandler->moveNodeNextTo(parentProxyNode, proxyNode);
     // connect them
@@ -314,16 +314,64 @@ void MainWindow::openIncludeNode(QGraphicsProxyWidget* parentProxyNode, YAML::No
 
 void MainWindow::openLayeredModelNode(QGraphicsProxyWidget* parentProxyNode, YAML::Node* node, QStringList* inputs)
 {
-    Q_UNUSED(inputs);
-    Q_UNUSED(node);
-    /// TODO
+    if (!(*node)["map"])
+    {
+        qDebug() << "ERROR: no map part in layered model";
+        return;
+    }
+
+    if (!(*node)["interpolation"])
+    {
+        qDebug() << "ERROR: no interpolation part in layered model";
+        return;
+    }
+
+    if (!(*node)["parameters"])
+    {
+        qDebug() << "ERROR: no parameters part in layered model";
+        return;
+    }
+
+    if (!(*node)["nodes"])
+    {
+        qDebug() << "ERROR: no nodes part in layered model";
+        return;
+    }
+
+    QString interpolation = QString::fromStdString((*node)["interpolation"].as<std::string>());
+
+    QStringList* outputs = new QStringList();
+    if ((*node)["parameters"])
+    {
+        for (size_t i = 0; i < (*node)["parameters"].size(); i++)
+            outputs->append(QString::fromStdString((*node)["parameters"][i].as<std::string>()));
+    }
+
+    QMap<double, QList<double>>* values = new QMap<double, QList<double>>();
+    for (YAML::iterator it = (*node)["nodes"].begin(); it != (*node)["nodes"].end(); it++)
+    {
+        double node = it->first.as<double>();
+        qDebug() << node << " : ";
+        QList<double> nodeValues;
+        for (size_t i = 0; i < it->second.size(); i++)
+        {
+            nodeValues.append(it->second[i].as<double>());
+            qDebug() << it->second[i].as<double>();
+        }
+        values->insert(node, nodeValues);
+    }
 
     // add node
-    QGraphicsProxyWidget* proxyNode = widgetsHandler->addLayeredModel();
+    QGraphicsProxyWidget* proxyNode = widgetsHandler->addLayeredModelNode(inputs, outputs, values, interpolation);
     // move it next to parent node
     widgetsHandler->moveNodeNextTo(parentProxyNode, proxyNode);
     // connect them
     widgetsHandler->connectNodes((NodeBase*) parentProxyNode->widget(), (NodeBase*) proxyNode->widget());
+
+    // add model
+    YAML::Node model = (*node)["map"];
+    if (!model.Tag().empty())
+        openNode(proxyNode, &model, inputs);
 }
 
 void MainWindow::openAnyNode(QGraphicsProxyWidget* parentProxyNode, YAML::Node* node, QStringList* inputs)
@@ -612,6 +660,7 @@ void MainWindow::openLuaMapNode(QGraphicsProxyWidget* parentProxyNode, YAML::Nod
     if (QString::fromStdString(it->first.as<std::string>()) != "returns")
     {
         qDebug() << "ERROR: no returns part in lua map";
+        delete outputs;
         return;
     }
 
@@ -920,12 +969,12 @@ void MainWindow::actionAddSpecialMap()
 
 void MainWindow::actionAddInclude()
 {
-    widgetsHandler->addInclude();
+    widgetsHandler->addIncludeNode();
 }
 
 void MainWindow::actionAddLayeredModel()
 {
-    widgetsHandler->addLayeredModel();
+    widgetsHandler->addLayeredModelNode();
 }
 
 
