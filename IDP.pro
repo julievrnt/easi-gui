@@ -29,6 +29,7 @@ SOURCES += \
     src/Nodes/Maps/evalmodelnode.cpp \
     src/Nodes/Maps/functionmapnode.cpp \
     src/Nodes/Maps/identitymapnode.cpp \
+    src/Nodes/Maps/luamapnode.cpp \
     src/Nodes/Maps/optimalstressnode.cpp \
     src/Nodes/Maps/polynomialmapnode.cpp \
     src/Nodes/Maps/scecfilenode.cpp \
@@ -66,6 +67,7 @@ HEADERS += \
     src/Nodes/Maps/evalmodelnode.h \
     src/Nodes/Maps/functionmapnode.h \
     src/Nodes/Maps/identitymapnode.h \
+    src/Nodes/Maps/luamapnode.h \
     src/Nodes/Maps/optimalstressnode.h \
     src/Nodes/Maps/polynomialmapnode.h \
     src/Nodes/Maps/scecfilenode.h \

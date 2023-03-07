@@ -104,7 +104,7 @@ void FunctionNode::saveValues(YAML::Emitter* out)
 {
     QString value = getValue();
     if (value.size() >= 6)
-        if (value.first(6).compare("return"))
+        if (value.first(6) != "return")
             *out << YAML::Literal;
     *out << value.toStdString();
 }

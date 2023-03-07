@@ -63,6 +63,7 @@ void MainWindow::connectActions()
     connect(ui->actionAddAffineMap, SIGNAL(triggered(bool)), this, SLOT(actionAddAffineMap()));
     connect(ui->actionAddPolynomialMap, SIGNAL(triggered(bool)), this, SLOT(actionAddPolynomialMap()));
     connect(ui->actionAddFunctionMap, SIGNAL(triggered(bool)), this, SLOT(actionAddFunctionMap()));
+    connect(ui->actionAddLuaMap, SIGNAL(triggered(bool)), this, SLOT(actionAddLuaMap()));
     connect(ui->actionAddASAGI, SIGNAL(triggered(bool)), this, SLOT(actionAddASAGI()));
     connect(ui->actionAddSCECFile, SIGNAL(triggered(bool)), this, SLOT(actionAddSCECFile()));
     connect(ui->actionAddEvalModel, SIGNAL(triggered(bool)), this, SLOT(actionAddEvalModel()));
@@ -227,7 +228,6 @@ void MainWindow::enableDisableIcons(bool enable)
 void MainWindow::openNode(QGraphicsProxyWidget* parentProxyNode, YAML::Node* node, QStringList* outputs)
 {
     QString tagOfNode = QString::fromStdString((*node).Tag());
-    qDebug() << tagOfNode;
 
     // read tag of node
     // builders
@@ -259,6 +259,8 @@ void MainWindow::openNode(QGraphicsProxyWidget* parentProxyNode, YAML::Node* nod
         openPolynomialMapNode(parentProxyNode, node, outputs);
     else if (tagOfNode == "!FunctionMap")
         openFunctionMapNode(parentProxyNode, node, outputs);
+    else if (tagOfNode == "!LuaMap")
+        openLuaMapNode(parentProxyNode, node, outputs);
     else if (tagOfNode == "!ASAGI")
         openASAGINode(parentProxyNode, node, outputs);
     else if (tagOfNode == "!SCECFile")
@@ -603,6 +605,42 @@ void MainWindow::openFunctionMapNode(QGraphicsProxyWidget* parentProxyNode, YAML
     openComponents(proxyNode, node, outputs);
 }
 
+void MainWindow::openLuaMapNode(QGraphicsProxyWidget* parentProxyNode, YAML::Node* node, QStringList* inputs)
+{
+    QStringList* outputs = new QStringList();
+    YAML::iterator it = (*node).begin();
+    if (QString::fromStdString(it->first.as<std::string>()) != "returns")
+    {
+        qDebug() << "ERROR: no returns part in lua map";
+        return;
+    }
+
+    for (std::size_t i = 0; i < it->second.size(); i++)
+    {
+        outputs->append(QString::fromStdString(it->second[i].as<std::string>()));
+    }
+
+    ++it;
+    if (QString::fromStdString(it->first.as<std::string>()) != "function")
+    {
+        qDebug() << "ERROR: no function part in lua map";
+        delete outputs;
+        return;
+    }
+
+    QString value;
+    value = QString::fromStdString(it->second.as<std::string>());
+
+    // add node
+    QGraphicsProxyWidget* proxyNode = widgetsHandler->addLuaMapNode(inputs, outputs, value);
+    // move it next to parent node
+    widgetsHandler->moveNodeNextTo(parentProxyNode, proxyNode);
+    // connect them
+    widgetsHandler->connectNodes((NodeBase*) parentProxyNode->widget(), (NodeBase*) proxyNode->widget());
+
+    openComponents(proxyNode, node, outputs);
+}
+
 void MainWindow::openASAGINode(QGraphicsProxyWidget* parentProxyNode, YAML::Node* node, QStringList* inputs)
 {
     Q_UNUSED(inputs);
@@ -843,6 +881,11 @@ void MainWindow::actionAddPolynomialMap()
 void MainWindow::actionAddFunctionMap()
 {
     widgetsHandler->addFunctionMapNode();
+}
+
+void MainWindow::actionAddLuaMap()
+{
+    widgetsHandler->addLuaMapNode();
 }
 
 void MainWindow::actionAddASAGI()

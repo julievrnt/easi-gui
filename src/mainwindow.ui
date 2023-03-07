@@ -52,6 +52,7 @@
     <addaction name="actionAddAffineMap"/>
     <addaction name="actionAddPolynomialMap"/>
     <addaction name="actionAddFunctionMap"/>
+    <addaction name="actionAddLuaMap"/>
     <addaction name="actionAddASAGI"/>
     <addaction name="actionAddSCECFile"/>
     <addaction name="actionAddEvalModel"/>
@@ -358,6 +359,11 @@
   <action name="actionAddLayeredModel">
    <property name="text">
     <string>Layered Model</string>
+   </property>
+  </action>
+  <action name="actionAddLuaMap">
+   <property name="text">
+    <string>Lua Map</string>
    </property>
   </action>
  </widget>

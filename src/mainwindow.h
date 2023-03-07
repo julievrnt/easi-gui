@@ -63,6 +63,7 @@ private:
     void openAffineMapNode(QGraphicsProxyWidget* parentProxyNode, YAML::Node* node, QStringList* inputs);
     void openPolynomialMapNode(QGraphicsProxyWidget* parentProxyNode, YAML::Node* node, QStringList* inputs);
     void openFunctionMapNode(QGraphicsProxyWidget* parentProxyNode, YAML::Node* node, QStringList* inputs);
+    void openLuaMapNode(QGraphicsProxyWidget* parentProxyNode, YAML::Node* node, QStringList* inputs);
     void openASAGINode(QGraphicsProxyWidget* parentProxyNode, YAML::Node* node, QStringList* inputs);
     void openSCECFileNode(QGraphicsProxyWidget* parentProxyNode, YAML::Node* node, QStringList* inputs);
     void openEvalModelNode(QGraphicsProxyWidget* parentProxyNode, YAML::Node* node, QStringList* inputs);
@@ -91,6 +92,7 @@ private slots:
     void actionAddAffineMap();
     void actionAddPolynomialMap();
     void actionAddFunctionMap();
+    void actionAddLuaMap();
     void actionAddASAGI();
     void actionAddSCECFile();
     void actionAddEvalModel();

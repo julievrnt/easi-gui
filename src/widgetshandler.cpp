@@ -12,6 +12,7 @@
 #include "src/Nodes/Maps/affinemapnode.h"
 #include "src/Nodes/Maps/polynomialmapnode.h"
 #include "src/Nodes/Maps/functionmapnode.h"
+#include "src/Nodes/Maps/luamapnode.h"
 #include "src/Nodes/Maps/asaginode.h"
 #include "src/Nodes/Maps/scecfilenode.h"
 #include "src/Nodes/Maps/evalmodelnode.h"
@@ -173,7 +174,7 @@ void WidgetsHandler::addInputConnector(InputConnector* inputConnector, QGraphics
 void WidgetsHandler::addOutputConnector(OutputConnector* outputConnector, QGraphicsProxyWidget* proxyNode, QPointF pos)
 {
     NodeBase* node = (NodeBase*) proxyNode->widget();
-    if (outputConnector->getSubtypeOfConnector() == NONE || (outputConnector->getSubtypeOfConnector() == SPECIALCOMPONENT && node->getTypeOfNode() != FUNCTIONMAPNODE))
+    if (outputConnector->getSubtypeOfConnector() == NONE || (outputConnector->getSubtypeOfConnector() == SPECIALCOMPONENT && node->getTypeOfNode() != FUNCTIONMAPNODE && node->getTypeOfNode() != LUAMAPNODE))
     {
         connect(node, SIGNAL(transferOutputsRequested(QStringList*)), outputConnector, SLOT(transferOutputs(QStringList*)));
         emit node->transferOutputsRequested(node->getOutputs());
@@ -194,6 +195,8 @@ void WidgetsHandler::addOutputConnector(OutputConnector* outputConnector, QGraph
         ((EvalModelNode*) node)->setOutputConnectorModel(outputConnectorProxy);
     else if (outputConnector->getSubtypeOfConnector() == SPECIALCOMPONENT && node->getTypeOfNode() == FUNCTIONMAPNODE)
         ((FunctionMapNode*) node)->addFunctionOutputConnector(outputConnectorProxy);
+    else if (outputConnector->getSubtypeOfConnector() == SPECIALCOMPONENT && node->getTypeOfNode() == LUAMAPNODE)
+        ((LuaMapNode*) node)->addFunctionOutputConnector(outputConnectorProxy);
     else
         node->addOutputConnector(outputConnectorProxy);
     node->performResize();
@@ -273,6 +276,19 @@ void WidgetsHandler::addOutputConnector(OutputConnector* outputConnector, QGraph
             InputConnector* functionInputConnector = (InputConnector*) ((NodeBase*) functionNodeProxy->widget())->getInputConnector()->widget();
             OutputConnector* functionOutputConnector = (OutputConnector*) functionMapNode->getFunctionOutputConnectors()->back()->widget();
             functionMapNode->addFunctionNodeProxy(functionNodeProxy);
+            createConnectorLine(functionOutputConnector, functionInputConnector);
+        }
+        else if (outputConnector->getSubtypeOfConnector() == SPECIALCOMPONENT && node->getTypeOfNode() == LUAMAPNODE)
+        {
+            LuaMapNode* luaMapNode = (LuaMapNode*) node;
+            QGraphicsProxyWidget* functionNodeProxy = addFunctionNode(luaMapNode->getInputs());
+
+            // move node next to node
+            moveNodeNextTo(proxyNode, functionNodeProxy, QPointF(0, pos.y()));
+
+            InputConnector* functionInputConnector = (InputConnector*) ((NodeBase*) functionNodeProxy->widget())->getInputConnector()->widget();
+            OutputConnector* functionOutputConnector = (OutputConnector*) luaMapNode->getFunctionOutputConnectors()->back()->widget();
+            luaMapNode->setFunctionNodeProxy(functionNodeProxy);
             createConnectorLine(functionOutputConnector, functionInputConnector);
         }
     }
@@ -605,6 +621,32 @@ QGraphicsProxyWidget* WidgetsHandler::addFunctionMapNode(QStringList* inputs, QS
     return proxyNode;
 }
 
+QGraphicsProxyWidget* WidgetsHandler::addLuaMapNode(QStringList* inputs, QStringList* outputs, QString value)
+{
+    LuaMapNode* luaMapNode = new LuaMapNode(inputs, outputs);
+    QGraphicsProxyWidget* proxyNode = addNode(luaMapNode);
+
+    NodeParentWidget* nodeParentWidget = (NodeParentWidget*)proxyNode->parentWidget();
+
+    // Add function output connector
+    OutputConnector* functionConnector = new OutputConnector(nodeParentWidget, SPECIALCOMPONENT, false);
+    addOutputConnector(functionConnector, proxyNode, QPointF(luaMapNode->geometry().width() - 7, 20));
+
+    // set value when opening node
+    luaMapNode->setValue(value);
+
+    // Add one input connector
+    InputConnector* inputConnector = new InputConnector(nodeParentWidget);
+    addInputConnector(inputConnector, proxyNode, QPointF(-8, 20));
+
+    // Add one output connector
+    OutputConnector* outputConnector = new OutputConnector(nodeParentWidget);
+    QPointF pos(luaMapNode->geometry().width() - 7, luaMapNode->geometry().height() - 58);
+    addOutputConnector(outputConnector, proxyNode, pos);
+
+    return proxyNode;
+}
+
 QGraphicsProxyWidget* WidgetsHandler::addASAGINode(QStringList* outputs, QString filePath, QString var, QString interpolation)
 {
     ASAGINode* asagiNode = new ASAGINode(outputs, filePath, var, interpolation);
@@ -830,6 +872,12 @@ void WidgetsHandler::connectNode(QGraphicsProxyWidget* proxyNode)
         FunctionMapNode* functionMapNode = (FunctionMapNode*) node;
         connect(functionMapNode, SIGNAL(addFunctionOutputConnectorRequested(QGraphicsProxyWidget*, QPointF)), this, SLOT(actionAddFunctionOutputConnector(QGraphicsProxyWidget*, QPointF)));
         connect(functionMapNode, SIGNAL(deleteNodeRequested(QGraphicsProxyWidget*)), this, SLOT(actionDeleteNode(QGraphicsProxyWidget*)));
+    }
+
+    if (node->getTypeOfNode() == LUAMAPNODE)
+    {
+        LuaMapNode* luaMapNode = (LuaMapNode*) node;
+        connect(luaMapNode, SIGNAL(deleteNodeRequested(QGraphicsProxyWidget*)), this, SLOT(actionDeleteNode(QGraphicsProxyWidget*)));
     }
 }
 
