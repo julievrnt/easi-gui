@@ -34,8 +34,7 @@ void LuaMapNode::performResize()
     for (int i = 0; i < functionOutputConnectors->size(); i++)
     {
         int x = sizeHint().width() - 7;
-        int y = 70 + i * 46;
-        functionOutputConnectors->at(i)->setPos(x, y);
+        functionOutputConnectors->at(i)->setPos(x, 20);
     }
 }
 
