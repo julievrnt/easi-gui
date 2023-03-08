@@ -47,6 +47,7 @@
 #define POLYNOMIALMATHNODE 22
 #define SWITCHCOMPONENTNODE 23
 #define FUNCTIONNODE 24
+#define LAYEREDMODELNODENODE 25
 
 
 class NodeBase : public QWidget

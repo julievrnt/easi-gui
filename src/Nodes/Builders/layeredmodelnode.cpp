@@ -31,7 +31,6 @@ void LayeredModelNode::setValues(QMap<double, QList<double>>* values)
     QList<double> keys = values->keys();
     for (int i = 0; i < values->size(); i++)
     {
-        qDebug() << keys.at(i);
         addNewNodesLayoutRow(nodesLayout, i);
         QHBoxLayout* row = (QHBoxLayout*) nodesLayout->children().at(i);
         ((QDoubleSpinBox*) row->itemAt(1)->widget())->setValue(keys.at(i));

@@ -58,7 +58,6 @@
     <addaction name="actionAddEvalModel"/>
     <addaction name="actionAddOptimalStress"/>
     <addaction name="actionAddAndersonianStress"/>
-    <addaction name="actionAddSpecialMap"/>
    </widget>
    <widget class="QMenu" name="menuAdd_Filter">
     <property name="title">
@@ -344,11 +343,6 @@
   <action name="actionAddAndersonianStress">
    <property name="text">
     <string>Andersonian Stress</string>
-   </property>
-  </action>
-  <action name="actionAddSpecialMap">
-   <property name="text">
-    <string>Special Map</string>
    </property>
   </action>
   <action name="actionAddInclude">

@@ -69,7 +69,6 @@ private:
     void openEvalModelNode(QGraphicsProxyWidget* parentProxyNode, YAML::Node* node, QStringList* inputs);
     void openOptimalStressNode(QGraphicsProxyWidget* parentProxyNode, YAML::Node* node, QStringList* inputs);
     void openAndersonianStressNode(QGraphicsProxyWidget* parentProxyNode, YAML::Node* node, QStringList* inputs);
-    void openSpecialMapNode(QGraphicsProxyWidget* parentProxyNode, YAML::Node* node, QStringList* inputs);
 
 private slots:
     void getNewFocusItem(QGraphicsItem* newFocusItem, QGraphicsItem* oldFocusItem, Qt::FocusReason reason);
@@ -98,7 +97,6 @@ private slots:
     void actionAddEvalModel();
     void actionAddOptimalStress();
     void actionAddAndersonianStress();
-    void actionAddSpecialMap();
 
     // basic software actions
     void actionNew();
