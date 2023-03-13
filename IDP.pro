@@ -39,6 +39,7 @@ SOURCES += \
     src/Nodes/Extra/polynomialmatrixnode.cpp \
     src/Nodes/Extra/translationnode.cpp \
     src/Nodes/Extra/switchcomponentnode.cpp \
+    src/easigraphicsview.cpp \
     src/main.cpp \
     src/mainwindow.cpp \
     src/Nodes/nodebase.cpp \
@@ -78,6 +79,7 @@ HEADERS += \
     src/Nodes/Extra/polynomialmatrixnode.h \
     src/Nodes/Extra/translationnode.h \
     src/Nodes/Extra/switchcomponentnode.h \
+    src/easigraphicsview.h \
     src/mainwindow.h \
     src/Nodes/nodebase.h \
     src/Nodes/nodeparentwidget.h \

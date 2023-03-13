@@ -3,6 +3,7 @@
 #include "src/Nodes/Filters/switchnode.h"
 #include "ui_mainwindow.h"
 #include "yaml-cpp/emitter.h"
+#include "src/easigraphicsview.h"
 #include <QFile>
 #include <QMessageBox>
 #include <QFileDialog>
@@ -19,7 +20,9 @@ MainWindow::MainWindow(QWidget* parent)
     nodeScene = new QGraphicsScene(this);
 
     this->setWindowTitle(fileName);
-    this->setCentralWidget(ui->graphicsView);
+
+    EasiGraphicsView* easiGraphicsView = new EasiGraphicsView();
+    this->setCentralWidget(easiGraphicsView);
 
     /// TODO: change the size such that nodeScene fits in the window and more !
     int menuBarHeight = ui->menubar->height();
@@ -27,7 +30,7 @@ MainWindow::MainWindow(QWidget* parent)
     int startusBarHeight = ui->statusbar->height();
     QRectF sceneRectInit = QRectF(0, 0, 1700 - 25, 1000 - menuBarHeight - toolBarHeight - startusBarHeight - 20);
     nodeScene->setSceneRect(sceneRectInit);
-    ui->graphicsView->setScene(nodeScene);
+    easiGraphicsView->setScene(nodeScene);
 
     connectActions();
 

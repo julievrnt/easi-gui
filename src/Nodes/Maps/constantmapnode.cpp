@@ -100,7 +100,6 @@ void ConstantMapNode::saveValues(YAML::Emitter* out)
     {
         *out << YAML::Key << key.toStdString();
         *out << YAML::Value << values->value(key);
-        qDebug() << values->value(key);
     }
     *out << YAML::EndMap;
 
