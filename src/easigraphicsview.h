@@ -11,7 +11,7 @@ public:
 
     // QWidget interface
 protected:
-    void wheelEvent(QWheelEvent *event);
+    void wheelEvent(QWheelEvent* event);
 };
 
 #endif // EASIGRAPHICSVIEW_H

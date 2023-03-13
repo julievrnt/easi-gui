@@ -85,6 +85,7 @@ public:
 signals:
     void saveRequested(YAML::Emitter* out);
     void connectConnectorToLine(ConnectorBase* connector);
+    void showCursorPos();
 
 private:
     QGraphicsScene* nodeScene;

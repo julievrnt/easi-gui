@@ -3,7 +3,6 @@
 #include "src/Nodes/Filters/switchnode.h"
 #include "ui_mainwindow.h"
 #include "yaml-cpp/emitter.h"
-#include "src/easigraphicsview.h"
 #include <QFile>
 #include <QMessageBox>
 #include <QFileDialog>
@@ -21,20 +20,16 @@ MainWindow::MainWindow(QWidget* parent)
 
     this->setWindowTitle(fileName);
 
-    EasiGraphicsView* easiGraphicsView = new EasiGraphicsView();
+    easiGraphicsView = new EasiGraphicsView();
+    easiGraphicsView->setDragMode(QGraphicsView::ScrollHandDrag);
     this->setCentralWidget(easiGraphicsView);
 
-    /// TODO: change the size such that nodeScene fits in the window and more !
-    int menuBarHeight = ui->menubar->height();
-    int toolBarHeight = ui->toolBar->height();
-    int startusBarHeight = ui->statusbar->height();
-    QRectF sceneRectInit = QRectF(0, 0, 1700 - 25, 1000 - menuBarHeight - toolBarHeight - startusBarHeight - 20);
-    nodeScene->setSceneRect(sceneRectInit);
+    nodeScene->setSceneRect(QRectF(0, 0, 5000, 100000));
     easiGraphicsView->setScene(nodeScene);
 
-    connectActions();
-
     widgetsHandler = new WidgetsHandler(nodeScene);
+
+    connectActions();
 }
 
 MainWindow::~MainWindow()
@@ -46,6 +41,9 @@ MainWindow::~MainWindow()
 
 void MainWindow::connectActions()
 {
+    connect(widgetsHandler, SIGNAL(showCursorPos()), this, SLOT(showCursorPos()));
+    //connect(nodeScene, SIGNAL(changed(const QList<QRectF>&)), this, SLOT(resizeScene(const QList<QRectF>&)));
+
     // add builder actions
     connect(ui->actionAddLayeredModel, SIGNAL(triggered(bool)), this, SLOT(actionAddLayeredModel()));
     connect(ui->actionAddInclude, SIGNAL(triggered(bool)), this, SLOT(actionAddInclude()));
@@ -828,9 +826,24 @@ void MainWindow::getNewFocusItem(QGraphicsItem* newFocusItem, QGraphicsItem* old
     }
 }
 
+void MainWindow::resizeScene(const QList<QRectF>& region)
+{
+    Q_UNUSED(region);
+    QRectF newRect = nodeScene->itemsBoundingRect();
+    if (newRect.width() < 5000 || newRect.height() < 5000)
+        return;
+    nodeScene->setSceneRect(newRect);
+}
+
 void MainWindow::stateChanged()
 {
     notSaved = true;
+}
+
+void MainWindow::showCursorPos()
+{
+    qDebug() << "cursor position: " << QCursor::pos();
+    qDebug() << "cursor position in Scene: " << easiGraphicsView->mapToScene(QCursor::pos());
 }
 
 

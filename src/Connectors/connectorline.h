@@ -49,6 +49,7 @@ private slots:
     void resetConnectorLine(ConnectorBase* connector);
     void getOhterConnectorTimeOut();
     void deleteConnectorLine();
+    void resize(QRectF newRect);
     void transferOutputs(QStringList* outputs);
     void save(YAML::Emitter* out);
 };

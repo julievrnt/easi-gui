@@ -239,6 +239,11 @@ void ConnectorLine::deleteConnectorLine()
     emit deleteConnectorLine(connectorLineProxy);
 }
 
+void ConnectorLine::resize(QRectF newRect)
+{
+    setGeometry(newRect.toRect());
+}
+
 void ConnectorLine::transferOutputs(QStringList* outputs)
 {
     emit transferOutputsRequested(outputs);

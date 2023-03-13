@@ -63,7 +63,7 @@ void WidgetsHandler::addRoot()
     RootNode* rootNode = new RootNode();
     proxyRoot = addNode(rootNode);
     NodeParentWidget* nodeParentWidget = (NodeParentWidget*) proxyRoot->parentWidget();
-    // nodeParentWidget->move(??, ??);
+    nodeParentWidget->move(nodeScene->width() / 2, nodeScene->height() / 2);
 
     // Add one output connector
     OutputConnector* outputConnector = new OutputConnector(nodeParentWidget);
@@ -89,7 +89,7 @@ QGraphicsProxyWidget* WidgetsHandler::addNode(NodeBase* node, QPointF pos)
     proxyNode->setParentItem(nodeParentWidget);
     connectNode(proxyNode);
 
-    nodeParentWidget->move(pos.x(), pos.y());
+    nodeParentWidget->move(nodeScene->width() / 2 + pos.x(), nodeScene->height() / 2 + pos.y());
 
     return proxyNode;
 }
@@ -350,8 +350,7 @@ void WidgetsHandler::addConnectorLineToScene(ConnectorLine* connectorLine)
     connectorLine->setConnectorLineProxy(connectorLineProxy);
     connectorLine->setGeometry(nodeScene->sceneRect().toRect());
 
-    //nodeScene->addRect(connectorLine->geometry(), QPen(Qt::green));
-
+    connect(nodeScene, SIGNAL(sceneRectChanged(QRectF)), connectorLine, SLOT(resize(QRectF)));
     connect(this, SIGNAL(connectConnectorToLine(ConnectorBase*)), connectorLine, SLOT(connectTo(ConnectorBase*)));
     connect(connectorLine, SIGNAL(drawnIsDone(ConnectorLine*)), this, SLOT(actionConnectorLineDrawn(ConnectorLine*)));
     connect(connectorLine, SIGNAL(connectorLineConnected()), this, SLOT(actionConnectorLineConnected()));
@@ -916,6 +915,7 @@ void WidgetsHandler::nodeContextMenu(QPoint pos)
 void WidgetsHandler::actionCreateConnectorLine(ConnectorBase* connector)
 {
     createConnectorLine(connector);
+    emit showCursorPos();
 }
 
 void WidgetsHandler::actionDeleteConnectorLine(QGraphicsProxyWidget* connectorLineProxy)

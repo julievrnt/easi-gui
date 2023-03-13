@@ -7,6 +7,7 @@
 #include <QMap>
 #include <QStringList>
 #include "widgetshandler.h"
+#include "src/easigraphicsview.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -25,6 +26,7 @@ public:
 private:
     Ui::MainWindow* ui;
     QString fileName;
+    EasiGraphicsView* easiGraphicsView;
     QGraphicsScene* nodeScene;
     WidgetsHandler* widgetsHandler;
     bool notSaved = false;
@@ -72,7 +74,9 @@ private:
 
 private slots:
     void getNewFocusItem(QGraphicsItem* newFocusItem, QGraphicsItem* oldFocusItem, Qt::FocusReason reason);
+    void resizeScene(const QList<QRectF>& region);
     void stateChanged();
+    void showCursorPos();
 
     // action add builders
     void actionAddInclude();

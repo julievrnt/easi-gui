@@ -37,6 +37,7 @@ int ConnectorBase::getTypeOfConnector() const
 
 QPointF ConnectorBase::getCenterPos() const
 {
+    qDebug() << this << " " << centerPos;
     return centerPos;
 }
 
@@ -75,7 +76,6 @@ bool ConnectorBase::getConnectorLineConnected() const
 void ConnectorBase::updateCenterPos()
 {
     centerPos = nodeParentWidget->pos() + pos() + QPointF(geometry().width() / 2, geometry().height() / 2);
-    // qDebug() << this << " " << centerPos;
 }
 
 void ConnectorBase::nodeParentWidgetHasMoved()
