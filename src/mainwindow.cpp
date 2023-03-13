@@ -177,6 +177,7 @@ void MainWindow::save()
     ///     - what to do when they are nodes that are not connected? --> ask Lukas
 
     YAML::Emitter out;
+    out.SetDoublePrecision(3);
 
     if (widgetsHandler->getProxyRoot() == nullptr)
         qDebug() << "ERROR: no root !";

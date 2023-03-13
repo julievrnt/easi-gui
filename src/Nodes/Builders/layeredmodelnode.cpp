@@ -183,7 +183,7 @@ void LayeredModelNode::addNewNodesLayoutRow(QVBoxLayout* nodesLayout, int index)
 
 void LayeredModelNode::addNodeConnector(int index)
 {
-    QPointF pos(sizeHint().width() - 7, 58 + index * 46);
+    QPointF pos(sizeHint().width() - 7, (index + outputs->size()) * 32 + 220);
     emit addMathOutputConnectorRequested(proxyNode, pos);
 }
 
