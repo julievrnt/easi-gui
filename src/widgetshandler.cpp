@@ -27,8 +27,9 @@
 #include "src/Nodes/rootnode.h"
 #include <QMenu>
 
-WidgetsHandler::WidgetsHandler(QGraphicsScene* nodeScene)
+WidgetsHandler::WidgetsHandler(EasiGraphicsView* easiGraphicsView, QGraphicsScene* nodeScene)
 {
+    this->easiGraphicsView = easiGraphicsView;
     this->nodeScene = nodeScene;
     newConnectorLine = nullptr;
     nodes = QList<QGraphicsProxyWidget*>();
@@ -359,13 +360,13 @@ void WidgetsHandler::addConnectorLineToScene(ConnectorLine* connectorLine)
 
 void WidgetsHandler::createConnectorLine(ConnectorBase* connector)
 {
-    ConnectorLine* connectorLine = new ConnectorLine(connector);
+    ConnectorLine* connectorLine = new ConnectorLine(connector, easiGraphicsView);
     addConnectorLineToScene(connectorLine);
 }
 
 void WidgetsHandler::createConnectorLine(OutputConnector* outputConnector, InputConnector* inputConnector)
 {
-    ConnectorLine* connectorLine = new ConnectorLine(outputConnector, inputConnector);
+    ConnectorLine* connectorLine = new ConnectorLine(outputConnector, inputConnector, easiGraphicsView);
     addConnectorLineToScene(connectorLine);
 }
 
@@ -915,7 +916,6 @@ void WidgetsHandler::nodeContextMenu(QPoint pos)
 void WidgetsHandler::actionCreateConnectorLine(ConnectorBase* connector)
 {
     createConnectorLine(connector);
-    emit showCursorPos();
 }
 
 void WidgetsHandler::actionDeleteConnectorLine(QGraphicsProxyWidget* connectorLineProxy)

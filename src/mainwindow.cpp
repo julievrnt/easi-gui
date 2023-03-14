@@ -24,10 +24,10 @@ MainWindow::MainWindow(QWidget* parent)
     easiGraphicsView->setDragMode(QGraphicsView::ScrollHandDrag);
     this->setCentralWidget(easiGraphicsView);
 
-    nodeScene->setSceneRect(QRectF(0, 0, 5000, 100000));
+    nodeScene->setSceneRect(QRectF(0, 0, 100000, 5000));
     easiGraphicsView->setScene(nodeScene);
 
-    widgetsHandler = new WidgetsHandler(nodeScene);
+    widgetsHandler = new WidgetsHandler(easiGraphicsView, nodeScene);
 
     connectActions();
 }
@@ -41,9 +41,6 @@ MainWindow::~MainWindow()
 
 void MainWindow::connectActions()
 {
-    connect(widgetsHandler, SIGNAL(showCursorPos()), this, SLOT(showCursorPos()));
-    //connect(nodeScene, SIGNAL(changed(const QList<QRectF>&)), this, SLOT(resizeScene(const QList<QRectF>&)));
-
     // add builder actions
     connect(ui->actionAddLayeredModel, SIGNAL(triggered(bool)), this, SLOT(actionAddLayeredModel()));
     connect(ui->actionAddInclude, SIGNAL(triggered(bool)), this, SLOT(actionAddInclude()));
@@ -826,24 +823,9 @@ void MainWindow::getNewFocusItem(QGraphicsItem* newFocusItem, QGraphicsItem* old
     }
 }
 
-void MainWindow::resizeScene(const QList<QRectF>& region)
-{
-    Q_UNUSED(region);
-    QRectF newRect = nodeScene->itemsBoundingRect();
-    if (newRect.width() < 5000 || newRect.height() < 5000)
-        return;
-    nodeScene->setSceneRect(newRect);
-}
-
 void MainWindow::stateChanged()
 {
     notSaved = true;
-}
-
-void MainWindow::showCursorPos()
-{
-    qDebug() << "cursor position: " << QCursor::pos();
-    qDebug() << "cursor position in Scene: " << easiGraphicsView->mapToScene(QCursor::pos());
 }
 
 

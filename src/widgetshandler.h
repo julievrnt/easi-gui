@@ -14,7 +14,7 @@ class WidgetsHandler : public QObject
     Q_OBJECT
 
 public:
-    WidgetsHandler(QGraphicsScene* nodeScene);
+    WidgetsHandler(EasiGraphicsView* easiGraphicsView, QGraphicsScene* nodeScene);
     ~WidgetsHandler();
 
     void init();
@@ -85,9 +85,9 @@ public:
 signals:
     void saveRequested(YAML::Emitter* out);
     void connectConnectorToLine(ConnectorBase* connector);
-    void showCursorPos();
 
 private:
+    EasiGraphicsView* easiGraphicsView;
     QGraphicsScene* nodeScene;
     QAction* deleteNodeAction;
     QGraphicsProxyWidget* proxyRoot;

@@ -4,6 +4,7 @@
 #include <QWidget>
 #include "inputs/inputconnector.h"
 #include "outputs/outputconnector.h"
+#include "src/easigraphicsview.h"
 #include "yaml-cpp/yaml.h"
 #include <QTimer>
 
@@ -11,8 +12,9 @@ class ConnectorLine : public QWidget
 {
     Q_OBJECT
 public:
-    explicit ConnectorLine(ConnectorBase* connector);
-    explicit ConnectorLine(OutputConnector* outputConnector, InputConnector* inputConnector);
+    explicit ConnectorLine(ConnectorBase* connector, EasiGraphicsView* easiGraphicsView);
+    explicit ConnectorLine(OutputConnector* outputConnector, InputConnector* inputConnector, EasiGraphicsView* easiGraphicsView);
+    ~ConnectorLine();
 
     void setConnectorLineProxy(QGraphicsProxyWidget* newConnectorLineProxy);
     QPointF getPositionToCheck();
@@ -25,6 +27,7 @@ signals:
     void saveRequested(YAML::Emitter* out);
 
 private:
+    EasiGraphicsView* easiGraphicsView;
     QPointF inputConnectorPoint;
     QPointF outputConnectorPoint;
     InputConnector* inputConnector = nullptr;

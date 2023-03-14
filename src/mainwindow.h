@@ -74,9 +74,7 @@ private:
 
 private slots:
     void getNewFocusItem(QGraphicsItem* newFocusItem, QGraphicsItem* oldFocusItem, Qt::FocusReason reason);
-    void resizeScene(const QList<QRectF>& region);
     void stateChanged();
-    void showCursorPos();
 
     // action add builders
     void actionAddInclude();

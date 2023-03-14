@@ -1,8 +1,9 @@
 #include "connectorline.h"
 #include <QPainter>
 
-ConnectorLine::ConnectorLine(ConnectorBase* connector)
+ConnectorLine::ConnectorLine(ConnectorBase* connector,  EasiGraphicsView* easiGraphicsView)
 {
+    this->easiGraphicsView = easiGraphicsView;
     getOtherConnectorTimer = new QTimer();
 
     inputConnectorPoint = connector->getCenterPos();
@@ -12,13 +13,19 @@ ConnectorLine::ConnectorLine(ConnectorBase* connector)
     setAttribute(Qt::WA_TranslucentBackground);
 }
 
-ConnectorLine::ConnectorLine(OutputConnector* outputConnector, InputConnector* inputConnector)
+ConnectorLine::ConnectorLine(OutputConnector* outputConnector, InputConnector* inputConnector,  EasiGraphicsView* easiGraphicsView)
 {
+    this->easiGraphicsView = easiGraphicsView;
     getOtherConnectorTimer = new QTimer();
     connectLineToConnector(outputConnector);
     connectLineToConnector(inputConnector);
     setAttribute(Qt::WA_TranslucentBackground);
     isDone = true;
+}
+
+ConnectorLine::~ConnectorLine()
+{
+
 }
 
 void ConnectorLine::setConnectorLineProxy(QGraphicsProxyWidget* newConnectorLineProxy)
@@ -174,9 +181,9 @@ void ConnectorLine::isDragged()
     if (isDone == true)
         isDone = false;
     if (inputConnector == nullptr)
-        inputConnectorPoint = mapFromGlobal(QCursor::pos());
+        inputConnectorPoint = easiGraphicsView->mapToScene(easiGraphicsView->mapFromGlobal(QCursor::pos()));
     else
-        outputConnectorPoint = mapFromGlobal(QCursor::pos());
+        outputConnectorPoint = easiGraphicsView->mapToScene(easiGraphicsView->mapFromGlobal(QCursor::pos()));
     this->repaint();
 }
 

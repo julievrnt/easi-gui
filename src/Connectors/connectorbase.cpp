@@ -37,7 +37,6 @@ int ConnectorBase::getTypeOfConnector() const
 
 QPointF ConnectorBase::getCenterPos() const
 {
-    qDebug() << this << " " << centerPos;
     return centerPos;
 }
 
