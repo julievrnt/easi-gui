@@ -11,6 +11,7 @@ ConnectorLine::ConnectorLine(ConnectorBase* connector,  EasiGraphicsView* easiGr
     connectLineToConnector(connector);
 
     setAttribute(Qt::WA_TranslucentBackground);
+    setObjectName("Line");
 }
 
 ConnectorLine::ConnectorLine(OutputConnector* outputConnector, InputConnector* inputConnector,  EasiGraphicsView* easiGraphicsView)
@@ -21,6 +22,7 @@ ConnectorLine::ConnectorLine(OutputConnector* outputConnector, InputConnector* i
     connectLineToConnector(inputConnector);
     setAttribute(Qt::WA_TranslucentBackground);
     isDone = true;
+    setObjectName("Line");
 }
 
 ConnectorLine::~ConnectorLine()
@@ -66,7 +68,7 @@ void ConnectorLine::connectLineToConnector(ConnectorBase* connector)
 
         inputConnector = (InputConnector*) connector;
         inputConnectorPoint = inputConnector->getCenterPos();
-        connect(this, SIGNAL(transferOutputsRequested(QStringList*)), inputConnector, SLOT(transferOutputs(QStringList*)));
+        connect(this, SIGNAL(transferOutputsRequested(QSharedPointer<QStringList>)), inputConnector, SLOT(transferOutputs(QSharedPointer<QStringList>)));
         connect(this, SIGNAL(saveRequested(YAML::Emitter*)), inputConnector, SLOT(save(YAML::Emitter*)));
     }
     else if (connector->getTypeOfConnector() == OUTPUTCONNECTOR)
@@ -88,7 +90,7 @@ void ConnectorLine::connectLineToConnector(ConnectorBase* connector)
 
         outputConnector = (OutputConnector*) connector;
         outputConnectorPoint = outputConnector->getCenterPos();
-        connect(outputConnector, SIGNAL(transferOutputsRequested(QStringList*)), this, SLOT(transferOutputs(QStringList*)));
+        connect(outputConnector, SIGNAL(transferOutputsRequested(QSharedPointer<QStringList>)), this, SLOT(transferOutputs(QSharedPointer<QStringList>)));
         connect(outputConnector, SIGNAL(saveRequested(YAML::Emitter*)), this, SLOT(save(YAML::Emitter*)));
     }
     else
@@ -134,12 +136,12 @@ void ConnectorLine::disconnectLineFromConnector(ConnectorBase* connector)
 
     if (connector->getTypeOfConnector() == INPUTCONNECTOR)
     {
-        disconnect(this, SIGNAL(transferOutputsRequested(QStringList*)), inputConnector, SLOT(transferOutputs(QStringList*)));
+        disconnect(this, SIGNAL(transferOutputsRequested(QSharedPointer<QStringList>)), inputConnector, SLOT(transferOutputs(QSharedPointer<QStringList>)));
         if (connector->getSubtypeOfConnector() == EVAL)
             connector->setSubtypeOfConnector(NONE);
     }
     else if (connector->getTypeOfConnector() == OUTPUTCONNECTOR)
-        disconnect(outputConnector, SIGNAL(transferOutputsRequested(QStringList*)), this, SLOT(transferOutputs(QStringList*)));
+        disconnect(outputConnector, SIGNAL(transferOutputsRequested(QSharedPointer<QStringList>)), this, SLOT(transferOutputs(QSharedPointer<QStringList>)));
     else
         qDebug() << "error: neither input nor output";
 }
@@ -243,7 +245,7 @@ void ConnectorLine::deleteConnectorLine()
         disconnectLineFromConnector(inputConnector);
     if (outputConnector != nullptr)
         disconnectLineFromConnector(outputConnector);
-    emit deleteConnectorLine(connectorLineProxy);
+    emit deleteConnectorLineRequested(connectorLineProxy);
 }
 
 void ConnectorLine::resize(QRectF newRect)
@@ -251,7 +253,7 @@ void ConnectorLine::resize(QRectF newRect)
     setGeometry(newRect.toRect());
 }
 
-void ConnectorLine::transferOutputs(QStringList* outputs)
+void ConnectorLine::transferOutputs(QSharedPointer<QStringList> outputs)
 {
     emit transferOutputsRequested(outputs);
 }

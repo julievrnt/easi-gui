@@ -4,7 +4,7 @@
 #include <QPushButton>
 #include <QLineEdit>
 
-AffineMapNode::AffineMapNode(QStringList* inputs, QStringList* outputs) : NodeBase(inputs, outputs)
+AffineMapNode::AffineMapNode(QSharedPointer<QStringList> inputs, QSharedPointer<QStringList> outputs) : NodeBase(inputs, outputs)
 {
     typeOfNode = AFFINEMAPNODE;
     localTag = "AffineMap";

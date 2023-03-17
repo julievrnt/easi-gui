@@ -4,7 +4,7 @@
 #include <QLabel>
 #include "float.h"
 
-AffineMatrixNode::AffineMatrixNode(QStringList* inputs) : NodeBase(inputs)
+AffineMatrixNode::AffineMatrixNode(QSharedPointer<QStringList> inputs) : NodeBase(inputs)
 {
     this->typeOfNode = AFFINEMATHNODE;
     setWindowTitle("Matrix");
@@ -18,7 +18,7 @@ AffineMatrixNode::~AffineMatrixNode()
     /// TODO
 }
 
-void AffineMatrixNode::setValues(QStringList* inputs, QList<double>* values)
+void AffineMatrixNode::setValues(QSharedPointer<QStringList> inputs, QList<double>* values)
 {
     if (inputs->size() != values->size())
     {

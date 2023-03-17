@@ -7,7 +7,7 @@ class SwitchComponentNode : public NodeBase
 {
     Q_OBJECT
 public:
-    SwitchComponentNode(QStringList* inputs = nullptr, QStringList* outputs = nullptr);
+    SwitchComponentNode(QSharedPointer<QStringList> inputs = nullptr, QSharedPointer<QStringList> outputs = nullptr);
     void setParameters(QStringList* parameters);
     void performResize();
 
@@ -21,7 +21,7 @@ private:
 protected:
     void updateLayout();
     void addNewDimensionsLayoutRow(QVBoxLayout* dimensionsLayout, int index);
-    void saveNodeContent(YAML::Emitter *out);
+    void saveNodeContent(YAML::Emitter* out);
     void saveValues(YAML::Emitter* out);
 
 private slots:

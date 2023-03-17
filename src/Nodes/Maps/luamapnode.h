@@ -7,7 +7,7 @@ class LuaMapNode : public NodeBase
 {
     Q_OBJECT
 public:
-    LuaMapNode(QStringList* inputs = nullptr, QStringList* outputs = nullptr);
+    LuaMapNode(QSharedPointer<QStringList> inputs = nullptr, QSharedPointer<QStringList> outputs = nullptr);
 
     void setValue(QString value);
     void setFunctionNodeProxy(QGraphicsProxyWidget* newFunctionNodeProxy);

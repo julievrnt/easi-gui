@@ -2,7 +2,7 @@
 #include <QDoubleSpinBox>
 #include "float.h"
 
-GroupFilterNode::GroupFilterNode(QStringList* inputs) : NodeBase(inputs)
+GroupFilterNode::GroupFilterNode(QSharedPointer<QStringList> inputs) : NodeBase(inputs)
 {
     typeOfNode = GROUPFILTERNODE;
     localTag = "GroupFilter";
@@ -13,7 +13,7 @@ GroupFilterNode::GroupFilterNode(QStringList* inputs) : NodeBase(inputs)
     setGeometry(QRect(0, 0, sizeHint().width(), sizeHint().height()));
 }
 
-GroupFilterNode::GroupFilterNode(QStringList* inputs, QList<double>* values) : GroupFilterNode(inputs)
+GroupFilterNode::GroupFilterNode(QSharedPointer<QStringList> inputs, QList<double>* values) : GroupFilterNode(inputs)
 {
     if (values == nullptr)
         return;

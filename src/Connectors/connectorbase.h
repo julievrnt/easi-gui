@@ -23,7 +23,7 @@ public:
     explicit ConnectorBase(NodeParentWidget* nodeParentWidget, int subtype, bool canDisconnect);
     ~ConnectorBase();
 
-    QStringList* getOutputs() const;
+    QSharedPointer<QStringList> getOutputs() const;
     void outputsChanged();
     int getTypeOfConnector() const;
     QPointF getCenterPos() const;
@@ -49,11 +49,11 @@ signals:
     void isConnectorLineOnMe(ConnectorBase* connector);
     void moveConnectorLineRequested(int connectorType);
     void deleteConnectorLineRequested();
-    void transferOutputsRequested(QStringList* outputs);
+    void transferOutputsRequested(QSharedPointer<QStringList> outputs);
     void saveRequested(YAML::Emitter* out);
 
 private:
-    QStringList* outputs;
+    QSharedPointer<QStringList> outputs;
     bool highlight;
     NodeParentWidget* nodeParentWidget;
 
@@ -61,7 +61,7 @@ private:
 
 private slots:
     void nodeParentWidgetHasMoved();
-    void transferOutputs(QStringList* outputs);
+    void transferOutputs(QSharedPointer<QStringList> outputs);
 
     // QWidget interface
 protected:

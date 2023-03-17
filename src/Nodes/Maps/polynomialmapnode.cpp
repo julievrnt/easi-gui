@@ -3,7 +3,7 @@
 #include <QLabel>
 #include <QSpinBox>
 
-PolynomialMapNode::PolynomialMapNode(QStringList* inputs, QStringList* outputs) : NodeBase(inputs, outputs)
+PolynomialMapNode::PolynomialMapNode(QSharedPointer<QStringList> inputs, QSharedPointer<QStringList> outputs) : NodeBase(inputs, outputs)
 {
     typeOfNode = POLYNOMIALMAPNODE;
     localTag = "PolynomialMap";

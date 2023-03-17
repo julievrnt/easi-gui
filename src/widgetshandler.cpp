@@ -39,6 +39,7 @@ WidgetsHandler::WidgetsHandler(EasiGraphicsView* easiGraphicsView, QGraphicsScen
 
 WidgetsHandler::~WidgetsHandler()
 {
+    // easiGraphicsView deleted in mainwindow
     // nodeScene is deleted in mainwindow
     delete deleteNodeAction;
     delete proxyRoot;
@@ -64,7 +65,6 @@ void WidgetsHandler::addRoot()
     RootNode* rootNode = new RootNode();
     proxyRoot = addNode(rootNode);
     NodeParentWidget* nodeParentWidget = (NodeParentWidget*) proxyRoot->parentWidget();
-    nodeParentWidget->move(nodeScene->width() / 2, nodeScene->height() / 2);
 
     // Add one output connector
     OutputConnector* outputConnector = new OutputConnector(nodeParentWidget);
@@ -72,7 +72,7 @@ void WidgetsHandler::addRoot()
     QGraphicsProxyWidget* outputConnectorProxy = nodeScene->addWidget(outputConnector);
     outputConnectorProxy->setParentItem(nodeParentWidget);
     rootNode->setOutputConnector(outputConnectorProxy);
-    connect(rootNode, SIGNAL(transferOutputsRequested(QStringList*)), outputConnector, SLOT(transferOutputs(QStringList*)));
+    connect(rootNode, SIGNAL(transferOutputsRequested(QSharedPointer<QStringList>)), outputConnector, SLOT(transferOutputs(QSharedPointer<QStringList>)));
     emit rootNode->transferOutputsRequested(rootNode->getOutputs());
     connectConnector(outputConnector, proxyRoot);
 }
@@ -90,53 +90,21 @@ QGraphicsProxyWidget* WidgetsHandler::addNode(NodeBase* node, QPointF pos)
     proxyNode->setParentItem(nodeParentWidget);
     connectNode(proxyNode);
 
-    nodeParentWidget->move(nodeScene->width() / 2 + pos.x(), nodeScene->height() / 2 + pos.y());
+    nodeParentWidget->move(pos.x(), pos.y());
 
     return proxyNode;
 }
 
 void WidgetsHandler::deleteNode()
 {
-    QGraphicsItem* nodeToRemove = nodeScene->focusItem();
+    QGraphicsProxyWidget* nodeToRemove = (QGraphicsProxyWidget*) nodeScene->focusItem();
     if (nodeToRemove == nullptr)
     {
         qDebug() << "Could not delete node, no node selected";
         return;
     }
 
-    // remove maths nodes
-    NodeBase* node = (NodeBase*) ((QGraphicsProxyWidget*) nodeToRemove)->widget();
-    if (node->getTypeOfNode() == ROOTNODE)
-        return;
-    node->clearNodes();
-
-    // remove parent to remove node & connectors
-    nodeScene->removeItem(nodeToRemove->parentItem());
-    QList<QGraphicsItem*> proxyChildren = nodeToRemove->parentItem()->childItems();
-    while (!proxyChildren.isEmpty())
-    {
-        deleteProxy((QGraphicsProxyWidget*) proxyChildren.takeLast());
-    }
-}
-
-/// TODO
-void WidgetsHandler::deleteProxy(QGraphicsProxyWidget* proxy)
-{
-    if (proxy->widget()->objectName() == "Node")
-    {
-        //  delete proxy->widget();
-    }
-    else if (proxy->widget()->objectName() == "Connector")
-    {
-        ConnectorBase* connector = (ConnectorBase*) proxy->widget();
-        connector->deleteLine();
-        delete connector;
-    }
-    else
-        qDebug() << proxy->widget();
-    // qDebug() << "delete proxy";
-    //delete proxy;
-    //qDebug() << "delete proxy done";
+    deleteWidget(nodeToRemove);
 }
 
 QPointF WidgetsHandler::getPosNextTo(QGraphicsProxyWidget* parentProxyNode, QPointF pos)
@@ -180,29 +148,29 @@ void WidgetsHandler::addOutputConnector(OutputConnector* outputConnector, QGraph
     NodeBase* node = (NodeBase*) proxyNode->widget();
     if (outputConnector->getSubtypeOfConnector() == NONE)
     {
-        connect(node, SIGNAL(transferOutputsRequested(QStringList*)), outputConnector, SLOT(transferOutputs(QStringList*)));
+        connect(node, SIGNAL(transferOutputsRequested(QSharedPointer<QStringList>)), outputConnector, SLOT(transferOutputs(QSharedPointer<QStringList>)));
         emit node->transferOutputsRequested(node->getOutputs());
     }
     else if (outputConnector->getSubtypeOfConnector() == SPECIALCOMPONENT && node->getTypeOfNode() != FUNCTIONMAPNODE && node->getTypeOfNode() != LUAMAPNODE)
     {
-        connect(node, SIGNAL(transferOutputsRequested(QStringList*)), outputConnector, SLOT(transferOutputs(QStringList*)));
+        connect(node, SIGNAL(transferOutputsRequested(QSharedPointer<QStringList>)), outputConnector, SLOT(transferOutputs(QSharedPointer<QStringList>)));
         emit node->transferOutputsRequested(node->getOutputs());
     }
     else if (outputConnector->getSubtypeOfConnector() == MATH && node->getTypeOfNode() == LAYEREDMODELNODE)
     {
-        connect(node, SIGNAL(transferOutputsRequested(QStringList*)), outputConnector, SLOT(transferOutputs(QStringList*)));
+        connect(node, SIGNAL(transferOutputsRequested(QSharedPointer<QStringList>)), outputConnector, SLOT(transferOutputs(QSharedPointer<QStringList>)));
         emit node->transferOutputsRequested(node->getOutputs());
     }
     else if (outputConnector->getSubtypeOfConnector() == EVAL)
     {
         if (node->getTypeOfNode() == EVALMODELNODE)
         {
-            connect((EvalModelNode*) node, SIGNAL(transferInputsRequested(QStringList*)), outputConnector, SLOT(transferOutputs(QStringList*)));
+            connect((EvalModelNode*) node, SIGNAL(transferInputsRequested(QStringList*)), outputConnector, SLOT(transferOutputs(QSharedPointer<QStringList>)));
             emit ((EvalModelNode*) node)->transferInputsRequested(node->getOutputs());
         }
         else
         {
-            connect((LayeredModelNode*) node, SIGNAL(transferInputsRequested(QStringList*)), outputConnector, SLOT(transferOutputs(QStringList*)));
+            connect((LayeredModelNode*) node, SIGNAL(transferInputsRequested(QStringList*)), outputConnector, SLOT(transferOutputs(QSharedPointer<QStringList>)));
             emit ((LayeredModelNode*) node)->transferInputsRequested(node->getOutputs());
         }
     }
@@ -324,21 +292,12 @@ void WidgetsHandler::connectConnector(ConnectorBase* connector, QGraphicsProxyWi
     if (connector->getTypeOfConnector() == INPUTCONNECTOR)
     {
         NodeBase* node = (NodeBase*) proxyNode->widget();
-        connect((InputConnector*) connector, SIGNAL(transferOutputsRequested(QStringList*)), node, SLOT(transferOutputsReceived(QStringList*)));
+        connect((InputConnector*) connector, SIGNAL(transferOutputsRequested(QSharedPointer<QStringList>)), node, SLOT(transferOutputsReceived(QSharedPointer<QStringList>)));
         connect((InputConnector*) connector, SIGNAL(saveRequested(YAML::Emitter*)), node, SLOT(save(YAML::Emitter*)));
     }
     connect(connector, SIGNAL(createConnectorLineResquested(ConnectorBase*)), this, SLOT(actionCreateConnectorLine(ConnectorBase*)));
     connect(nodeParentWidget, SIGNAL(hasMoved()), connector, SLOT(nodeParentWidgetHasMoved()));
     connect(connector, SIGNAL(isConnectorLineOnMe(ConnectorBase*)), this, SLOT(actionCheckIfConnectorNeedsConnection(ConnectorBase*)));
-}
-
-bool WidgetsHandler::deleteOutputConnector(QGraphicsProxyWidget* outputConnectorProxy)
-{
-    nodeScene->removeItem(outputConnectorProxy);
-    ((ConnectorBase*) outputConnectorProxy->widget())->deleteLine();
-    //delete outputConnector->widget();
-    delete outputConnectorProxy;
-    return true;
 }
 
 void WidgetsHandler::addConnectorLineToScene(ConnectorLine* connectorLine)
@@ -355,7 +314,7 @@ void WidgetsHandler::addConnectorLineToScene(ConnectorLine* connectorLine)
     connect(this, SIGNAL(connectConnectorToLine(ConnectorBase*)), connectorLine, SLOT(connectTo(ConnectorBase*)));
     connect(connectorLine, SIGNAL(drawnIsDone(ConnectorLine*)), this, SLOT(actionConnectorLineDrawn(ConnectorLine*)));
     connect(connectorLine, SIGNAL(connectorLineConnected()), this, SLOT(actionConnectorLineConnected()));
-    connect(connectorLine, SIGNAL(deleteConnectorLine(QGraphicsProxyWidget*)), this, SLOT(actionDeleteConnectorLine(QGraphicsProxyWidget*)));
+    connect(connectorLine, SIGNAL(deleteConnectorLineRequested(QGraphicsProxyWidget*)), this, SLOT(actionDeleteWidget(QGraphicsProxyWidget*)));
 }
 
 void WidgetsHandler::createConnectorLine(ConnectorBase* connector)
@@ -368,14 +327,6 @@ void WidgetsHandler::createConnectorLine(OutputConnector* outputConnector, Input
 {
     ConnectorLine* connectorLine = new ConnectorLine(outputConnector, inputConnector, easiGraphicsView);
     addConnectorLineToScene(connectorLine);
-}
-
-void WidgetsHandler::deleteConnectorLine(QGraphicsProxyWidget* connectorLineProxy)
-{
-    nodeScene->removeItem(connectorLineProxy);
-    delete connectorLineProxy;
-    if (newConnectorLine != nullptr)
-        removeNewConnectorLine();
 }
 
 void WidgetsHandler::saveNewConnectorLine(ConnectorLine* connectorLine)
@@ -395,6 +346,44 @@ void WidgetsHandler::checkConnectionBetweenConnectorAndLine(ConnectorBase* conne
     QPointF positionToCheck = newConnectorLine->getPositionToCheck();
     if (abs(connector->getCenterPos().x() - positionToCheck.x()) <= 7.5 && abs(connector->getCenterPos().y() - positionToCheck.y()) <= 7.5)
         emit connectConnectorToLine(connector);
+}
+
+void WidgetsHandler::deleteWidget(QGraphicsProxyWidget* proxy)
+{
+    if (proxy->widget()->objectName() == "Node")
+    {
+        if (((NodeBase*) proxy->widget())->getTypeOfNode() == ROOTNODE)
+            return;
+
+        // remove other nodes
+        ((NodeBase*) proxy->widget())->clearNodes();
+        nodeScene->removeItem(proxy->parentItem());
+
+        QList<QGraphicsItem*> proxyChildren = proxy->parentItem()->childItems();
+        while (!proxyChildren.isEmpty())
+        {
+            deleteProxy((QGraphicsProxyWidget*) proxyChildren.takeLast());
+        }
+    }
+    else
+    {
+        nodeScene->removeItem(proxy);
+        deleteProxy(proxy);
+    }
+}
+
+void WidgetsHandler::deleteProxy(QGraphicsProxyWidget* proxy)
+{
+    if (proxy->widget()->objectName() == "Connector")
+    {
+        ((ConnectorBase*) proxy->widget())->deleteLine();
+    }
+    else if (proxy->widget()->objectName() == "Line")
+    {
+        removeNewConnectorLine();
+    }
+
+    delete proxy;
 }
 
 void WidgetsHandler::createActions()
@@ -430,7 +419,7 @@ QGraphicsProxyWidget* WidgetsHandler::addIncludeNode(QPointF pos, QString filePa
     return proxyNode;
 }
 
-QGraphicsProxyWidget* WidgetsHandler::addLayeredModelNode(QPointF pos, QStringList* inputs, QStringList* outputs, QMap<double, QList<double>>* values, QString interpolation)
+QGraphicsProxyWidget* WidgetsHandler::addLayeredModelNode(QPointF pos, QSharedPointer<QStringList> inputs, QSharedPointer<QStringList> outputs, QMap<double, QList<double>>* values, QString interpolation)
 {
     LayeredModelNode* layeredModelNode = new LayeredModelNode(inputs, outputs, interpolation);
     QGraphicsProxyWidget* proxyNode = addNode(layeredModelNode, pos);
@@ -453,7 +442,7 @@ QGraphicsProxyWidget* WidgetsHandler::addLayeredModelNode(QPointF pos, QStringLi
 /// =========================== ADD FILTER FUNCTIONS ==========================
 /// ===========================================================================
 
-QGraphicsProxyWidget* WidgetsHandler::addAnyNode(QPointF pos, QStringList* inputs)
+QGraphicsProxyWidget* WidgetsHandler::addAnyNode(QPointF pos, QSharedPointer<QStringList> inputs)
 {
     AnyNode* anyNode = new AnyNode(inputs);
     QGraphicsProxyWidget* proxyNode = addNode(anyNode, pos);
@@ -470,7 +459,7 @@ QGraphicsProxyWidget* WidgetsHandler::addAnyNode(QPointF pos, QStringList* input
     return proxyNode;
 }
 
-QGraphicsProxyWidget* WidgetsHandler::addAxisAlignedCuboidalDomainFilterNode(QPointF pos, QStringList* inputs, QList<double>* values)
+QGraphicsProxyWidget* WidgetsHandler::addAxisAlignedCuboidalDomainFilterNode(QPointF pos, QSharedPointer<QStringList> inputs, QList<double>* values)
 {
     AxisAlignedCuboidalDomainFilterNode* axisAlignedCuboidalDomainFilterNode = new AxisAlignedCuboidalDomainFilterNode(inputs, values);
     QGraphicsProxyWidget* proxyNode = addNode(axisAlignedCuboidalDomainFilterNode, pos);
@@ -488,7 +477,7 @@ QGraphicsProxyWidget* WidgetsHandler::addAxisAlignedCuboidalDomainFilterNode(QPo
     return proxyNode;
 }
 
-QGraphicsProxyWidget* WidgetsHandler::addSphericalDomainFilterNode(QPointF pos, QStringList* inputs, QList<double>* values)
+QGraphicsProxyWidget* WidgetsHandler::addSphericalDomainFilterNode(QPointF pos, QSharedPointer<QStringList> inputs, QList<double>* values)
 {
     SphericalDomainFilterNode* sphericalDomainFilterNode = new SphericalDomainFilterNode(inputs, values);
     QGraphicsProxyWidget* proxyNode = addNode(sphericalDomainFilterNode, pos);
@@ -506,7 +495,7 @@ QGraphicsProxyWidget* WidgetsHandler::addSphericalDomainFilterNode(QPointF pos, 
     return proxyNode;
 }
 
-QGraphicsProxyWidget* WidgetsHandler::addGroupFilterNode(QPointF pos, QStringList* inputs, QList<double>* values)
+QGraphicsProxyWidget* WidgetsHandler::addGroupFilterNode(QPointF pos, QSharedPointer<QStringList> inputs, QList<double>* values)
 {
     GroupFilterNode* groupFilterNode = new GroupFilterNode(inputs, values);
     QGraphicsProxyWidget* proxyNode = addNode(groupFilterNode, pos);
@@ -524,7 +513,7 @@ QGraphicsProxyWidget* WidgetsHandler::addGroupFilterNode(QPointF pos, QStringLis
     return proxyNode;
 }
 
-QGraphicsProxyWidget* WidgetsHandler::addSwitchNode(QPointF pos, QStringList* inputs, QStringList* outputs, QList<QStringList*> values)
+QGraphicsProxyWidget* WidgetsHandler::addSwitchNode(QPointF pos, QSharedPointer<QStringList> inputs, QSharedPointer<QStringList> outputs, QList<QStringList*> values)
 {
     SwitchNode* switchNode = new SwitchNode(inputs, outputs);
     QGraphicsProxyWidget* proxyNode = addNode(switchNode, pos);
@@ -549,7 +538,7 @@ QGraphicsProxyWidget* WidgetsHandler::addSwitchNode(QPointF pos, QStringList* in
 /// ============================ ADD MAP FUNCTIONS ============================
 /// ===========================================================================
 
-QGraphicsProxyWidget* WidgetsHandler::addConstantMapNode(QPointF pos, QStringList* outputs, QList<double>* values)
+QGraphicsProxyWidget* WidgetsHandler::addConstantMapNode(QPointF pos, QSharedPointer<QStringList> outputs, QList<double>* values)
 {
     ConstantMapNode* constantMapNode = new ConstantMapNode(outputs, values);
     QGraphicsProxyWidget* proxyNode = addNode(constantMapNode, pos);
@@ -567,7 +556,7 @@ QGraphicsProxyWidget* WidgetsHandler::addConstantMapNode(QPointF pos, QStringLis
     return proxyNode;
 }
 
-QGraphicsProxyWidget* WidgetsHandler::addIdentityMapNode(QPointF pos, QStringList* inputs)
+QGraphicsProxyWidget* WidgetsHandler::addIdentityMapNode(QPointF pos, QSharedPointer<QStringList> inputs)
 {
     IdentityMapNode* identityMapNode = new IdentityMapNode(inputs);
     QGraphicsProxyWidget* proxyNode = addNode(identityMapNode, pos);
@@ -584,7 +573,7 @@ QGraphicsProxyWidget* WidgetsHandler::addIdentityMapNode(QPointF pos, QStringLis
     return proxyNode;
 }
 
-QGraphicsProxyWidget* WidgetsHandler::addAffineMapNode(QPointF pos, QStringList* inputs, QStringList* outputs, QMap<QString, QList<double>>* values)
+QGraphicsProxyWidget* WidgetsHandler::addAffineMapNode(QPointF pos, QSharedPointer<QStringList> inputs, QSharedPointer<QStringList> outputs, QMap<QString, QList<double>>* values)
 {
     AffineMapNode* affineMapNode = new AffineMapNode(inputs, outputs);
     QGraphicsProxyWidget* proxyNode = addNode(affineMapNode, pos);
@@ -604,7 +593,7 @@ QGraphicsProxyWidget* WidgetsHandler::addAffineMapNode(QPointF pos, QStringList*
     return proxyNode;
 }
 
-QGraphicsProxyWidget* WidgetsHandler::addPolynomialMapNode(QPointF pos, QStringList* inputs, QStringList* outputs, QMap<QString, QList<double>>* values)
+QGraphicsProxyWidget* WidgetsHandler::addPolynomialMapNode(QPointF pos, QSharedPointer<QStringList> inputs, QSharedPointer<QStringList> outputs, QMap<QString, QList<double>>* values)
 {
     PolynomialMapNode* polynomialMapNode = new PolynomialMapNode(inputs, outputs);
     QGraphicsProxyWidget* proxyNode = addNode(polynomialMapNode, pos);
@@ -624,7 +613,7 @@ QGraphicsProxyWidget* WidgetsHandler::addPolynomialMapNode(QPointF pos, QStringL
     return proxyNode;
 }
 
-QGraphicsProxyWidget* WidgetsHandler::addFunctionMapNode(QPointF pos, QStringList* inputs, QStringList* outputs, QMap<QString, QString>* values)
+QGraphicsProxyWidget* WidgetsHandler::addFunctionMapNode(QPointF pos, QSharedPointer<QStringList> inputs, QSharedPointer<QStringList> outputs, QMap<QString, QString>* values)
 {
     FunctionMapNode* functionMapNode = new FunctionMapNode(inputs, outputs);
     QGraphicsProxyWidget* proxyNode = addNode(functionMapNode, pos);
@@ -644,7 +633,7 @@ QGraphicsProxyWidget* WidgetsHandler::addFunctionMapNode(QPointF pos, QStringLis
     return proxyNode;
 }
 
-QGraphicsProxyWidget* WidgetsHandler::addLuaMapNode(QPointF pos, QStringList* inputs, QStringList* outputs, QString value)
+QGraphicsProxyWidget* WidgetsHandler::addLuaMapNode(QPointF pos, QSharedPointer<QStringList> inputs, QSharedPointer<QStringList> outputs, QString value)
 {
     LuaMapNode* luaMapNode = new LuaMapNode(inputs, outputs);
     QGraphicsProxyWidget* proxyNode = addNode(luaMapNode, pos);
@@ -670,7 +659,7 @@ QGraphicsProxyWidget* WidgetsHandler::addLuaMapNode(QPointF pos, QStringList* in
     return proxyNode;
 }
 
-QGraphicsProxyWidget* WidgetsHandler::addASAGINode(QPointF pos, QStringList* outputs, QString filePath, QString var, QString interpolation)
+QGraphicsProxyWidget* WidgetsHandler::addASAGINode(QPointF pos, QSharedPointer<QStringList> outputs, QString filePath, QString var, QString interpolation)
 {
     ASAGINode* asagiNode = new ASAGINode(outputs, filePath, var, interpolation);
     QGraphicsProxyWidget* proxyNode = addNode(asagiNode, pos);
@@ -706,7 +695,7 @@ QGraphicsProxyWidget* WidgetsHandler::addSCECFileNode(QPointF pos, QString fileP
     return proxyNode;
 }
 
-QGraphicsProxyWidget* WidgetsHandler::addEvalModelNode(QPointF pos, QStringList* inputs, QStringList* outputs)
+QGraphicsProxyWidget* WidgetsHandler::addEvalModelNode(QPointF pos, QSharedPointer<QStringList> inputs, QSharedPointer<QStringList> outputs)
 {
     EvalModelNode* evalModelNode = new EvalModelNode(inputs, outputs);
     QGraphicsProxyWidget* proxyNode = addNode(evalModelNode, pos);
@@ -764,7 +753,7 @@ QGraphicsProxyWidget* WidgetsHandler::addAndersonianStressNode(QPointF pos, doub
     return proxyNode;
 }
 
-QGraphicsProxyWidget* WidgetsHandler::addAffineMatrixNode(QPointF pos, QStringList* inputs)
+QGraphicsProxyWidget* WidgetsHandler::addAffineMatrixNode(QPointF pos, QSharedPointer<QStringList> inputs)
 {
     AffineMatrixNode* matrixNode = new AffineMatrixNode(inputs);
     QGraphicsProxyWidget* proxyNode = addNode(matrixNode, pos);
@@ -790,7 +779,7 @@ QGraphicsProxyWidget* WidgetsHandler::addTranslationNode(QPointF pos)
     return proxyNode;
 }
 
-QGraphicsProxyWidget* WidgetsHandler::addPolynomialMatrixNode(QPointF pos, QStringList* inputs, int degree)
+QGraphicsProxyWidget* WidgetsHandler::addPolynomialMatrixNode(QPointF pos, QSharedPointer<QStringList> inputs, int degree)
 {
     PolynomialMatrixNode* matrixNode = new PolynomialMatrixNode(inputs, degree);
     QGraphicsProxyWidget* proxyNode = addNode(matrixNode, pos);
@@ -803,7 +792,7 @@ QGraphicsProxyWidget* WidgetsHandler::addPolynomialMatrixNode(QPointF pos, QStri
     return proxyNode;
 }
 
-QGraphicsProxyWidget* WidgetsHandler::addSwitchComponentNode(QPointF pos, QStringList* inputs, QStringList* outputs)
+QGraphicsProxyWidget* WidgetsHandler::addSwitchComponentNode(QPointF pos, QSharedPointer<QStringList> inputs, QSharedPointer<QStringList> outputs)
 {
     SwitchComponentNode* switchComponentNode = new SwitchComponentNode(inputs, outputs);
     QGraphicsProxyWidget* proxyNode = addNode(switchComponentNode, pos);
@@ -820,7 +809,7 @@ QGraphicsProxyWidget* WidgetsHandler::addSwitchComponentNode(QPointF pos, QStrin
     return proxyNode;
 }
 
-QGraphicsProxyWidget* WidgetsHandler::addFunctionNode(QPointF pos, QStringList* inputs)
+QGraphicsProxyWidget* WidgetsHandler::addFunctionNode(QPointF pos, QSharedPointer<QStringList> inputs)
 {
     FunctionNode* functionNode = new FunctionNode(inputs);
     QGraphicsProxyWidget* proxyNode = addNode(functionNode, pos);
@@ -833,7 +822,7 @@ QGraphicsProxyWidget* WidgetsHandler::addFunctionNode(QPointF pos, QStringList* 
     return proxyNode;
 }
 
-QGraphicsProxyWidget* WidgetsHandler::addLayeredModelNodeNode(QPointF pos, QStringList* inputs)
+QGraphicsProxyWidget* WidgetsHandler::addLayeredModelNodeNode(QPointF pos, QSharedPointer<QStringList> inputs)
 {
     LayeredModelNodeNode* layeredModelNodeNode = new LayeredModelNodeNode(inputs);
     QGraphicsProxyWidget* proxyNode = addNode(layeredModelNodeNode, pos);
@@ -859,7 +848,7 @@ void WidgetsHandler::connectNode(QGraphicsProxyWidget* proxyNode)
         connect(this, SIGNAL(saveRequested(YAML::Emitter*)), (RootNode*) node, SLOT(save(YAML::Emitter*)));
 
     connect(node, SIGNAL(addOutputConnectorRequested(QGraphicsProxyWidget*)), this, SLOT(actionAddOutputConnector(QGraphicsProxyWidget*)));
-    connect(node, SIGNAL(deleteOutputConnectorRequested(QGraphicsProxyWidget*)), this, SLOT(actionDeleteOutputConnector(QGraphicsProxyWidget*)));
+    connect(node, SIGNAL(deleteOutputConnectorRequested(QGraphicsProxyWidget*)), this, SLOT(actionDeleteWidget(QGraphicsProxyWidget*)));
 
     connect(node, SIGNAL(resized(QRectF)), nodeParentWidget, SLOT(resize(QRectF)));
     connect(node, SIGNAL(nodeContextMenuRequested(QPoint)), this, SLOT(nodeContextMenu(QPoint)));
@@ -869,40 +858,40 @@ void WidgetsHandler::connectNode(QGraphicsProxyWidget* proxyNode)
     {
         AffineMapNode* affineMapNode = (AffineMapNode*) node;
         connect(affineMapNode, SIGNAL(addMathOutputConnectorRequested(QGraphicsProxyWidget*, QPointF)), this, SLOT(actionAddMathOutputConnector(QGraphicsProxyWidget*, QPointF)));
-        connect(affineMapNode, SIGNAL(deleteNodeRequested(QGraphicsProxyWidget*)), this, SLOT(actionDeleteNode(QGraphicsProxyWidget*)));
+        connect(affineMapNode, SIGNAL(deleteNodeRequested(QGraphicsProxyWidget*)), this, SLOT(actionDeleteWidget(QGraphicsProxyWidget*)));
     }
 
     if (node->getTypeOfNode() == POLYNOMIALMAPNODE)
     {
         PolynomialMapNode* polynomialMapNode = (PolynomialMapNode*) node;
         connect(polynomialMapNode, SIGNAL(addMathOutputConnectorRequested(QGraphicsProxyWidget*, QPointF)), this, SLOT(actionAddMathOutputConnector(QGraphicsProxyWidget*, QPointF)));
-        connect(polynomialMapNode, SIGNAL(deleteNodeRequested(QGraphicsProxyWidget*)), this, SLOT(actionDeleteNode(QGraphicsProxyWidget*)));
+        connect(polynomialMapNode, SIGNAL(deleteNodeRequested(QGraphicsProxyWidget*)), this, SLOT(actionDeleteWidget(QGraphicsProxyWidget*)));
     }
 
     if (node->getTypeOfNode() == SWITCHNODE)
     {
         SwitchNode* switchNode = (SwitchNode*) node;
-        connect(switchNode, SIGNAL(deleteNodeRequested(QGraphicsProxyWidget*)), this, SLOT(actionDeleteNode(QGraphicsProxyWidget*)));
+        connect(switchNode, SIGNAL(deleteNodeRequested(QGraphicsProxyWidget*)), this, SLOT(actionDeleteWidget(QGraphicsProxyWidget*)));
     }
 
     if (node->getTypeOfNode() == FUNCTIONMAPNODE)
     {
         FunctionMapNode* functionMapNode = (FunctionMapNode*) node;
         connect(functionMapNode, SIGNAL(addFunctionOutputConnectorRequested(QGraphicsProxyWidget*, QPointF)), this, SLOT(actionAddFunctionOutputConnector(QGraphicsProxyWidget*, QPointF)));
-        connect(functionMapNode, SIGNAL(deleteNodeRequested(QGraphicsProxyWidget*)), this, SLOT(actionDeleteNode(QGraphicsProxyWidget*)));
+        connect(functionMapNode, SIGNAL(deleteNodeRequested(QGraphicsProxyWidget*)), this, SLOT(actionDeleteWidget(QGraphicsProxyWidget*)));
     }
 
     if (node->getTypeOfNode() == LUAMAPNODE)
     {
         LuaMapNode* luaMapNode = (LuaMapNode*) node;
-        connect(luaMapNode, SIGNAL(deleteNodeRequested(QGraphicsProxyWidget*)), this, SLOT(actionDeleteNode(QGraphicsProxyWidget*)));
+        connect(luaMapNode, SIGNAL(deleteNodeRequested(QGraphicsProxyWidget*)), this, SLOT(actionDeleteWidget(QGraphicsProxyWidget*)));
     }
 
     if (node->getTypeOfNode() == LAYEREDMODELNODE)
     {
         LayeredModelNode* layeredModelNode = (LayeredModelNode*) node;
         connect(layeredModelNode, SIGNAL(addMathOutputConnectorRequested(QGraphicsProxyWidget*, QPointF)), this, SLOT(actionAddMathOutputConnector(QGraphicsProxyWidget*, QPointF)));
-        connect(layeredModelNode, SIGNAL(deleteNodeRequested(QGraphicsProxyWidget*)), this, SLOT(actionDeleteNode(QGraphicsProxyWidget*)));
+        connect(layeredModelNode, SIGNAL(deleteNodeRequested(QGraphicsProxyWidget*)), this, SLOT(actionDeleteWidget(QGraphicsProxyWidget*)));
     }
 }
 
@@ -916,11 +905,6 @@ void WidgetsHandler::nodeContextMenu(QPoint pos)
 void WidgetsHandler::actionCreateConnectorLine(ConnectorBase* connector)
 {
     createConnectorLine(connector);
-}
-
-void WidgetsHandler::actionDeleteConnectorLine(QGraphicsProxyWidget* connectorLineProxy)
-{
-    deleteConnectorLine(connectorLineProxy);
 }
 
 void WidgetsHandler::actionConnectorLineDrawn(ConnectorLine* connectorLine)
@@ -956,11 +940,6 @@ OutputConnector* WidgetsHandler::actionAddOutputConnector(QGraphicsProxyWidget* 
     return outputConnector;
 }
 
-void WidgetsHandler::actionDeleteOutputConnector(QGraphicsProxyWidget* outputConnectorProxy)
-{
-    deleteOutputConnector(outputConnectorProxy);
-}
-
 void WidgetsHandler::actionAddMathOutputConnector(QGraphicsProxyWidget* proxyNode, QPointF pos)
 {
     OutputConnector* mathOutputConnector = new OutputConnector((NodeParentWidget*) proxyNode->parentWidget(), MATH, false);
@@ -973,13 +952,7 @@ void WidgetsHandler::actionAddFunctionOutputConnector(QGraphicsProxyWidget* prox
     addOutputConnector(mathOutputConnector, proxyNode, pos);
 }
 
-void WidgetsHandler::actionDeleteNode(QGraphicsProxyWidget* proxyNode)
+void WidgetsHandler::actionDeleteWidget(QGraphicsProxyWidget* proxy)
 {
-    // remove parent to remove node & connectors
-    nodeScene->removeItem(proxyNode->parentItem());
-    QList<QGraphicsItem*> proxyChildren = proxyNode->parentItem()->childItems();
-    while (!proxyChildren.isEmpty())
-    {
-        deleteProxy((QGraphicsProxyWidget*) proxyChildren.takeLast());
-    }
+    deleteWidget(proxy);
 }

@@ -3,13 +3,13 @@
 #include <QDoubleSpinBox>
 #include "float.h"
 
-SphericalDomainFilterNode::SphericalDomainFilterNode(QStringList* inputs) : NodeBase(inputs, inputs)
+SphericalDomainFilterNode::SphericalDomainFilterNode(QSharedPointer<QStringList> inputs) : NodeBase(inputs, inputs)
 {
     typeOfNode = SPHERICALDOMAINFILTERNODE;
     localTag = "SphericalDomainFilter";
     setWindowTitle("Spherical Domain Filter");
     if (inputs != nullptr)
-        outputs = new QStringList(*inputs);
+        outputs = QSharedPointer<QStringList>(new QStringList(*inputs));
     createLayout(true, false);
 
     QVBoxLayout* globalLayout = (QVBoxLayout*) this->layout();
@@ -44,7 +44,7 @@ SphericalDomainFilterNode::SphericalDomainFilterNode(QStringList* inputs) : Node
     setGeometry(QRect(0, 0, sizeHint().width(), sizeHint().height()));
 }
 
-SphericalDomainFilterNode::SphericalDomainFilterNode(QStringList* inputs, QList<double>* values) : SphericalDomainFilterNode(inputs)
+SphericalDomainFilterNode::SphericalDomainFilterNode(QSharedPointer<QStringList> inputs, QList<double>* values) : SphericalDomainFilterNode(inputs)
 {
     if (values == nullptr || values->size() == 0)
         return;

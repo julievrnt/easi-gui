@@ -7,11 +7,11 @@ class EvalModelNode : public NodeBase
 {
     Q_OBJECT
 public:
-    EvalModelNode(QStringList* inputs = nullptr, QStringList* outputs = nullptr);
+    EvalModelNode(QSharedPointer<QStringList> inputs = nullptr, QSharedPointer<QStringList> outputs = nullptr);
     void performResize();
 
 signals:
-    void transferInputsRequested(QStringList* inputs);
+    void transferInputsRequested(QSharedPointer<QStringList> inputs);
 
 private:
     void createLayout();

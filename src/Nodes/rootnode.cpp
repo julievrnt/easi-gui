@@ -11,7 +11,7 @@ RootNode::RootNode()
     setWindowTitle("Inputs");
     outputConnector = nullptr;
 
-    outputs = new QStringList();
+    outputs = QSharedPointer<QStringList>(new QStringList);
     *outputs << "x" << "y" << "z";
 
     createLayout();
@@ -21,9 +21,8 @@ RootNode::RootNode()
 
 RootNode::~RootNode()
 {
-    delete outputs;
-    delete outputConnector;
-    delete outputConnectors;
+    qDebug() << "root node destructor called";
+    //delete outputConnector;
 }
 
 void RootNode::setOutputConnector(QGraphicsProxyWidget* newOutputConnector)

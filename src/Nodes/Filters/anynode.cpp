@@ -1,6 +1,6 @@
 #include "anynode.h"
 
-AnyNode::AnyNode(QStringList* inputs) : NodeBase(inputs, inputs)
+AnyNode::AnyNode(QSharedPointer<QStringList> inputs) : NodeBase(inputs, inputs)
 {
     typeOfNode = ANYNODE;
     localTag = "Any";

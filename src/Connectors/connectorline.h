@@ -22,8 +22,8 @@ public:
 signals:
     void drawnIsDone(ConnectorLine* connectorLine);
     void connectorLineConnected();
-    void deleteConnectorLine(QGraphicsProxyWidget* connectorLineProxy);
-    void transferOutputsRequested(QStringList* outputs);
+    void deleteConnectorLineRequested(QGraphicsProxyWidget* connectorLineProxy);
+    void transferOutputsRequested(QSharedPointer<QStringList> outputs);
     void saveRequested(YAML::Emitter* out);
 
 private:
@@ -53,7 +53,7 @@ private slots:
     void getOhterConnectorTimeOut();
     void deleteConnectorLine();
     void resize(QRectF newRect);
-    void transferOutputs(QStringList* outputs);
+    void transferOutputs(QSharedPointer<QStringList> outputs);
     void save(YAML::Emitter* out);
 };
 

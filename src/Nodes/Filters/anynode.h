@@ -7,7 +7,7 @@ class AnyNode : public NodeBase
 {
     Q_OBJECT
 public:
-    AnyNode(QStringList* inputs = nullptr);
+    AnyNode(QSharedPointer<QStringList> inputs = nullptr);
 
 protected:
     void updateLayout();

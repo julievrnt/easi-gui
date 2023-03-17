@@ -9,7 +9,7 @@
 #include <QMap>
 #include "float.h"
 
-ConstantMapNode::ConstantMapNode(QStringList* outputs) : NodeBase(nullptr, outputs)
+ConstantMapNode::ConstantMapNode(QSharedPointer<QStringList> outputs) : NodeBase(nullptr, outputs)
 {
     typeOfNode = CONSTANTMAPNODE;
     localTag = "ConstantMap";
@@ -21,7 +21,7 @@ ConstantMapNode::ConstantMapNode(QStringList* outputs) : NodeBase(nullptr, outpu
     setGeometry(QRect(0, 0, sizeHint().width(), sizeHint().height()));
 }
 
-ConstantMapNode::ConstantMapNode(QStringList* outputs, QList<double>* values) : ConstantMapNode(outputs)
+ConstantMapNode::ConstantMapNode(QSharedPointer<QStringList> outputs, QList<double>* values) : ConstantMapNode(outputs)
 {
     if (values == nullptr)
         return;

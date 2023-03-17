@@ -9,8 +9,8 @@ class ConstantMapNode : public NodeBase
 {
     Q_OBJECT
 public:
-    ConstantMapNode(QStringList* outputs = nullptr);
-    ConstantMapNode(QStringList* outputs, QList<double>* values);
+    ConstantMapNode(QSharedPointer<QStringList> outputs = nullptr);
+    ConstantMapNode(QSharedPointer<QStringList> outputs, QList<double>* values);
     ~ConstantMapNode();
 
 private:

@@ -9,7 +9,7 @@ class ASAGINode : public NodeBase
 {
     Q_OBJECT
 public:
-    ASAGINode(QStringList* outputs = nullptr, QString filePath = NO_FILE_SELECTED, QString var = "data", QString interpolation = "linear");
+    ASAGINode(QSharedPointer<QStringList> outputs = nullptr, QString filePath = NO_FILE_SELECTED, QString var = "data", QString interpolation = "linear");
 
 private:
     QString filePath;

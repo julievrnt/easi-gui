@@ -7,7 +7,7 @@ class AffineMapNode : public NodeBase
 {
     Q_OBJECT
 public:
-    AffineMapNode(QStringList* inputs = nullptr, QStringList* outputs = nullptr);
+    AffineMapNode(QSharedPointer<QStringList> inputs = nullptr, QSharedPointer<QStringList> outputs = nullptr);
     ~AffineMapNode();
 
     void setValues(QMap<QString, QList<double>>* values);

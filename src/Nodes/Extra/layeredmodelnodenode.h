@@ -7,9 +7,9 @@ class LayeredModelNodeNode : public NodeBase
 {
     Q_OBJECT
 public:
-    LayeredModelNodeNode(QStringList* inputs = nullptr);
+    LayeredModelNodeNode(QSharedPointer<QStringList> inputs = nullptr);
 
-    void setValues(QStringList* inputs, QList<double>* values);
+    void setValues(QSharedPointer<QStringList> inputs, QList<double>* values);
 
 private:
     void addNewDimensionsLayoutRow(QVBoxLayout* dimensionsLayout, int index);

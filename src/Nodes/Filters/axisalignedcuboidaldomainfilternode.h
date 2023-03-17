@@ -8,8 +8,8 @@ class AxisAlignedCuboidalDomainFilterNode : public NodeBase
 {
     Q_OBJECT
 public:
-    AxisAlignedCuboidalDomainFilterNode(QStringList* inputs = nullptr);
-    AxisAlignedCuboidalDomainFilterNode(QStringList* inputs, QList<double>* values);
+    AxisAlignedCuboidalDomainFilterNode(QSharedPointer<QStringList> inputs = nullptr);
+    AxisAlignedCuboidalDomainFilterNode(QSharedPointer<QStringList> inputs, QList<double>* values);
 
 private:
     QList<double>* getValues();

@@ -4,7 +4,7 @@
 #include <QLabel>
 #include "float.h"
 
-LayeredModelNodeNode::LayeredModelNodeNode(QStringList* inputs) : NodeBase(inputs)
+LayeredModelNodeNode::LayeredModelNodeNode(QSharedPointer<QStringList> inputs) : NodeBase(inputs)
 {
     this->typeOfNode = LAYEREDMODELNODENODE;
     setWindowTitle("Node");
@@ -13,7 +13,7 @@ LayeredModelNodeNode::LayeredModelNodeNode(QStringList* inputs) : NodeBase(input
     setGeometry(QRect(0, 0, sizeHint().width(), sizeHint().height()));
 }
 
-void LayeredModelNodeNode::setValues(QStringList* inputs, QList<double>* values)
+void LayeredModelNodeNode::setValues(QSharedPointer<QStringList> inputs, QList<double>* values)
 {
     if (inputs->size() != values->size())
     {

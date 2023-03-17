@@ -3,7 +3,7 @@
 #include <QDoubleSpinBox>
 #include "float.h"
 
-PolynomialMatrixNode::PolynomialMatrixNode(QStringList* inputs, int degree) : NodeBase(inputs)
+PolynomialMatrixNode::PolynomialMatrixNode(QSharedPointer<QStringList> inputs, int degree) : NodeBase(inputs)
 {
     this->typeOfNode = POLYNOMIALMATHNODE;
     setWindowTitle("Matrix");
@@ -19,7 +19,7 @@ PolynomialMatrixNode::PolynomialMatrixNode(QStringList* inputs, int degree) : No
     setGeometry(QRect(0, 0, sizeHint().width(), sizeHint().height()));
 }
 
-void PolynomialMatrixNode::setValues(QStringList* inputs, QList<double>* values)
+void PolynomialMatrixNode::setValues(QSharedPointer<QStringList> inputs, QList<double>* values)
 {
     if (inputs == nullptr || values == nullptr)
         return;

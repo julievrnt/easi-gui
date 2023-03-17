@@ -7,7 +7,7 @@ class IdentityMapNode : public NodeBase
 {
     Q_OBJECT
 public:
-    IdentityMapNode(QStringList* inputs = nullptr);
+    IdentityMapNode(QSharedPointer<QStringList> inputs = nullptr);
 
 protected:
     void updateLayout();

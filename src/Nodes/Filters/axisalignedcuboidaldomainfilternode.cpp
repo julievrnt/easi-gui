@@ -3,14 +3,14 @@
 #include <QBitArray>
 #include "float.h"
 
-AxisAlignedCuboidalDomainFilterNode::AxisAlignedCuboidalDomainFilterNode(QStringList* inputs) : NodeBase(inputs, inputs)
+AxisAlignedCuboidalDomainFilterNode::AxisAlignedCuboidalDomainFilterNode(QSharedPointer<QStringList> inputs) : NodeBase(inputs, inputs)
 {
     typeOfNode = AXISALIGNEDCUBOIDALDOMAINFILTERNODE;
     localTag = "AxisAlignedCuboidalDomainFilter";
     dimensionLineEditIndex = 1;
     setWindowTitle("Axis Aligned Cuboidal Domain Filter");
     if (inputs != nullptr)
-        outputs = new QStringList(*inputs);
+        outputs = QSharedPointer<QStringList>(new QStringList(*inputs));
     createLayout(true, false);
 
     QLabel* title = (QLabel*) this->layout()->findChild<QVBoxLayout*>("titleLayout")->itemAt(0)->widget();
@@ -20,7 +20,7 @@ AxisAlignedCuboidalDomainFilterNode::AxisAlignedCuboidalDomainFilterNode(QString
     setGeometry(QRect(0, 0, sizeHint().width(), sizeHint().height()));
 }
 
-AxisAlignedCuboidalDomainFilterNode::AxisAlignedCuboidalDomainFilterNode(QStringList* inputs, QList<double>* values) : AxisAlignedCuboidalDomainFilterNode(inputs)
+AxisAlignedCuboidalDomainFilterNode::AxisAlignedCuboidalDomainFilterNode(QSharedPointer<QStringList> inputs, QList<double>* values) : AxisAlignedCuboidalDomainFilterNode(inputs)
 {
     if (values == nullptr)
         return;

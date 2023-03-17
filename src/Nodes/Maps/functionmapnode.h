@@ -7,7 +7,7 @@ class FunctionMapNode : public NodeBase
 {
     Q_OBJECT
 public:
-    FunctionMapNode(QStringList* inputs = nullptr, QStringList* outputs = nullptr);
+    FunctionMapNode(QSharedPointer<QStringList> inputs = nullptr, QSharedPointer<QStringList> outputs = nullptr);
 
     void setValues(QMap<QString, QString>* values);
     void addFunctionNodeProxy(QGraphicsProxyWidget* newFunctionNodeProxy);
@@ -24,7 +24,7 @@ private:
     void removeFunctionOfDimensionRow(int index);
 
 protected:
-    void addNewDimensionsLayoutRow(QVBoxLayout *dimensionsLayout, int index);
+    void addNewDimensionsLayoutRow(QVBoxLayout* dimensionsLayout, int index);
     void addDimensionsLayoutRowRequested(bool clicked);
     void removeDimensionsLayoutRowRequested(bool clicked);
     void updateLayout();

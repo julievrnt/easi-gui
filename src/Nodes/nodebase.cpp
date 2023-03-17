@@ -7,18 +7,18 @@
 #include "../Connectors/outputs/outputconnector.h"
 #include "float.h"
 
-NodeBase::NodeBase(QStringList* inputs, QStringList* outputs, QWidget* parent)
+NodeBase::NodeBase(QSharedPointer<QStringList> inputs, QSharedPointer<QStringList> outputs, QWidget* parent)
     : QWidget{parent}
 {
     typeOfNode = NODE;
 
     this->inputs = inputs;
     if (this->inputs == nullptr)
-        this->inputs = new QStringList();
+        this->inputs = QSharedPointer<QStringList>(new QStringList);
 
     this->outputs = outputs;
     if (this->outputs == nullptr)
-        this->outputs = new QStringList();
+        this->outputs = QSharedPointer<QStringList>(new QStringList);
 
     this->setWindowTitle("Node Base");
     outputConnectors = new QList<QGraphicsProxyWidget*>();
@@ -28,12 +28,27 @@ NodeBase::NodeBase(QStringList* inputs, QStringList* outputs, QWidget* parent)
     setObjectName("Node");
 }
 
+NodeBase::~NodeBase()
+{
+    // proxyNode deleted in widgetshandler
+    // inputConnector deleted in widgetshandler
+    // outputConnectors content deleted in widgetshandler
+    // mathOutputConnectors content deleted in widgetshandler
+    // functionOutputConnectors content deleted in widgetshandler
+    // outputConnectorModel deleted in widgetshandler
+
+    qDebug() << "node base destructor called";
+    delete outputConnectors;
+    delete mathOutputConnectors;
+    delete functionOutputConnectors;
+}
+
 int NodeBase::getTypeOfNode()
 {
     return typeOfNode;
 }
 
-QStringList* NodeBase::getOutputs() const
+QSharedPointer<QStringList> NodeBase::getOutputs() const
 {
     return outputs;
 }
@@ -108,7 +123,7 @@ void NodeBase::clearNodes()
     // do nothing
 }
 
-QStringList* NodeBase::getInputs() const
+QSharedPointer<QStringList> NodeBase::getInputs() const
 {
     return inputs;
 }
@@ -452,7 +467,7 @@ void NodeBase::renameNextDimensionLineEdit(QVBoxLayout* dimensionsLayout, int in
     }
 }
 
-void NodeBase::transferOutputsReceived(QStringList* newInputs)
+void NodeBase::transferOutputsReceived(QSharedPointer<QStringList> newInputs)
 {
     if (this->inputs != newInputs)
         this->inputs = newInputs;

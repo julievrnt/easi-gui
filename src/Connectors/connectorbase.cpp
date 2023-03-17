@@ -25,7 +25,7 @@ ConnectorBase::~ConnectorBase()
     //delete outputs;
 }
 
-QStringList* ConnectorBase::getOutputs() const
+QSharedPointer<QStringList> ConnectorBase::getOutputs() const
 {
     return outputs;
 }
@@ -83,7 +83,7 @@ void ConnectorBase::nodeParentWidgetHasMoved()
     emit moveConnectorLineRequested(getTypeOfConnector());
 }
 
-void ConnectorBase::transferOutputs(QStringList* outputs)
+void ConnectorBase::transferOutputs(QSharedPointer<QStringList> outputs)
 {
     if (this->outputs != outputs)
         this->outputs = outputs;

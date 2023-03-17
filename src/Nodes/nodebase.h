@@ -54,11 +54,12 @@ class NodeBase : public QWidget
 {
     Q_OBJECT
 public:
-    explicit NodeBase(QStringList* inputs = nullptr, QStringList* outputs = nullptr, QWidget* parent = nullptr);
+    explicit NodeBase(QSharedPointer<QStringList> inputs = nullptr, QSharedPointer<QStringList> outputs = nullptr, QWidget* parent = nullptr);
+    ~NodeBase();
 
     int getTypeOfNode();
-    QStringList* getInputs() const;
-    QStringList* getOutputs() const;
+    QSharedPointer<QStringList> getInputs() const;
+    QSharedPointer<QStringList> getOutputs() const;
 
     QGraphicsProxyWidget* getInputConnector() const;
     void setInputConnector(QGraphicsProxyWidget* newInputConnector);
@@ -89,7 +90,7 @@ signals:
     void resized(QRectF rect);
     OutputConnector* addOutputConnectorRequested(QGraphicsProxyWidget* proxyNode, QPointF pos = QPointF(0, 0));
     void deleteOutputConnectorRequested(QGraphicsProxyWidget* outputConnectorProxy);
-    void transferOutputsRequested(QStringList* outputs);
+    void transferOutputsRequested(QSharedPointer<QStringList> outputs);
     void deleteNodeRequested(QGraphicsProxyWidget* proxyNode);
 
 protected:
@@ -97,8 +98,8 @@ protected:
     QString localTag = "";
     int removeButtonIndex = -1;
     int dimensionLineEditIndex = -1;
-    QStringList* inputs;
-    QStringList* outputs;
+    QSharedPointer<QStringList> inputs;
+    QSharedPointer<QStringList> outputs;
     QGraphicsProxyWidget* proxyNode;
     QGraphicsProxyWidget* inputConnector;
     QList<QGraphicsProxyWidget*>* outputConnectors;
@@ -142,7 +143,7 @@ protected slots:
     void renameNextRemoveButtons(QVBoxLayout* dimensionsLayout, int index);
     QLineEdit* getDimensionLineEditAtIndex(QVBoxLayout* dimensionsLayout, int index);
     void renameNextDimensionLineEdit(QVBoxLayout* dimensionsLayout, int index);
-    void transferOutputsReceived(QStringList* newInputs);
+    void transferOutputsReceived(QSharedPointer<QStringList> newInputs);
     void save(YAML::Emitter* out);
 };
 

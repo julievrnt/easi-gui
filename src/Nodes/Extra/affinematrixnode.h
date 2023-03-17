@@ -8,13 +8,13 @@ class AffineMatrixNode : public NodeBase
 {
     Q_OBJECT
 public:
-    AffineMatrixNode(QStringList* inputs = nullptr);
+    AffineMatrixNode(QSharedPointer<QStringList> inputs = nullptr);
     ~AffineMatrixNode();
 
-    void setValues(QStringList* inputs, QList<double>* values);
+    void setValues(QSharedPointer<QStringList> inputs, QList<double>* values);
 
 private:
-    void addNewDimensionsLayoutRow(QVBoxLayout *dimensionsLayout, int index);
+    void addNewDimensionsLayoutRow(QVBoxLayout* dimensionsLayout, int index);
     void updateLayout();
     void saveNodeContent(YAML::Emitter* out);
     void saveValues(YAML::Emitter* out);

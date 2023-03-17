@@ -1,7 +1,7 @@
 #include "evalmodelnode.h"
 #include "src/Connectors/outputs/outputconnector.h"
 
-EvalModelNode::EvalModelNode(QStringList* inputs, QStringList* outputs) : NodeBase(inputs, outputs)
+EvalModelNode::EvalModelNode(QSharedPointer<QStringList> inputs, QSharedPointer<QStringList> outputs) : NodeBase(inputs, outputs)
 {
     typeOfNode = EVALMODELNODE;
     localTag = "EvalModel";

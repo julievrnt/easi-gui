@@ -8,17 +8,17 @@ class SphericalDomainFilterNode : public NodeBase
 {
     Q_OBJECT
 public:
-    SphericalDomainFilterNode(QStringList* inputs = nullptr);
-    SphericalDomainFilterNode(QStringList* inputs, QList<double>* values);
+    SphericalDomainFilterNode(QSharedPointer<QStringList> inputs = nullptr);
+    SphericalDomainFilterNode(QSharedPointer<QStringList> inputs, QList<double>* values);
 
 private:
     QMap<QString, double>* getCenterValues();
 
     // NodeBase interface
 protected:
-    void addNewDimensionsLayoutRow(QVBoxLayout *dimensionsLayout, int index);
+    void addNewDimensionsLayoutRow(QVBoxLayout* dimensionsLayout, int index);
     void updateLayout();
-    void saveValues(YAML::Emitter *out);
+    void saveValues(YAML::Emitter* out);
 };
 
 #endif // SPHERICALDOMAINFILTERNODE_H

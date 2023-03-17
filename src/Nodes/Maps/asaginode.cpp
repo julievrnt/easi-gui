@@ -4,7 +4,7 @@
 #include <QPushButton>
 #include <QComboBox>
 
-ASAGINode::ASAGINode(QStringList* outputs, QString filePath, QString var, QString interpolation) : NodeBase(nullptr, outputs)
+ASAGINode::ASAGINode(QSharedPointer<QStringList> outputs, QString filePath, QString var, QString interpolation) : NodeBase(nullptr, outputs)
 {
     typeOfNode = ASAGINODE;
     localTag = "ASAGI";
@@ -50,7 +50,7 @@ void ASAGINode::addFileLayout(QVBoxLayout* globalLayout)
 
     addLabel(fileLayout, "file");
 
-    QLabel* filePath = addLabel(fileLayout,this->filePath);
+    QLabel* filePath = addLabel(fileLayout, this->filePath);
     filePath->setFixedHeight(30);
     filePath->setStyleSheet("QLabel { background-color : #242424; }");
 

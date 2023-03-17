@@ -1,7 +1,7 @@
 #include "functionmapnode.h"
 #include "src/Nodes/Extra/functionnode.h"
 
-FunctionMapNode::FunctionMapNode(QStringList* inputs, QStringList* outputs) : NodeBase(inputs, outputs)
+FunctionMapNode::FunctionMapNode(QSharedPointer<QStringList> inputs, QSharedPointer<QStringList> outputs) : NodeBase(inputs, outputs)
 {
     typeOfNode = FUNCTIONMAPNODE;
     localTag = "FunctionMap";

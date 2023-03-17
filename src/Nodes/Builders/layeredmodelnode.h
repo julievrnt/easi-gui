@@ -8,7 +8,7 @@ class LayeredModelNode : public NodeBase
 {
     Q_OBJECT
 public:
-    LayeredModelNode(QStringList* inputs = nullptr, QStringList* outputs = nullptr, QString interpolation = "lower");
+    LayeredModelNode(QSharedPointer<QStringList> inputs = nullptr, QSharedPointer<QStringList> outputs = nullptr, QString interpolation = "lower");
 
     void setValues(QMap<double, QList<double>>* values);
     void performResize();
@@ -17,7 +17,7 @@ public:
     void addNodeProxy(QGraphicsProxyWidget*& newNodeProxy);
 
 signals:
-    void transferInputsRequested(QStringList* inputs);
+    void transferInputsRequested(QSharedPointer<QStringList> inputs);
     void addMathOutputConnectorRequested(QGraphicsProxyWidget* proxyNode, QPointF pos);
 
 private:

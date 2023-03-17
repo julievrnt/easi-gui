@@ -1,7 +1,7 @@
 #include "luamapnode.h"
 #include "src/Nodes/Extra/functionnode.h"
 
-LuaMapNode::LuaMapNode(QStringList* inputs, QStringList* outputs) : NodeBase(inputs, outputs)
+LuaMapNode::LuaMapNode(QSharedPointer<QStringList> inputs, QSharedPointer<QStringList> outputs) : NodeBase(inputs, outputs)
 {
     typeOfNode = LUAMAPNODE;
     localTag = "LuaMap";

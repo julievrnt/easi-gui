@@ -34,7 +34,6 @@ SOURCES += \
     src/Nodes/Maps/optimalstressnode.cpp \
     src/Nodes/Maps/polynomialmapnode.cpp \
     src/Nodes/Maps/scecfilenode.cpp \
-    src/Nodes/Maps/specialmapnode.cpp \
     src/Nodes/Extra/affinematrixnode.cpp \
     src/Nodes/Extra/polynomialmatrixnode.cpp \
     src/Nodes/Extra/translationnode.cpp \
@@ -45,7 +44,6 @@ SOURCES += \
     src/Nodes/nodebase.cpp \
     src/Nodes/nodeparentwidget.cpp \
     src/Nodes/rootnode.cpp \
-    src/Nodes/rootnodedialog.cpp \
     src/widgetshandler.cpp
 
 HEADERS += \
@@ -74,7 +72,6 @@ HEADERS += \
     src/Nodes/Maps/optimalstressnode.h \
     src/Nodes/Maps/polynomialmapnode.h \
     src/Nodes/Maps/scecfilenode.h \
-    src/Nodes/Maps/specialmapnode.h \
     src/Nodes/Extra/affinematrixnode.h \
     src/Nodes/Extra/polynomialmatrixnode.h \
     src/Nodes/Extra/translationnode.h \
@@ -84,7 +81,6 @@ HEADERS += \
     src/Nodes/nodebase.h \
     src/Nodes/nodeparentwidget.h \
     src/Nodes/rootnode.h \
-    src/Nodes/rootnodedialog.h \
     src/widgetshandler.h
 
 FORMS += \

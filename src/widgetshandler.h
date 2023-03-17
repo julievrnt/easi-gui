@@ -18,69 +18,68 @@ public:
     ~WidgetsHandler();
 
     void init();
-    QGraphicsProxyWidget* addNode(NodeBase* node, QPointF pos = QPointF(0, 0));
+    QGraphicsProxyWidget* addNode(NodeBase* node, QPointF pos = QPointF(50000, 2500));
     QGraphicsProxyWidget* getProxyRoot() const;
 
     // basic functions to handle nodes
     void addRoot();
     void deleteNode();
+    void deleteWidget(QGraphicsProxyWidget* proxy);
     void deleteProxy(QGraphicsProxyWidget* proxy);
-    QPointF getPosNextTo(QGraphicsProxyWidget* parentProxyNode, QPointF pos = QPointF(0, 0));
+    QPointF getPosNextTo(QGraphicsProxyWidget* parentProxyNode, QPointF pos = QPointF(50000, 2500));
     void connectNodes(NodeBase* parentNode, NodeBase* childNode);
 
     // basic functions to handle connectors
     void addInputConnector(InputConnector* inputConnector, QGraphicsProxyWidget* proxyNode, QPointF pos);
     void addOutputConnector(OutputConnector* outputConnector, QGraphicsProxyWidget* proxyNode, QPointF pos);
     void connectConnector(ConnectorBase* connector, QGraphicsProxyWidget* connectorProxy);
-    bool deleteOutputConnector(QGraphicsProxyWidget* outputConnectorProxy);
 
     // basic functions to handle connector lines
     void addConnectorLineToScene(ConnectorLine* connectorLine);
     void createConnectorLine(ConnectorBase* connector);
     void createConnectorLine(OutputConnector* outputConnector, InputConnector* inputConnector);
-    void deleteConnectorLine(QGraphicsProxyWidget* connectorLineProxy);
     void saveNewConnectorLine(ConnectorLine* connectorLine);
     void removeNewConnectorLine();
     void checkConnectionBetweenConnectorAndLine(ConnectorBase* connector);
 
     // add builder functions
-    QGraphicsProxyWidget* addIncludeNode(QPointF pos = QPointF(0, 0), QString filePath = "");
-    QGraphicsProxyWidget* addLayeredModelNode(QPointF pos = QPointF(0, 0), QStringList* inputs = nullptr, QStringList* outputs = nullptr, QMap<double, QList<double>>* values = nullptr, QString interpolation = "");
+    QGraphicsProxyWidget* addIncludeNode(QPointF pos = QPointF(50000, 2500), QString filePath = "");
+    QGraphicsProxyWidget* addLayeredModelNode(QPointF pos = QPointF(50000, 2500), QSharedPointer<QStringList> inputs = nullptr, QSharedPointer<QStringList> outputs = nullptr, QMap<double, QList<double>>* values = nullptr, QString interpolation = "");
 
     // add filter functions
-    QGraphicsProxyWidget* addAnyNode(QPointF pos = QPointF(0, 0), QStringList* inputs = nullptr);
-    QGraphicsProxyWidget* addAxisAlignedCuboidalDomainFilterNode(QPointF pos = QPointF(0, 0), QStringList* inputs = nullptr, QList<double>* values = nullptr);
-    QGraphicsProxyWidget* addSphericalDomainFilterNode(QPointF pos = QPointF(0, 0), QStringList* inputs = nullptr, QList<double>* values = nullptr);
-    QGraphicsProxyWidget* addGroupFilterNode(QPointF pos = QPointF(0, 0), QStringList* inputs = nullptr, QList<double>* values = nullptr);
-    QGraphicsProxyWidget* addSwitchNode(QPointF pos = QPointF(0, 0), QStringList* inputs = nullptr, QStringList* outputs = nullptr, QList<QStringList*> values = QList<QStringList*>());
+    QGraphicsProxyWidget* addAnyNode(QPointF pos = QPointF(50000, 2500), QSharedPointer<QStringList> inputs = nullptr);
+    QGraphicsProxyWidget* addAxisAlignedCuboidalDomainFilterNode(QPointF pos = QPointF(50000, 2500), QSharedPointer<QStringList> inputs = nullptr, QList<double>* values = nullptr);
+    QGraphicsProxyWidget* addSphericalDomainFilterNode(QPointF pos = QPointF(50000, 2500), QSharedPointer<QStringList> inputs = nullptr, QList<double>* values = nullptr);
+    QGraphicsProxyWidget* addGroupFilterNode(QPointF pos = QPointF(50000, 2500), QSharedPointer<QStringList> inputs = nullptr, QList<double>* values = nullptr);
+    QGraphicsProxyWidget* addSwitchNode(QPointF pos = QPointF(50000, 2500), QSharedPointer<QStringList> inputs = nullptr, QSharedPointer<QStringList> outputs = nullptr, QList<QStringList*> values = QList<QStringList*>());
 
     // add map functions
-    QGraphicsProxyWidget* addConstantMapNode(QPointF pos = QPointF(0, 0), QStringList* outputs = nullptr, QList<double>* values = nullptr);
-    QGraphicsProxyWidget* addIdentityMapNode(QPointF pos = QPointF(0, 0), QStringList* inputs = nullptr);
-    QGraphicsProxyWidget* addAffineMapNode(QPointF pos = QPointF(0, 0), QStringList* inputs = nullptr, QStringList* outputs = nullptr, QMap<QString, QList<double>>* values = nullptr);
-    QGraphicsProxyWidget* addPolynomialMapNode(QPointF pos = QPointF(0, 0), QStringList* inputs = nullptr, QStringList* outputs = nullptr, QMap<QString, QList<double>>* values = nullptr);
-    QGraphicsProxyWidget* addFunctionMapNode(QPointF pos = QPointF(0, 0), QStringList* inputs = nullptr, QStringList* outputs = nullptr, QMap<QString, QString>* values = nullptr);
-    QGraphicsProxyWidget* addLuaMapNode(QPointF pos = QPointF(0, 0), QStringList* inputs = nullptr, QStringList* outputs = nullptr, QString value = "");
-    QGraphicsProxyWidget* addASAGINode(QPointF pos = QPointF(0, 0), QStringList* outputs = nullptr, QString filePath = "", QString var = "data", QString interpolation = "linear");
-    QGraphicsProxyWidget* addSCECFileNode(QPointF pos = QPointF(0, 0), QString filePath = "", QString interpolation = "linear");
-    QGraphicsProxyWidget* addEvalModelNode(QPointF pos = QPointF(0, 0), QStringList* inputs = nullptr, QStringList* outputs = nullptr);
-    QGraphicsProxyWidget* addOptimalStressNode(QPointF pos = QPointF(0, 0), double mu_d = 0., double mu_s = 0.,
+    QGraphicsProxyWidget* addConstantMapNode(QPointF pos = QPointF(50000, 2500), QSharedPointer<QStringList> outputs = nullptr, QList<double>* values = nullptr);
+    QGraphicsProxyWidget* addIdentityMapNode(QPointF pos = QPointF(50000, 2500), QSharedPointer<QStringList> inputs = nullptr);
+    QGraphicsProxyWidget* addAffineMapNode(QPointF pos = QPointF(50000, 2500), QSharedPointer<QStringList> inputs = nullptr, QSharedPointer<QStringList> outputs = nullptr, QMap<QString, QList<double>>* values = nullptr);
+    QGraphicsProxyWidget* addPolynomialMapNode(QPointF pos = QPointF(50000, 2500), QSharedPointer<QStringList> inputs = nullptr, QSharedPointer<QStringList> outputs = nullptr, QMap<QString, QList<double>>* values = nullptr);
+    QGraphicsProxyWidget* addFunctionMapNode(QPointF pos = QPointF(50000, 2500), QSharedPointer<QStringList> inputs = nullptr, QSharedPointer<QStringList> outputs = nullptr, QMap<QString, QString>* values = nullptr);
+    QGraphicsProxyWidget* addLuaMapNode(QPointF pos = QPointF(50000, 2500), QSharedPointer<QStringList> inputs = nullptr, QSharedPointer<QStringList> outputs = nullptr, QString value = "");
+    QGraphicsProxyWidget* addASAGINode(QPointF pos = QPointF(50000, 2500), QSharedPointer<QStringList> outputs = nullptr, QString filePath = "", QString var = "data", QString interpolation = "linear");
+    QGraphicsProxyWidget* addSCECFileNode(QPointF pos = QPointF(50000, 2500), QString filePath = "", QString interpolation = "linear");
+    QGraphicsProxyWidget* addEvalModelNode(QPointF pos = QPointF(50000, 2500), QSharedPointer<QStringList> inputs = nullptr, QSharedPointer<QStringList> outputs = nullptr);
+    QGraphicsProxyWidget* addOptimalStressNode(QPointF pos = QPointF(50000, 2500), double mu_d = 0., double mu_s = 0.,
                                                double strike = 0., double dip = 0.,
                                                double rake = 0., double cohesion = 0.,
                                                double s2ratio = 0., double r = 0.,
                                                double effectiveConfiningStress = 0.);
-    QGraphicsProxyWidget* addAndersonianStressNode(QPointF pos = QPointF(0, 0), double mu_d = 0, double mu_s = 0,
+    QGraphicsProxyWidget* addAndersonianStressNode(QPointF pos = QPointF(50000, 2500), double mu_d = 0, double mu_s = 0,
                                                    double sh_max = 0, double s_v = 0,
                                                    double cohesion = 0, double s2ratio = 0,
                                                    double s = 0, double sig_zz = 0);
 
     // add other node functions
-    QGraphicsProxyWidget* addAffineMatrixNode(QPointF pos = QPointF(0, 0), QStringList* inputs = nullptr);
-    QGraphicsProxyWidget* addTranslationNode(QPointF pos = QPointF(0, 0));
-    QGraphicsProxyWidget* addPolynomialMatrixNode(QPointF pos = QPointF(0, 0), QStringList* inputs = nullptr, int degree = 0);
-    QGraphicsProxyWidget* addSwitchComponentNode(QPointF pos = QPointF(0, 0), QStringList* inputs = nullptr, QStringList* outputs = nullptr);
-    QGraphicsProxyWidget* addFunctionNode(QPointF pos = QPointF(0, 0), QStringList* inputs = nullptr);
-    QGraphicsProxyWidget* addLayeredModelNodeNode(QPointF pos = QPointF(0, 0), QStringList* inputs = nullptr);
+    QGraphicsProxyWidget* addAffineMatrixNode(QPointF pos = QPointF(50000, 2500), QSharedPointer<QStringList> inputs = nullptr);
+    QGraphicsProxyWidget* addTranslationNode(QPointF pos = QPointF(50000, 2500));
+    QGraphicsProxyWidget* addPolynomialMatrixNode(QPointF pos = QPointF(50000, 2500), QSharedPointer<QStringList> inputs = nullptr, int degree = 0);
+    QGraphicsProxyWidget* addSwitchComponentNode(QPointF pos = QPointF(50000, 2500), QSharedPointer<QStringList> inputs = nullptr, QSharedPointer<QStringList> outputs = nullptr);
+    QGraphicsProxyWidget* addFunctionNode(QPointF pos = QPointF(50000, 2500), QSharedPointer<QStringList> inputs = nullptr);
+    QGraphicsProxyWidget* addLayeredModelNodeNode(QPointF pos = QPointF(50000, 2500), QSharedPointer<QStringList> inputs = nullptr);
 
 signals:
     void saveRequested(YAML::Emitter* out);
@@ -101,15 +100,13 @@ private:
 private slots:
     void nodeContextMenu(QPoint pos);
     void actionCreateConnectorLine(ConnectorBase* connector);
-    void actionDeleteConnectorLine(QGraphicsProxyWidget* connectorLineProxy);
     void actionConnectorLineDrawn(ConnectorLine* connectorLine);
     void actionConnectorLineConnected();
     void actionCheckIfConnectorNeedsConnection(ConnectorBase* connector);
     OutputConnector* actionAddOutputConnector(QGraphicsProxyWidget* proxyNode);
-    void actionDeleteOutputConnector(QGraphicsProxyWidget* outputConnectorProxy);
     void actionAddMathOutputConnector(QGraphicsProxyWidget* proxyNode, QPointF pos);
     void actionAddFunctionOutputConnector(QGraphicsProxyWidget* proxyNode, QPointF pos);
-    void actionDeleteNode(QGraphicsProxyWidget* proxyNode);
+    void actionDeleteWidget(QGraphicsProxyWidget* proxy);
 };
 
 #endif // WIDGETSHANDLER_H

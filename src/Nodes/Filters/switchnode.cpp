@@ -1,7 +1,7 @@
 #include "switchnode.h"
 #include "src/Nodes/Extra/switchcomponentnode.h"
 
-SwitchNode::SwitchNode(QStringList* inputs, QStringList* outputs) : NodeBase(inputs, outputs)
+SwitchNode::SwitchNode(QSharedPointer<QStringList> inputs, QSharedPointer<QStringList> outputs) : NodeBase(inputs, outputs)
 {
     typeOfNode = SWITCHNODE;
     localTag = "Switch";

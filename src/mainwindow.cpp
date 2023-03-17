@@ -37,6 +37,7 @@ MainWindow::~MainWindow()
     delete ui;
     delete widgetsHandler;
     delete nodeScene;
+    delete easiGraphicsView;
 }
 
 void MainWindow::connectActions()
@@ -220,7 +221,7 @@ void MainWindow::enableDisableIcons(bool enable)
 /// =========================== OPEN NODE FUNCTIONS ===========================
 /// ===========================================================================
 
-void MainWindow::openNode(QGraphicsProxyWidget* parentProxyNode, YAML::Node* node, QStringList* outputs)
+void MainWindow::openNode(QGraphicsProxyWidget* parentProxyNode, YAML::Node* node, QSharedPointer<QStringList> outputs)
 {
     QString tagOfNode = QString::fromStdString((*node).Tag());
 
@@ -270,7 +271,7 @@ void MainWindow::openNode(QGraphicsProxyWidget* parentProxyNode, YAML::Node* nod
         qDebug() << tagOfNode << " does not exist or has not been implemented yet";
 }
 
-void MainWindow::openComponents(QGraphicsProxyWidget* parentProxyNode, YAML::Node* node, QStringList* outputs)
+void MainWindow::openComponents(QGraphicsProxyWidget* parentProxyNode, YAML::Node* node, QSharedPointer<QStringList> outputs)
 {
     if (!(*node)["components"])
         return;
@@ -291,7 +292,7 @@ void MainWindow::openComponents(QGraphicsProxyWidget* parentProxyNode, YAML::Nod
         qDebug() << "components of " << parentProxyNode << " is neither a map nor a sequence";
 }
 
-void MainWindow::openIncludeNode(QGraphicsProxyWidget* parentProxyNode, YAML::Node* node, QStringList* inputs)
+void MainWindow::openIncludeNode(QGraphicsProxyWidget* parentProxyNode, YAML::Node* node, QSharedPointer<QStringList> inputs)
 {
     Q_UNUSED(inputs);
 
@@ -306,7 +307,7 @@ void MainWindow::openIncludeNode(QGraphicsProxyWidget* parentProxyNode, YAML::No
     widgetsHandler->connectNodes((NodeBase*) parentProxyNode->widget(), (NodeBase*) proxyNode->widget());
 }
 
-void MainWindow::openLayeredModelNode(QGraphicsProxyWidget* parentProxyNode, YAML::Node* node, QStringList* inputs)
+void MainWindow::openLayeredModelNode(QGraphicsProxyWidget* parentProxyNode, YAML::Node* node, QSharedPointer<QStringList> inputs)
 {
     if (!(*node)["map"])
     {
@@ -334,7 +335,7 @@ void MainWindow::openLayeredModelNode(QGraphicsProxyWidget* parentProxyNode, YAM
 
     QString interpolation = QString::fromStdString((*node)["interpolation"].as<std::string>());
 
-    QStringList* outputs = new QStringList();
+    QSharedPointer<QStringList> outputs = QSharedPointer<QStringList>(new QStringList);
     if ((*node)["parameters"])
     {
         for (size_t i = 0; i < (*node)["parameters"].size(); i++)
@@ -363,7 +364,7 @@ void MainWindow::openLayeredModelNode(QGraphicsProxyWidget* parentProxyNode, YAM
         openNode(proxyNode, &model, inputs);
 }
 
-void MainWindow::openAnyNode(QGraphicsProxyWidget* parentProxyNode, YAML::Node* node, QStringList* inputs)
+void MainWindow::openAnyNode(QGraphicsProxyWidget* parentProxyNode, YAML::Node* node, QSharedPointer<QStringList> inputs)
 {
     // add node
     QGraphicsProxyWidget* proxyNode = widgetsHandler->addAnyNode(widgetsHandler->getPosNextTo(parentProxyNode), inputs);
@@ -374,7 +375,7 @@ void MainWindow::openAnyNode(QGraphicsProxyWidget* parentProxyNode, YAML::Node* 
     openComponents(proxyNode, node, inputs);
 }
 
-void MainWindow::openAxisAlignedCuboidalDomainFilterNode(QGraphicsProxyWidget* parentProxyNode, YAML::Node* node, QStringList* inputs)
+void MainWindow::openAxisAlignedCuboidalDomainFilterNode(QGraphicsProxyWidget* parentProxyNode, YAML::Node* node, QSharedPointer<QStringList> inputs)
 {
     if (!(*node)["limits"])
     {
@@ -398,7 +399,7 @@ void MainWindow::openAxisAlignedCuboidalDomainFilterNode(QGraphicsProxyWidget* p
     openComponents(proxyNode, node, ((NodeBase*)proxyNode->widget())->getOutputs());
 }
 
-void MainWindow::openSphericalDomainFilterNode(QGraphicsProxyWidget* parentProxyNode, YAML::Node* node, QStringList* inputs)
+void MainWindow::openSphericalDomainFilterNode(QGraphicsProxyWidget* parentProxyNode, YAML::Node* node, QSharedPointer<QStringList> inputs)
 {
     if (!(*node)["radius"])
     {
@@ -430,7 +431,7 @@ void MainWindow::openSphericalDomainFilterNode(QGraphicsProxyWidget* parentProxy
     openComponents(proxyNode, node, inputs);
 }
 
-void MainWindow::openGroupFilterNode(QGraphicsProxyWidget* parentProxyNode, YAML::Node* node, QStringList* inputs)
+void MainWindow::openGroupFilterNode(QGraphicsProxyWidget* parentProxyNode, YAML::Node* node, QSharedPointer<QStringList> inputs)
 {
     // maps matrix and translation values to outputs
     QList<double>* values = new QList<double>();
@@ -453,7 +454,7 @@ void MainWindow::openGroupFilterNode(QGraphicsProxyWidget* parentProxyNode, YAML
     openComponents(proxyNode, node, inputs);
 }
 
-void MainWindow::openSwitchNode(QGraphicsProxyWidget* parentProxyNode, YAML::Node* node, QStringList* inputs)
+void MainWindow::openSwitchNode(QGraphicsProxyWidget* parentProxyNode, YAML::Node* node, QSharedPointer<QStringList> inputs)
 {
     if (!node->IsMap())
     {
@@ -502,7 +503,7 @@ void MainWindow::openConstantMapNode(QGraphicsProxyWidget* parentProxyNode, YAML
         return;
     }
 
-    QStringList* outputs = new QStringList();
+    QSharedPointer<QStringList> outputs = QSharedPointer<QStringList>(new QStringList);
     QList<double>* values = new QList<double>();
     for (YAML::const_iterator it = (*node)["map"].begin(); it != (*node)["map"].end(); ++it)
     {
@@ -519,7 +520,7 @@ void MainWindow::openConstantMapNode(QGraphicsProxyWidget* parentProxyNode, YAML
     openComponents(proxyNode, node, outputs);
 }
 
-void MainWindow::openIdentityMapNode(QGraphicsProxyWidget* parentProxyNode, YAML::Node* node, QStringList* inputs)
+void MainWindow::openIdentityMapNode(QGraphicsProxyWidget* parentProxyNode, YAML::Node* node, QSharedPointer<QStringList> inputs)
 {
     // add node
     QGraphicsProxyWidget* proxyNode = widgetsHandler->addIdentityMapNode(widgetsHandler->getPosNextTo(parentProxyNode), inputs);
@@ -530,7 +531,7 @@ void MainWindow::openIdentityMapNode(QGraphicsProxyWidget* parentProxyNode, YAML
     openComponents(proxyNode, node, inputs);
 }
 
-void MainWindow::openAffineMapNode(QGraphicsProxyWidget* parentProxyNode, YAML::Node* node, QStringList* inputs)
+void MainWindow::openAffineMapNode(QGraphicsProxyWidget* parentProxyNode, YAML::Node* node, QSharedPointer<QStringList> inputs)
 {
     // get output and matrix value
     if (!(*node)["matrix"] || !(*node)["translation"])
@@ -540,7 +541,7 @@ void MainWindow::openAffineMapNode(QGraphicsProxyWidget* parentProxyNode, YAML::
     }
 
     // outputs of Affine Map
-    QStringList* outputs = new QStringList();
+    QSharedPointer<QStringList> outputs = QSharedPointer<QStringList>(new QStringList);
     // maps matrix and translation values to outputs
     QMap<QString, QList<double>>* values = new QMap<QString, QList<double>>();
     for (YAML::const_iterator it = (*node)["matrix"].begin(); it != (*node)["matrix"].end(); ++it)
@@ -575,7 +576,7 @@ void MainWindow::openAffineMapNode(QGraphicsProxyWidget* parentProxyNode, YAML::
     openComponents(proxyNode, node, outputs);
 }
 
-void MainWindow::openPolynomialMapNode(QGraphicsProxyWidget* parentProxyNode, YAML::Node* node, QStringList* inputs)
+void MainWindow::openPolynomialMapNode(QGraphicsProxyWidget* parentProxyNode, YAML::Node* node, QSharedPointer<QStringList> inputs)
 {
     if (!(*node)["map"])
     {
@@ -584,7 +585,7 @@ void MainWindow::openPolynomialMapNode(QGraphicsProxyWidget* parentProxyNode, YA
     }
 
     // outputs of Polynomial Map
-    QStringList* outputs = new QStringList();
+    QSharedPointer<QStringList> outputs = QSharedPointer<QStringList>(new QStringList);
     // maps matrix and translation values to outputs
     QMap<QString, QList<double>>* values = new QMap<QString, QList<double>>();
     for (YAML::const_iterator it = (*node)["map"].begin(); it != (*node)["map"].end(); ++it)
@@ -607,7 +608,7 @@ void MainWindow::openPolynomialMapNode(QGraphicsProxyWidget* parentProxyNode, YA
     openComponents(proxyNode, node, outputs);
 }
 
-void MainWindow::openFunctionMapNode(QGraphicsProxyWidget* parentProxyNode, YAML::Node* node, QStringList* inputs)
+void MainWindow::openFunctionMapNode(QGraphicsProxyWidget* parentProxyNode, YAML::Node* node, QSharedPointer<QStringList> inputs)
 {
     if (!(*node)["map"])
     {
@@ -620,7 +621,7 @@ void MainWindow::openFunctionMapNode(QGraphicsProxyWidget* parentProxyNode, YAML
     {
         values->insert(QString::fromStdString(it->first.as<std::string>()), QString::fromStdString(it->second.as<std::string>()));
     }
-    QStringList* outputs = new QStringList(values->keys());
+    QSharedPointer<QStringList> outputs = QSharedPointer<QStringList>(new QStringList(values->keys()));
 
     // add node
     QGraphicsProxyWidget* proxyNode = widgetsHandler->addFunctionMapNode(widgetsHandler->getPosNextTo(parentProxyNode), inputs, outputs, values);
@@ -631,14 +632,13 @@ void MainWindow::openFunctionMapNode(QGraphicsProxyWidget* parentProxyNode, YAML
     openComponents(proxyNode, node, outputs);
 }
 
-void MainWindow::openLuaMapNode(QGraphicsProxyWidget* parentProxyNode, YAML::Node* node, QStringList* inputs)
+void MainWindow::openLuaMapNode(QGraphicsProxyWidget* parentProxyNode, YAML::Node* node, QSharedPointer<QStringList> inputs)
 {
-    QStringList* outputs = new QStringList();
+    QSharedPointer<QStringList> outputs = QSharedPointer<QStringList>(new QStringList);
     YAML::iterator it = (*node).begin();
     if (QString::fromStdString(it->first.as<std::string>()) != "returns")
     {
         qDebug() << "ERROR: no returns part in lua map";
-        delete outputs;
         return;
     }
 
@@ -651,7 +651,6 @@ void MainWindow::openLuaMapNode(QGraphicsProxyWidget* parentProxyNode, YAML::Nod
     if (QString::fromStdString(it->first.as<std::string>()) != "function")
     {
         qDebug() << "ERROR: no function part in lua map";
-        delete outputs;
         return;
     }
 
@@ -667,11 +666,11 @@ void MainWindow::openLuaMapNode(QGraphicsProxyWidget* parentProxyNode, YAML::Nod
     openComponents(proxyNode, node, outputs);
 }
 
-void MainWindow::openASAGINode(QGraphicsProxyWidget* parentProxyNode, YAML::Node* node, QStringList* inputs)
+void MainWindow::openASAGINode(QGraphicsProxyWidget* parentProxyNode, YAML::Node* node, QSharedPointer<QStringList> inputs)
 {
     Q_UNUSED(inputs);
 
-    QStringList* outputs = new QStringList();
+    QSharedPointer<QStringList> outputs = QSharedPointer<QStringList>(new QStringList);
     if ((*node)["parameters"])
     {
         for (size_t i = 0; i < (*node)["parameters"].size(); i++)
@@ -699,7 +698,7 @@ void MainWindow::openASAGINode(QGraphicsProxyWidget* parentProxyNode, YAML::Node
     openComponents(proxyNode, node, outputs);
 }
 
-void MainWindow::openSCECFileNode(QGraphicsProxyWidget* parentProxyNode, YAML::Node* node, QStringList* inputs)
+void MainWindow::openSCECFileNode(QGraphicsProxyWidget* parentProxyNode, YAML::Node* node, QSharedPointer<QStringList> inputs)
 {
     Q_UNUSED(inputs);
 
@@ -720,9 +719,9 @@ void MainWindow::openSCECFileNode(QGraphicsProxyWidget* parentProxyNode, YAML::N
     openComponents(proxyNode, node, ((NodeBase*) proxyNode->widget())->getOutputs());
 }
 
-void MainWindow::openEvalModelNode(QGraphicsProxyWidget* parentProxyNode, YAML::Node* node, QStringList* inputs)
+void MainWindow::openEvalModelNode(QGraphicsProxyWidget* parentProxyNode, YAML::Node* node, QSharedPointer<QStringList> inputs)
 {
-    QStringList* outputs = new QStringList();
+    QSharedPointer<QStringList> outputs = QSharedPointer<QStringList>(new QStringList);
     if ((*node)["parameters"])
     {
         for (size_t i = 0; i < (*node)["parameters"].size(); i++)
@@ -743,7 +742,7 @@ void MainWindow::openEvalModelNode(QGraphicsProxyWidget* parentProxyNode, YAML::
     openComponents(proxyNode, node, outputs);
 }
 
-void MainWindow::openOptimalStressNode(QGraphicsProxyWidget* parentProxyNode, YAML::Node* node, QStringList* inputs)
+void MainWindow::openOptimalStressNode(QGraphicsProxyWidget* parentProxyNode, YAML::Node* node, QSharedPointer<QStringList> inputs)
 {
     Q_UNUSED(inputs);
 
@@ -772,7 +771,7 @@ void MainWindow::openOptimalStressNode(QGraphicsProxyWidget* parentProxyNode, YA
     openComponents(proxyNode, node, ((NodeBase*) proxyNode->widget())->getOutputs());
 }
 
-void MainWindow::openAndersonianStressNode(QGraphicsProxyWidget* parentProxyNode, YAML::Node* node, QStringList* inputs)
+void MainWindow::openAndersonianStressNode(QGraphicsProxyWidget* parentProxyNode, YAML::Node* node, QSharedPointer<QStringList> inputs)
 {
     Q_UNUSED(inputs);
 

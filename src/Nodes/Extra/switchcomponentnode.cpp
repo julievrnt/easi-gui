@@ -1,6 +1,6 @@
 #include "switchcomponentnode.h"
 
-SwitchComponentNode::SwitchComponentNode(QStringList* inputs, QStringList* outputs) : NodeBase(inputs, outputs)
+SwitchComponentNode::SwitchComponentNode(QSharedPointer<QStringList> inputs, QSharedPointer<QStringList> outputs) : NodeBase(inputs, outputs)
 {
     typeOfNode = SWITCHCOMPONENTNODE;
     setWindowTitle("Switch Component");

@@ -1,7 +1,7 @@
 #include "functionnode.h"
 #include <QTextEdit>
 
-FunctionNode::FunctionNode(QStringList* inputs) : NodeBase(inputs)
+FunctionNode::FunctionNode(QSharedPointer<QStringList> inputs) : NodeBase(inputs)
 {
     typeOfNode = FUNCTIONNODE;
     setWindowTitle("Function");
@@ -10,7 +10,7 @@ FunctionNode::FunctionNode(QStringList* inputs) : NodeBase(inputs)
     setGeometry(QRect(0, 0, sizeHint().width(), sizeHint().height()));
 }
 
-void FunctionNode::setValue(QStringList* inputs, QString value)
+void FunctionNode::setValue(QSharedPointer<QStringList> inputs, QString value)
 {
     if (inputs != nullptr)
     {

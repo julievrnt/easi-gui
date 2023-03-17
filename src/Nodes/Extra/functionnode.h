@@ -7,9 +7,9 @@ class FunctionNode : public NodeBase
 {
     Q_OBJECT
 public:
-    FunctionNode(QStringList* inputs = nullptr);
+    FunctionNode(QSharedPointer<QStringList> inputs = nullptr);
 
-    void setValue(QStringList* inputs, QString value);
+    void setValue(QSharedPointer<QStringList> inputs, QString value);
 
 private:
     void createLayout();

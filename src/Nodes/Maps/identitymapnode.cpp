@@ -1,6 +1,6 @@
 #include "identitymapnode.h"
 
-IdentityMapNode::IdentityMapNode(QStringList* inputs): NodeBase(inputs, inputs)
+IdentityMapNode::IdentityMapNode(QSharedPointer<QStringList> inputs): NodeBase(inputs, inputs)
 {
     typeOfNode = IDENTITYMAPNODE;
     localTag = "IdentityMap";

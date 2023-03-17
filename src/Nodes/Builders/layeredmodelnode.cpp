@@ -3,7 +3,7 @@
 #include <QComboBox>
 #include <QTableWidget>
 
-LayeredModelNode::LayeredModelNode(QStringList* inputs, QStringList* outputs, QString interpolation) : NodeBase(inputs, outputs)
+LayeredModelNode::LayeredModelNode(QSharedPointer<QStringList> inputs, QSharedPointer<QStringList> outputs, QString interpolation) : NodeBase(inputs, outputs)
 {
     typeOfNode = LAYEREDMODELNODE;
     localTag = "LayeredModel";
