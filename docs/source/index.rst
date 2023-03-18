@@ -1,5 +1,5 @@
 .. easi-gui documentation master file, created by
-   sphinx-quickstart on Sat Mar 18 13:53:13 2023.
+   sphinx-quickstart on Sat Mar 18 14:15:53 2023.
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
