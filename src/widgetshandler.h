@@ -26,7 +26,7 @@ public:
     void deleteNode();
     void deleteWidget(QGraphicsProxyWidget* proxy);
     void deleteProxy(QGraphicsProxyWidget* proxy);
-    QPointF getPosNextTo(QGraphicsProxyWidget* parentProxyNode, QPointF pos = QPointF(50000, 2500));
+    QPointF getPosNextTo(QGraphicsProxyWidget* parentProxyNode, QPointF pos = QPointF(0, 0));
     void connectNodes(NodeBase* parentNode, NodeBase* childNode);
 
     // basic functions to handle connectors

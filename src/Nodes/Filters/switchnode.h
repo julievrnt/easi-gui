@@ -8,6 +8,7 @@ class SwitchNode : public NodeBase
     Q_OBJECT
 public:
     SwitchNode(QSharedPointer<QStringList> inputs = nullptr, QSharedPointer<QStringList> outputs = nullptr);
+    ~SwitchNode();
 
     void setValues(QList<QStringList*> values);
     const QList<QGraphicsProxyWidget*>& getSwitchComponentProxies() const;

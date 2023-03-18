@@ -39,6 +39,14 @@ PolynomialMapNode::PolynomialMapNode(QSharedPointer<QStringList> inputs, QShared
     setGeometry(QRect(0, 0, sizeHint().width(), sizeHint().height()));
 }
 
+PolynomialMapNode::~PolynomialMapNode()
+{
+    while (mathOutputConnectors->size() > 0)
+    {
+        removeMathOfDimensionRow(mathOutputConnectors->size() - 1);
+    }
+}
+
 void PolynomialMapNode::setValues(QMap<QString, QList<double>>* values)
 {
     if (values == nullptr)

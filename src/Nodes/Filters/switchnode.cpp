@@ -11,6 +11,12 @@ SwitchNode::SwitchNode(QSharedPointer<QStringList> inputs, QSharedPointer<QStrin
     setGeometry(QRect(0, 0, sizeHint().width(), sizeHint().height()));
 }
 
+SwitchNode::~SwitchNode()
+{
+    while (switchComponentProxies.size() > 0)
+        removeComponentOfDimensionRow(switchComponentProxies.size() - 1);
+}
+
 void SwitchNode::setValues(QList<QStringList*> values)
 {
     if (values.isEmpty())

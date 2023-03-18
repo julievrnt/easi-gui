@@ -21,8 +21,7 @@ RootNode::RootNode()
 
 RootNode::~RootNode()
 {
-    qDebug() << "root node destructor called";
-    //delete outputConnector;
+    delete outputConnector;
 }
 
 void RootNode::setOutputConnector(QGraphicsProxyWidget* newOutputConnector)

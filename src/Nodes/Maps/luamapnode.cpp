@@ -13,6 +13,12 @@ LuaMapNode::LuaMapNode(QSharedPointer<QStringList> inputs, QSharedPointer<QStrin
     setGeometry(QRect(0, 0, sizeHint().width(), sizeHint().height()));
 }
 
+LuaMapNode::~LuaMapNode()
+{
+    if(functionNodeProxy != nullptr)
+        emit deleteNodeRequested(functionNodeProxy);
+}
+
 void LuaMapNode::setValue(QString value)
 {
     if (value.isEmpty())

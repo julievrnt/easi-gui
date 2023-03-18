@@ -13,6 +13,11 @@ SwitchComponentNode::SwitchComponentNode(QSharedPointer<QStringList> inputs, QSh
     setGeometry(QRect(0, 0, sizeHint().width(), sizeHint().height()));
 }
 
+SwitchComponentNode::~SwitchComponentNode()
+{
+    delete parameters;
+}
+
 void SwitchComponentNode::setParameters(QStringList* parameters)
 {
     if (parameters == nullptr)

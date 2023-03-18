@@ -8,6 +8,7 @@ class PolynomialMapNode : public NodeBase
     Q_OBJECT
 public:
     PolynomialMapNode(QSharedPointer<QStringList> inputs = nullptr, QSharedPointer<QStringList> outputs = nullptr);
+    ~PolynomialMapNode();
 
     void setValues(QMap<QString, QList<double>>* values);
     void addPolynomialMatrixProxy(QGraphicsProxyWidget* newPolynomialMatrixProxy);

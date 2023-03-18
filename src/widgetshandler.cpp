@@ -165,12 +165,12 @@ void WidgetsHandler::addOutputConnector(OutputConnector* outputConnector, QGraph
     {
         if (node->getTypeOfNode() == EVALMODELNODE)
         {
-            connect((EvalModelNode*) node, SIGNAL(transferInputsRequested(QStringList*)), outputConnector, SLOT(transferOutputs(QSharedPointer<QStringList>)));
+            connect((EvalModelNode*) node, SIGNAL(transferInputsRequested(QSharedPointer<QStringList>)), outputConnector, SLOT(transferOutputs(QSharedPointer<QStringList>)));
             emit ((EvalModelNode*) node)->transferInputsRequested(node->getOutputs());
         }
         else
         {
-            connect((LayeredModelNode*) node, SIGNAL(transferInputsRequested(QStringList*)), outputConnector, SLOT(transferOutputs(QSharedPointer<QStringList>)));
+            connect((LayeredModelNode*) node, SIGNAL(transferInputsRequested(QSharedPointer<QStringList>)), outputConnector, SLOT(transferOutputs(QSharedPointer<QStringList>)));
             emit ((LayeredModelNode*) node)->transferInputsRequested(node->getOutputs());
         }
     }
@@ -350,6 +350,7 @@ void WidgetsHandler::checkConnectionBetweenConnectorAndLine(ConnectorBase* conne
 
 void WidgetsHandler::deleteWidget(QGraphicsProxyWidget* proxy)
 {
+    qDebug() << "delete widget: " << proxy;
     if (proxy->widget()->objectName() == "Node")
     {
         if (((NodeBase*) proxy->widget())->getTypeOfNode() == ROOTNODE)
@@ -374,6 +375,7 @@ void WidgetsHandler::deleteWidget(QGraphicsProxyWidget* proxy)
 
 void WidgetsHandler::deleteProxy(QGraphicsProxyWidget* proxy)
 {
+    qDebug() << "delete proxy: " << proxy;
     if (proxy->widget()->objectName() == "Connector")
     {
         ((ConnectorBase*) proxy->widget())->deleteLine();

@@ -37,7 +37,6 @@ NodeBase::~NodeBase()
     // functionOutputConnectors content deleted in widgetshandler
     // outputConnectorModel deleted in widgetshandler
 
-    qDebug() << "node base destructor called";
     delete outputConnectors;
     delete mathOutputConnectors;
     delete functionOutputConnectors;

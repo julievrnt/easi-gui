@@ -13,6 +13,12 @@ FunctionMapNode::FunctionMapNode(QSharedPointer<QStringList> inputs, QSharedPoin
     setGeometry(QRect(0, 0, sizeHint().width(), sizeHint().height()));
 }
 
+FunctionMapNode::~FunctionMapNode()
+{
+    while (functionNodeProxies.size() > 0)
+        removeFunctionOfDimensionRow(functionNodeProxies.size() - 1);
+}
+
 void FunctionMapNode::setValues(QMap<QString, QString>* values)
 {
     if (values == nullptr)

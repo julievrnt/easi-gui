@@ -8,6 +8,7 @@ class FunctionMapNode : public NodeBase
     Q_OBJECT
 public:
     FunctionMapNode(QSharedPointer<QStringList> inputs = nullptr, QSharedPointer<QStringList> outputs = nullptr);
+    ~FunctionMapNode();
 
     void setValues(QMap<QString, QString>* values);
     void addFunctionNodeProxy(QGraphicsProxyWidget* newFunctionNodeProxy);
