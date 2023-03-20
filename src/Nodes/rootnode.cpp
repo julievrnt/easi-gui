@@ -3,7 +3,6 @@
 #include <QHBoxLayout>
 #include <QPushButton>
 #include <QLabel>
-#include "../Connectors/outputs/outputconnector.h"
 
 RootNode::RootNode()
 {

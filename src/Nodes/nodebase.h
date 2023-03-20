@@ -12,7 +12,7 @@
 #include <QLineEdit>
 #include <QDoubleSpinBox>
 #include "yaml-cpp/yaml.h"
-#include "../Connectors/outputs/outputconnector.h"
+#include "src/Connectors/outputconnector.h"
 
 #define NODE 0
 #define ROOTNODE 1

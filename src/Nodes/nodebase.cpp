@@ -4,7 +4,6 @@
 #include <QLabel>
 #include <QHBoxLayout>
 #include <QPushButton>
-#include "../Connectors/outputs/outputconnector.h"
 #include "float.h"
 
 NodeBase::NodeBase(QSharedPointer<QStringList> inputs, QSharedPointer<QStringList> outputs, QWidget* parent)

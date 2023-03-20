@@ -12,8 +12,8 @@ SOURCES += \
     src/Connectors/connectorbase.cpp \
     src/Connectors/connectorline.cpp \
     src/Connectors/connectorlineparentwidget.cpp \
-    src/Connectors/inputs/inputconnector.cpp \
-    src/Connectors/outputs/outputconnector.cpp \
+    src/Connectors/inputconnector.cpp \
+    src/Connectors/outputconnector.cpp \
     src/Nodes/Builders/includenode.cpp \
     src/Nodes/Builders/layeredmodelnode.cpp \
     src/Nodes/Extra/functionnode.cpp \
@@ -50,8 +50,8 @@ HEADERS += \
     src/Connectors/connectorbase.h \
     src/Connectors/connectorline.h \
     src/Connectors/connectorlineparentwidget.h \
-    src/Connectors/inputs/inputconnector.h \
-    src/Connectors/outputs/outputconnector.h \
+    src/Connectors/inputconnector.h \
+    src/Connectors/outputconnector.h \
     src/Nodes/Builders/includenode.h \
     src/Nodes/Builders/layeredmodelnode.h \
     src/Nodes/Extra/functionnode.h \

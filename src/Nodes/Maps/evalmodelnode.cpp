@@ -1,5 +1,4 @@
 #include "evalmodelnode.h"
-#include "src/Connectors/outputs/outputconnector.h"
 
 EvalModelNode::EvalModelNode(QSharedPointer<QStringList> inputs, QSharedPointer<QStringList> outputs) : NodeBase(inputs, outputs)
 {

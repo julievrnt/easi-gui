@@ -2,8 +2,8 @@
 #define CONNECTORLINE_H
 
 #include <QWidget>
-#include "inputs/inputconnector.h"
-#include "outputs/outputconnector.h"
+#include "inputconnector.h"
+#include "outputconnector.h"
 #include "src/easigraphicsview.h"
 #include "yaml-cpp/yaml.h"
 #include <QTimer>
