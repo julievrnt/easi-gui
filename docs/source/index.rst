@@ -11,17 +11,8 @@ Welcome to easi-gui's documentation!
    :caption: Contents:
 
    getting_started
-   compiling_dependencies
    maps
    filters
    builders
    program_structure
    adding_nodes
-
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
