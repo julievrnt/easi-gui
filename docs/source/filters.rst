@@ -4,7 +4,7 @@ Filters
 Filters accept only a subsets of points and allows for the spatial partitioning of models. The following filter nodes implements the 
 `filters <https://easyinit.readthedocs.io/en/latest/filters.html>`_ of easi. If you are not familiar with the different easi filters, please read the easi documentation first.
 
-Note that easi-gui does not check for typos or wrong inputs.
+Note that easi-gui does not check for typos or wrong inputs/outputs.
 
 Any Node
 --------

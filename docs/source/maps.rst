@@ -4,7 +4,7 @@ Maps
 A map allows to map vectors from :math:`\mathbb{R}^m` to :math:`\mathbb{R}^n`. The following map nodes implements the 
 `maps <https://easyinit.readthedocs.io/en/latest/maps.html>`_ of easi. If you are not familiar with the different easi maps, please read the easi documentation first.
 
-Note that easi-gui does not check for typos or wrong inputs.
+Note that easi-gui does not check for typos or wrong inputs/outputs.
 
 Constant Map Node
 -----------------
@@ -92,7 +92,7 @@ This node implements `ASAGI <https://easyinit.readthedocs.io/en/latest/maps.html
 .. figure:: fig/maps/asagi.png
   :alt: ASAGI
   
-  This ASAGI Node gets its parameter rho from the file asagi_example.nc. The variable of the file is data, and the interpolation used is the linear one.
+  This ASAGI Node gets its parameter rho from the file ``asagi_example.nc``. The variable of the file is data, and the interpolation used is the linear one.
   
 The NetCDF file can be added by clicking on the button "select file". The parameters as well as the variable need to be added manually to the ASAGI node. Note that the parameters need to be added in the same order as they appear in the NetCDF file. The interpolation can be chosen between nearest neighbour and linear, the latest being the default one.
 
@@ -106,7 +106,7 @@ This node implements `SCECFile <https://easyinit.readthedocs.io/en/latest/maps.h
 .. figure:: fig/maps/scecfile.png
   :alt: SCECFile
   
-  This SCEC File node uses the file scec_example.txt and the interpolation is nearest neighbour.
+  This SCEC File node uses the file ``scec_example.txt`` and the interpolation is nearest neighbour.
   
 The text file can be added by clicking on the button "select file". The interpolation can be chosen between nearest neighbour and linear, the latest being the default one.
 
