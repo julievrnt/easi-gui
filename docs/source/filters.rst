@@ -9,7 +9,7 @@ Note that easi-gui does not check for typos or wrong inputs.
 Any Node
 --------
 
-This node implements `Any <https://easyinit.readthedocs.io/en/latest/filters.html#any>`_ of easi.
+This node implements `Any <https://easyinit.readthedocs.io/en/latest/filters.html#any>`_ of easi. It mostly serves as a root node and accepts every point and every group.
 
 .. image:: fig/filters/any.png
   :alt: Any
@@ -17,33 +17,49 @@ This node implements `Any <https://easyinit.readthedocs.io/en/latest/filters.htm
 Axis Aligned Cuboidal Domain Filter Node
 ----------------------------------------
 
-This node implements `AxisAlignedCuboidalDomainFilter <https://easyinit.readthedocs.io/en/latest/filters.html#axisalignedcuboidaldomainfilter>`_ of easi.
+This node implements `AxisAlignedCuboidalDomainFilter <https://easyinit.readthedocs.io/en/latest/filters.html#axisalignedcuboidaldomainfilter>`_ of easi. It accepts only points inside an axis-aligned bounding box (see easi documentation).
 
-.. image:: fig/filters/axisalignedcuboidaldomainfilter.png
+.. figure:: fig/filters/axisalignedcuboidaldomainfilter.png
   :alt: AxisAlignedCuboidalDomainFilter
+  
+  This Axis Aligned Cuboidal Domain Filter node takes all points that satisfy the conditions: :math:`-1 \leq x \leq 1`, :math:`0 \leq y \leq 2` and :math:`1 \leq z \leq 3`.
+
+When an input is given, the dimensions' names are automatically added to the Axis Aligned Cuboidal Domain Filter node. You then only need to give the lower and upper limits next to the labels of the same row.
 
 Spherical Domain Filter Node
 ----------------------------
 
-This node implements `SphericalDomainFilter <https://easyinit.readthedocs.io/en/latest/filters.html#sphericaldomainfilter>`_ of easi.
+This node implements `SphericalDomainFilter <https://easyinit.readthedocs.io/en/latest/filters.html#sphericaldomainfilter>`_ of easi. It accepts only points inside a sphere.
 
-.. image:: fig/filters/sphericaldomainfilter.png
+.. figure:: fig/filters/sphericaldomainfilter.png
   :alt: SphericalDomainFilter
-
+  
+  This Spherical Domain Filter node takes all nodes :math:`m` that satisfy :math:`||m - (1,2,3)^T|| \leq 1`.
+  
+The radius can be given in the spin box next to "radius". When an input is given, the dimensions' names are automatically added to the Spherical Domain Filter node. The value of the center corresponding to the dimension needs to be added in the spin box of the same row.
+  
 Group Filter Node
 -----------------
 
-This node implements `GroupFilter <https://easyinit.readthedocs.io/en/latest/filters.html#groupfilter>`_ of easi.
+This node implements `GroupFilter <https://easyinit.readthedocs.io/en/latest/filters.html#groupfilter>`_ of easi. It accepts only points belonging to a set of groups.
 
-.. image:: fig/filters/groupfilter.png
+.. figure:: fig/filters/groupfilter.png
   :alt: GroupFilter
+  
+  This Group Filter node accepts the nodes that belong to the groups 1, 2 and 3.
+
+The group values need to be written in the spin boxes of the Group Filter node.
+  
+The + button adds new group rows to the map, while the - button removes the group of the button's row.
 
 Switch Node
 -----------
 
-This node implements `Switch <https://easyinit.readthedocs.io/en/latest/filters.html#switch>`_ of easi.
+This node implements `Switch <https://easyinit.readthedocs.io/en/latest/filters.html#switch>`_ of easi. It can be used to use select a component based on the requested parameters.
 
-.. image:: fig/filters/switch.png
+.. figure:: fig/filters/switch.png
   :alt: Switch
-
-
+  
+  This Switch node separates the output parameters lambda, mu and rho, according to how they are computed. lambda and mu are determined using a Constant Map node and have respectively the values 1 and 2, while rho is defined via an affine map and has the value :math:`x-y+1`.
+  
+A Switch node always has at least one Switch Component node, in which the parameters need to be manually added. The + button adds new parameter rows to the map, while the - button removes the parameter of the button's row. Switch Component nodes can be further added by clicking on the "Add" button of the Switch node, while the "Delete" button removes the last Switch Component.
