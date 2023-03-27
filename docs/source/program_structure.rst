@@ -1,88 +1,36 @@
 Understanding the program's structure
 =====================================
 
-TODO
+Let's first take a quick look on the program's structure. The program is divided in three parts :
 
-Global View
------------
+* MainWindow and WidgetsHandler - they handle the basic functions of the software and the scene (e.g. opening a file, adding a node to the scene).
+* Nodes - they handle the content of the nodes (e.g. adding a parameter, saving its content).
+* Connectors and ConnectorLine - they handle the connection between two nodes as well as the transfer of information (e.g. the outputs of the parent).
 
-TODO:
+MainWindow & WidgetsHandler
+---------------------------
 
-* Add image of structure
-* 3 types of widgets: nodes, connectors and connector line
+MainWindow deals with the basic features of a software: new, open, save, save as and close. It is also in this class, that the different actions created in ``mainwindow.ui`` are connected to other MainWindow methods. When an action in the menu or on the toolbar is triggered, MainWindow receives the signal and handles the action or transfer it to WidgetsHandler.
 
-MainWindow
+WidgetsHandler takes care of adding and deleting nodes, as well as connecting them to one another. It is called by MainWindow when a node needs to be added to the scene (by opening a file or adding a specific node using the menu), or when the scene needs to be saved. In the later case, it asks the root node Inputs to save its content, which asks further its child to save its content and so on.
+
+Nodes
+-----
+
+There is one class of node that you need to know: NodeBase. It contains most nodes functions like transferring the outputs, resizing the node and adding the title and components layouts, and can be further expanded, in case several nodes have the same code. All node types are subclasses of NodeBase.
+
+The nodes are divided into four categories: maps, filters, builders and extra. Extra contains all nodes that are combined to a map, filter or builder node. This is where e.g. the Function node (used with the Function Map node and the Lua Map node) can be found.
+
+The main methods needed for the subclasses are: ``addNewDimensionsLayoutRow`` and ``saveValues``. The first method is used to add a new row of dimensions / parameters used as outputs (see e.g. the Constant Map node or the Affine Map node). ``saveValues`` is where the content of a node is saved.
+
+Connectors
 ----------
 
-TODO
-basic functions: close, open, save, save as ...
+They are two types of connectors: InputConnector and OutputConnector. Like their names suggest, one serves as the input of a node, while the other one is one of the many connectors to which another node can be connected. Except for a special case (see `Color Codes <https://easi-gui.readthedocs.io/en/latest/getting_started.html#color-codes>`_), an InputConnector can only be connected to an OutputConnector of the same subtype. The different subtypes and color codes are:
 
-WidgetsHandler
---------------
+* NONE - green
+* SPECIALCOMPONENT - blue
+* MATH - violet
+* EVAL - red
 
-TODO
-
-* handle the widgets -> add them, delete them etc...
-* is called by MainWindow when a file is opened or the scene needs to be saved
-
-EasiGraphicsView
-----------------
-
-TODO
-
-* subclass of qgraphicsview
-* handles the zoom
-
-Nodes/NodeBase
---------------
-
-TODO
-
-* contains most nodes function
-* defines all node types
-
-Nodes/RootNode
---------------
-
-TODO
-
-* base of the tree -> a simple node with no inputs and x,y,z as outputs
-* When saving, signals are sent from nodes to other connected nodes starting from the root
-
-Nodes/NodeParentWidget
-----------------------
-
-TODO
-
-* Parent of the nodes
-* Here to making the nodes selectable and movable
-
-Other Nodes
------------
-
-TODO
-
-* contains specific functions 
-* "needs" to implement: node name, saveValues() and addDimensionsRow something
-
-Connectors/ConnectorLine
-------------------------
-
-TODO
-
-* connect one InputConnector to one OutputConnector of the same type
-
-Connectors/ConnectorBase
-------------------------
-
-TODO
-
-* contains almost all connector functions
-* defines all connector types
-
-Connectors/InputConnector && OutputConnector
---------------------------------------------
-
-TODO
-
-* just to differenciate the types
+If you want to change the color of a connector or to create a new subtype of connector, you will need to update the parent class called ConnectorBase.
