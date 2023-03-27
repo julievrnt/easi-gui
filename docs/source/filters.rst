@@ -62,4 +62,4 @@ This node implements `Switch <https://easyinit.readthedocs.io/en/latest/filters.
   
   This Switch node separates the output parameters lambda, mu and rho, according to how they are computed. lambda and mu are determined using a Constant Map node and have respectively the values 1 and 2, while rho is defined via an affine map and has the value :math:`x-y+1`.
   
-A Switch node always has at least one Switch Component node, in which the parameters need to be manually added. The + button adds new parameter rows to the map, while the - button removes the parameter of the button's row. Switch Component nodes can be further added by clicking on the "Add" button of the Switch node, while the "Delete" button removes the last Switch Component.
+A Switch node always has at least one Switch Component node, in which the parameters need to be manually added. The + button adds new parameter rows to the map, while the - button removes the parameter of the button's row. As for normal components, Switch Component nodes can be further added by clicking on the "Add" button of the Switch node, while the "Delete" button removes the last Switch Component.
