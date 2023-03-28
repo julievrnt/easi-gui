@@ -6,7 +6,9 @@
 Welcome to easi-gui's documentation!
 ====================================
 
-easi-gui is a node-based interface designed to ease the initialisation of models with the library `easi <https://github.com/SeisSol/easi>`_. Note that easi-gui evaluate only takes three dimensional points as input for now. It opens and saves `YAML <http://yaml.org>`_ configuration files written with the syntax described by easi. It works the same way as easi does: it possesses two types of nodes, Map and Filter, that are connected together as a tree. If you are not familiar with easi, please read the `easi documentation <https://easyinit.readthedocs.io/en/latest/index.html>`_ first.
+easi-gui is a node-based interface designed to ease the initialisation of models with the library `easi <https://github.com/SeisSol/easi>`_. No need to write any code anymore ! It opens and saves `YAML <http://yaml.org>`_ configuration files written with the syntax described by easi. It works the same way as easi does: it possesses two types of nodes, Map and Filter, that are connected together as a tree. If you are not familiar with easi, please read the `easi documentation <https://easyinit.readthedocs.io/en/latest/index.html>`_ first. 
+
+Note that easi-gui evaluate only takes three dimensional points as input for now.
 
 Here an example of how easi-gui can be used:
 
