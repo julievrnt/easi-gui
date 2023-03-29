@@ -13,11 +13,10 @@ SwitchNode::SwitchNode(QSharedPointer<QStringList> inputs, QSharedPointer<QStrin
 
 SwitchNode::~SwitchNode()
 {
-    while (switchComponentProxies.size() > 0)
-        removeComponentOfDimensionRow(switchComponentProxies.size() - 1);
+    // switchComponentProxies deleted in clearNodes()
 }
 
-void SwitchNode::setValues(QList<QStringList*> values)
+void SwitchNode::setValues(QList<QSharedPointer<QStringList>> values)
 {
     if (values.isEmpty())
         return;
@@ -28,7 +27,7 @@ void SwitchNode::setValues(QList<QStringList*> values)
     for (int i = 0; i < values.size(); i++)
     {
         // get parameters for component
-        QStringList* parameters = values.at(i);
+        QSharedPointer<QStringList> parameters = values.at(i);
 
         // set parameters values
         SwitchComponentNode* switchComponentNode = (SwitchComponentNode*) this->switchComponentProxies.at(i)->widget();

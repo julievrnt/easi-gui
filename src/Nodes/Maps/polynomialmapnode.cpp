@@ -41,10 +41,7 @@ PolynomialMapNode::PolynomialMapNode(QSharedPointer<QStringList> inputs, QShared
 
 PolynomialMapNode::~PolynomialMapNode()
 {
-    while (mathOutputConnectors->size() > 0)
-    {
-        removeMathOfDimensionRow(mathOutputConnectors->size() - 1);
-    }
+    // polynomialMatrixProxies deleted in clearNodes()
 }
 
 void PolynomialMapNode::setValues(QMap<QString, QList<double>>* values)

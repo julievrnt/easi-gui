@@ -78,6 +78,9 @@ void MainWindow::connectActions()
     connect(ui->actionPaste, SIGNAL(triggered(bool)), this, SLOT(actionPaste()));
     connect(ui->actionUndo, SIGNAL(triggered(bool)), this, SLOT(actionUndo()));
     connect(ui->actionRedo, SIGNAL(triggered(bool)), this, SLOT(actionRedo()));
+
+    // other actions
+    connect(nodeScene, SIGNAL(focusItemChanged(QGraphicsItem*, QGraphicsItem*, Qt::FocusReason)), this, SLOT(getNewFocusItem(QGraphicsItem*, QGraphicsItem*, Qt::FocusReason)));
 }
 
 /// ===========================================================================
@@ -462,10 +465,10 @@ void MainWindow::openSwitchNode(QGraphicsProxyWidget* parentProxyNode, YAML::Nod
         return;
     }
 
-    QList<QStringList*> values;
+    QList<QSharedPointer<QStringList>> values;
     for (YAML::iterator it = node->begin(); it != node->end(); ++it)
     {
-        QStringList* parameters = new QStringList();
+        QSharedPointer<QStringList> parameters = QSharedPointer<QStringList>(new QStringList);
         for (size_t i = 0; i < it->first.size(); i++)
             parameters->append(QString::fromStdString(it->first[i].as<std::string>()));
         values.append(parameters);
@@ -811,7 +814,7 @@ void MainWindow::getNewFocusItem(QGraphicsItem* newFocusItem, QGraphicsItem* old
     {
         QGraphicsProxyWidget* currentProxyNode = (QGraphicsProxyWidget*) newFocusItem;
         NodeBase* currentNode = (NodeBase*) currentProxyNode->widget();
-        if (currentNode == nullptr || currentNode->getTypeOfNode() == ROOTNODE)
+        if (currentNode == nullptr || !currentNode->getHasMenu())
         {
             enableDisableIcons(false);
         }

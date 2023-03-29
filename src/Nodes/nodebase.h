@@ -85,6 +85,8 @@ public:
     void setOutputConnectorModel(QGraphicsProxyWidget* newOutputConnectorModel);
     OutputConnector* getOutputConnectorModel() const;
 
+    bool getHasMenu() const;
+
 signals:
     void nodeContextMenuRequested(QPoint pos);
     void resized(QRectF rect);
@@ -98,6 +100,7 @@ protected:
     QString localTag = "";
     int removeButtonIndex = -1;
     int dimensionLineEditIndex = -1;
+    bool hasMenu = true;
     QSharedPointer<QStringList> inputs;
     QSharedPointer<QStringList> outputs;
     QGraphicsProxyWidget* proxyNode;

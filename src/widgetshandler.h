@@ -51,7 +51,7 @@ public:
     QGraphicsProxyWidget* addAxisAlignedCuboidalDomainFilterNode(QPointF pos = QPointF(50000, 2500), QSharedPointer<QStringList> inputs = nullptr, QList<double>* values = nullptr);
     QGraphicsProxyWidget* addSphericalDomainFilterNode(QPointF pos = QPointF(50000, 2500), QSharedPointer<QStringList> inputs = nullptr, QList<double>* values = nullptr);
     QGraphicsProxyWidget* addGroupFilterNode(QPointF pos = QPointF(50000, 2500), QSharedPointer<QStringList> inputs = nullptr, QList<double>* values = nullptr);
-    QGraphicsProxyWidget* addSwitchNode(QPointF pos = QPointF(50000, 2500), QSharedPointer<QStringList> inputs = nullptr, QSharedPointer<QStringList> outputs = nullptr, QList<QStringList*> values = QList<QStringList*>());
+    QGraphicsProxyWidget* addSwitchNode(QPointF pos = QPointF(50000, 2500), QSharedPointer<QStringList> inputs = nullptr, QSharedPointer<QStringList> outputs = nullptr, QList<QSharedPointer<QStringList>> values = QList<QSharedPointer<QStringList>>());
 
     // add map functions
     QGraphicsProxyWidget* addConstantMapNode(QPointF pos = QPointF(50000, 2500), QSharedPointer<QStringList> outputs = nullptr, QList<double>* values = nullptr);

@@ -37,8 +37,11 @@ NodeBase::~NodeBase()
     // outputConnectorModel deleted in widgetshandler
 
     delete outputConnectors;
+    outputConnectors = nullptr;
     delete mathOutputConnectors;
+    mathOutputConnectors = nullptr;
     delete functionOutputConnectors;
+    functionOutputConnectors = nullptr;
 }
 
 int NodeBase::getTypeOfNode()
@@ -143,6 +146,11 @@ OutputConnector* NodeBase::getOutputConnectorModel() const
     return (OutputConnector*) outputConnectorModel->widget();
 }
 
+bool NodeBase::getHasMenu() const
+{
+    return hasMenu;
+}
+
 void NodeBase::setProxyNode(QGraphicsProxyWidget* newProxyNode)
 {
     proxyNode = newProxyNode;
@@ -150,7 +158,7 @@ void NodeBase::setProxyNode(QGraphicsProxyWidget* newProxyNode)
 
 void NodeBase::mousePressEvent(QMouseEvent* event)
 {
-    if (event->button() == Qt::RightButton)
+    if (event->button() == Qt::RightButton && hasMenu)
     {
         emit nodeContextMenuRequested(event->globalPosition().toPoint());
     }

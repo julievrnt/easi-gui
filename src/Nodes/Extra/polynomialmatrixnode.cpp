@@ -6,6 +6,7 @@
 PolynomialMatrixNode::PolynomialMatrixNode(QSharedPointer<QStringList> inputs, int degree) : NodeBase(inputs)
 {
     this->typeOfNode = POLYNOMIALMATHNODE;
+    hasMenu = false;
     setWindowTitle("Matrix");
     this->degree = degree;
     if (inputs->size() == 0)

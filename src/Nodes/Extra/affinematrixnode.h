@@ -9,7 +9,6 @@ class AffineMatrixNode : public NodeBase
     Q_OBJECT
 public:
     AffineMatrixNode(QSharedPointer<QStringList> inputs = nullptr);
-    ~AffineMatrixNode();
 
     void setValues(QSharedPointer<QStringList> inputs, QList<double>* values);
 

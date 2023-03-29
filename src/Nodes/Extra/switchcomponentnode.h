@@ -8,13 +8,12 @@ class SwitchComponentNode : public NodeBase
     Q_OBJECT
 public:
     SwitchComponentNode(QSharedPointer<QStringList> inputs = nullptr, QSharedPointer<QStringList> outputs = nullptr);
-    ~SwitchComponentNode();
 
-    void setParameters(QStringList* parameters);
+    void setParameters(QSharedPointer<QStringList> parameters);
     void performResize();
 
 private:
-    QStringList* parameters;
+    QSharedPointer<QStringList> parameters;
     void createLayout();
     void addParametersLayout(QVBoxLayout* globalLayout);
     void addParameterLayout(QVBoxLayout* parametersLayout);

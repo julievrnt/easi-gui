@@ -42,12 +42,16 @@ WidgetsHandler::~WidgetsHandler()
     // easiGraphicsView deleted in mainwindow
     // nodeScene is deleted in mainwindow
     delete deleteNodeAction;
+    deleteNodeAction = nullptr;
     delete proxyRoot;
+    proxyRoot = nullptr;
     foreach (QGraphicsProxyWidget* proxy, nodes)
     {
         delete proxy;
+        proxy = nullptr;
     }
     delete newConnectorLine;
+    newConnectorLine = nullptr;
 }
 
 void WidgetsHandler::init()
@@ -350,7 +354,6 @@ void WidgetsHandler::checkConnectionBetweenConnectorAndLine(ConnectorBase* conne
 
 void WidgetsHandler::deleteWidget(QGraphicsProxyWidget* proxy)
 {
-    qDebug() << "delete widget: " << proxy;
     if (proxy->widget()->objectName() == "Node")
     {
         if (((NodeBase*) proxy->widget())->getTypeOfNode() == ROOTNODE)
@@ -375,7 +378,6 @@ void WidgetsHandler::deleteWidget(QGraphicsProxyWidget* proxy)
 
 void WidgetsHandler::deleteProxy(QGraphicsProxyWidget* proxy)
 {
-    qDebug() << "delete proxy: " << proxy;
     if (proxy->widget()->objectName() == "Connector")
     {
         ((ConnectorBase*) proxy->widget())->deleteLine();
@@ -386,6 +388,7 @@ void WidgetsHandler::deleteProxy(QGraphicsProxyWidget* proxy)
     }
 
     delete proxy;
+    proxy = nullptr;
 }
 
 void WidgetsHandler::createActions()
@@ -515,7 +518,7 @@ QGraphicsProxyWidget* WidgetsHandler::addGroupFilterNode(QPointF pos, QSharedPoi
     return proxyNode;
 }
 
-QGraphicsProxyWidget* WidgetsHandler::addSwitchNode(QPointF pos, QSharedPointer<QStringList> inputs, QSharedPointer<QStringList> outputs, QList<QStringList*> values)
+QGraphicsProxyWidget* WidgetsHandler::addSwitchNode(QPointF pos, QSharedPointer<QStringList> inputs, QSharedPointer<QStringList> outputs, QList<QSharedPointer<QStringList>> values)
 {
     SwitchNode* switchNode = new SwitchNode(inputs, outputs);
     QGraphicsProxyWidget* proxyNode = addNode(switchNode, pos);

@@ -7,15 +7,11 @@
 AffineMatrixNode::AffineMatrixNode(QSharedPointer<QStringList> inputs) : NodeBase(inputs)
 {
     this->typeOfNode = AFFINEMATHNODE;
+    hasMenu = false;
     setWindowTitle("Matrix");
     createLayout(true, false, false);
 
     setGeometry(QRect(0, 0, sizeHint().width(), sizeHint().height()));
-}
-
-AffineMatrixNode::~AffineMatrixNode()
-{
-    /// TODO
 }
 
 void AffineMatrixNode::setValues(QSharedPointer<QStringList> inputs, QList<double>* values)

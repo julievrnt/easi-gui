@@ -7,6 +7,7 @@
 RootNode::RootNode()
 {
     typeOfNode = ROOTNODE;
+    hasMenu = false;
     setWindowTitle("Inputs");
     outputConnector = nullptr;
 
@@ -21,6 +22,7 @@ RootNode::RootNode()
 RootNode::~RootNode()
 {
     delete outputConnector;
+    outputConnector = nullptr;
 }
 
 void RootNode::setOutputConnector(QGraphicsProxyWidget* newOutputConnector)

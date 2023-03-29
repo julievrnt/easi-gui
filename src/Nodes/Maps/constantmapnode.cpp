@@ -36,11 +36,6 @@ ConstantMapNode::ConstantMapNode(QSharedPointer<QStringList> outputs, QList<doub
     delete values;
 }
 
-ConstantMapNode::~ConstantMapNode()
-{
-    //delete outputs;
-}
-
 QMap<QString, double>*  ConstantMapNode::getValues()
 {
     QMap<QString, double>* values = new QMap<QString, double>();

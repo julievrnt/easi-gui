@@ -11,7 +11,6 @@ class ConstantMapNode : public NodeBase
 public:
     ConstantMapNode(QSharedPointer<QStringList> outputs = nullptr);
     ConstantMapNode(QSharedPointer<QStringList> outputs, QList<double>* values);
-    ~ConstantMapNode();
 
 private:
     QMap<QString, double>* getValues();

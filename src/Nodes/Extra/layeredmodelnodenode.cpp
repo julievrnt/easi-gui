@@ -7,6 +7,7 @@
 LayeredModelNodeNode::LayeredModelNodeNode(QSharedPointer<QStringList> inputs) : NodeBase(inputs)
 {
     this->typeOfNode = LAYEREDMODELNODENODE;
+    hasMenu = false;
     setWindowTitle("Node");
     createLayout(true, false, false);
 

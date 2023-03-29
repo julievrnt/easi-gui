@@ -6,6 +6,7 @@
 TranslationNode::TranslationNode() : NodeBase(nullptr)
 {
     this->typeOfNode = AFFINEMATHNODE;
+    hasMenu = false;
     setWindowTitle("Translation");
     createLayout(true, false, false);
 

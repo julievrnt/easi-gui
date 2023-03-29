@@ -3,22 +3,18 @@
 SwitchComponentNode::SwitchComponentNode(QSharedPointer<QStringList> inputs, QSharedPointer<QStringList> outputs) : NodeBase(inputs, outputs)
 {
     typeOfNode = SWITCHCOMPONENTNODE;
+    hasMenu = false;
     setWindowTitle("Switch Component");
     removeButtonIndex = 1;
     dimensionLineEditIndex = 0;
-    parameters = new QStringList();
+    parameters = QSharedPointer<QStringList>(new QStringList);
 
     createLayout();
 
     setGeometry(QRect(0, 0, sizeHint().width(), sizeHint().height()));
 }
 
-SwitchComponentNode::~SwitchComponentNode()
-{
-    delete parameters;
-}
-
-void SwitchComponentNode::setParameters(QStringList* parameters)
+void SwitchComponentNode::setParameters(QSharedPointer<QStringList> parameters)
 {
     if (parameters == nullptr)
         return;

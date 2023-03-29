@@ -4,6 +4,7 @@
 FunctionNode::FunctionNode(QSharedPointer<QStringList> inputs) : NodeBase(inputs)
 {
     typeOfNode = FUNCTIONNODE;
+    hasMenu = false;
     setWindowTitle("Function");
     createLayout();
 

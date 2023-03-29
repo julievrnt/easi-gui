@@ -15,8 +15,7 @@ FunctionMapNode::FunctionMapNode(QSharedPointer<QStringList> inputs, QSharedPoin
 
 FunctionMapNode::~FunctionMapNode()
 {
-    while (functionNodeProxies.size() > 0)
-        removeFunctionOfDimensionRow(functionNodeProxies.size() - 1);
+    // functionNodeProxies deleted in clearNodes()
 }
 
 void FunctionMapNode::setValues(QMap<QString, QString>* values)

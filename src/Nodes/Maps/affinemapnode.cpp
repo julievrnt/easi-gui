@@ -18,10 +18,8 @@ AffineMapNode::AffineMapNode(QSharedPointer<QStringList> inputs, QSharedPointer<
 
 AffineMapNode::~AffineMapNode()
 {
-    while (mathOutputConnectors->size() > 0)
-    {
-        removeMathsOfDimensionRow((mathOutputConnectors->size() - 1) / 2);
-    }
+    // affineMatrixProxies deleted in clearNodes()
+    // translationProxies deleted in clearNodes()
 }
 
 void AffineMapNode::setValues(QMap<QString, QList<double> >* values)

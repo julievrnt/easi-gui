@@ -15,8 +15,7 @@ LuaMapNode::LuaMapNode(QSharedPointer<QStringList> inputs, QSharedPointer<QStrin
 
 LuaMapNode::~LuaMapNode()
 {
-    if(functionNodeProxy != nullptr)
-        emit deleteNodeRequested(functionNodeProxy);
+    // functionNodeProxy deleted in clearNodes()
 }
 
 void LuaMapNode::setValue(QString value)

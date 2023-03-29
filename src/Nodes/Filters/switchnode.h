@@ -10,7 +10,7 @@ public:
     SwitchNode(QSharedPointer<QStringList> inputs = nullptr, QSharedPointer<QStringList> outputs = nullptr);
     ~SwitchNode();
 
-    void setValues(QList<QStringList*> values);
+    void setValues(QList<QSharedPointer<QStringList>> values);
     const QList<QGraphicsProxyWidget*>& getSwitchComponentProxies() const;
     void addSwitchComponentProxy(QGraphicsProxyWidget* newSwitchComponentProxy);
     void clearNodes();
