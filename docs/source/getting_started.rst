@@ -31,7 +31,7 @@ The following command differs whether you have installed Qt using the command li
 .. code-block:: bash
 
    # if you have installed Qt using the command line:
-   qmake -makefile -o Makefile ../easi-gui.pro
+   qmake6 -makefile -o Makefile ../easi-gui.pro
    
    # if you have installed Qt using the official installer, where $QT_SRC is where Qt has been installed and $QT_VERSION is your Qt version
    $QT_SRC/$QT_VERSION/gcc_64/bin/qmake -makefile -o Makefile ../easi-gui.pro
