@@ -18,9 +18,9 @@ This node implements `LayeredModel <https://easyinit.readthedocs.io/en/latest/bu
   
 The model can be connected as any component is connected to its parent. The interpolation can be chosen between lower (smaller) node, upper (larger) node and linear. 
 
-The values of the nodes, for which the parameters are known, need to be added in the spin boxes of the Layered Model node. The + button below "nodes" adds new node rows to the map, while the - button removes the node of the button's row.
+The values of the nodes, for which the parameters are known, need to be added in the boxes of the Layered Model node. The + button below "nodes" adds new node rows to the map, while the - button removes the node of the button's row.
 
-When a parameter is added to the Layered Model node, it is automatically added to all the "Node" nodes. Its known value can then be given in the spin box next to its name. The + button below "parameters" adds new parameter rows to the map, while the - button removes the parameter of the button's row.
+When a parameter is added to the Layered Model node, it is automatically added to all the "Node" nodes. Its known value can then be given in the box next to its name. The + button below "parameters" adds new parameter rows to the map, while the - button removes the parameter of the button's row.
 
 
 

@@ -86,8 +86,8 @@ void EvalModelNode::saveValues(YAML::Emitter* out)
     *out << YAML::EndSeq << YAML::Block;
 
     *out << YAML::Key << "model" << YAML::Value;
-    if (outputConnectorModel != nullptr && ((OutputConnector*) outputConnectorModel->widget())->getConnectorLineConnected())
-        ((OutputConnector*) outputConnectorModel->widget())->saveComponent(out);
+    if (outputConnectorModel != nullptr && static_cast<OutputConnector*>(outputConnectorModel->widget())->getConnectorLineConnected())
+        static_cast<OutputConnector*>(outputConnectorModel->widget())->saveComponent(out);
     else
         *out << YAML::BeginMap << YAML::EndMap;
 }

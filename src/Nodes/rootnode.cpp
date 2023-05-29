@@ -32,7 +32,7 @@ void RootNode::setOutputConnector(QGraphicsProxyWidget* newOutputConnector)
 
 OutputConnector* RootNode::getFirstAvailableOutputConnector()
 {
-    return (OutputConnector*) outputConnector->widget();
+    return static_cast<OutputConnector*>(outputConnector->widget());
 }
 
 void RootNode::createLayout()
@@ -66,7 +66,7 @@ void RootNode::saveNodeContent(YAML::Emitter* out)
         qDebug() << "ERROR: output connnector of root is null !";
         return;
     }
-    ((OutputConnector*) outputConnector->widget())->saveComponent(out);
+    static_cast<OutputConnector*>(outputConnector->widget())->saveComponent(out);
 }
 
 void RootNode::performResize()

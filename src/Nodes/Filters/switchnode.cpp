@@ -30,7 +30,7 @@ void SwitchNode::setValues(QList<QSharedPointer<QStringList>> values)
         QSharedPointer<QStringList> parameters = values.at(i);
 
         // set parameters values
-        SwitchComponentNode* switchComponentNode = (SwitchComponentNode*) this->switchComponentProxies.at(i)->widget();
+        SwitchComponentNode* switchComponentNode = static_cast<SwitchComponentNode*>(this->switchComponentProxies.at(i)->widget());
         switchComponentNode->setParameters(parameters);
     }
 }
@@ -79,11 +79,11 @@ void SwitchNode::saveNodeContent(YAML::Emitter* out)
 
 void SwitchNode::saveValues(YAML::Emitter* out)
 {
-    if (!((OutputConnector*) outputConnectors->at(0)->widget())->getConnectorLineConnected())
+    if (!static_cast<OutputConnector*>(outputConnectors->at(0)->widget())->getConnectorLineConnected())
         return;
 
     for (int i = 0; i < outputConnectors->size(); i++)
     {
-        ((OutputConnector*) outputConnectors->at(i)->widget())->saveComponent(out);
+        static_cast<OutputConnector*>(outputConnectors->at(i)->widget())->saveComponent(out);
     }
 }

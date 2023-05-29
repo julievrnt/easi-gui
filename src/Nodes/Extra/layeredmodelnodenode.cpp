@@ -29,9 +29,9 @@ void LayeredModelNodeNode::setValues(QSharedPointer<QStringList> inputs, QList<d
         addNewDimensionsLayoutRow(dimensionsLayout, dimensionsLayout->children().size());
     for (int i = 0; i < inputs->size(); i++)
     {
-        QHBoxLayout* row = (QHBoxLayout*) dimensionsLayout->children().at(i);
-        int index = inputs->indexOf(((QLabel*) row->itemAt(0)->widget())->text());
-        ((QDoubleSpinBox*) row->itemAt(1)->widget())->setValue(values->at(index));
+        QHBoxLayout* row = static_cast<QHBoxLayout*>(dimensionsLayout->children().at(i));
+        int index = inputs->indexOf(static_cast<QLabel*>(row->itemAt(0)->widget())->text());
+        static_cast<QDoubleSpinBox*>(row->itemAt(1)->widget())->setValue(values->at(index));
     }
 }
 
@@ -66,8 +66,8 @@ QList<double>* LayeredModelNodeNode::getValues()
     QObjectList dimensionsLayout = this->layout()->findChild<QVBoxLayout*>("dimensionsLayout")->children();
     foreach (QObject* row, dimensionsLayout)
     {
-        QHBoxLayout* layout = (QHBoxLayout*) row;
-        double value = ((QDoubleSpinBox*) layout->itemAt(1)->widget())->value();
+        QHBoxLayout* layout = static_cast<QHBoxLayout*>(row);
+        double value = static_cast<QDoubleSpinBox*>(layout->itemAt(1)->widget())->value();
         values->append(value);
     }
 
@@ -83,7 +83,7 @@ void LayeredModelNodeNode::updateLayout()
     {
         foreach (QObject* child, dimensionsLayout->children())
         {
-            oldInputs.append(((QLabel*) ((QHBoxLayout*) child)->itemAt(0)->widget())->text());
+            oldInputs.append(static_cast<QLabel*>(static_cast<QHBoxLayout*>(child)->itemAt(0)->widget())->text());
         }
     }
 

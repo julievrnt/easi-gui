@@ -24,7 +24,7 @@ void LuaMapNode::setValue(QString value)
         return;
 
     // set function value
-    FunctionNode* functionNode = (FunctionNode*) functionNodeProxy->widget();
+    FunctionNode* functionNode = static_cast<FunctionNode*>(functionNodeProxy->widget());
     functionNode->setValue(inputs, value);
 }
 
@@ -74,7 +74,7 @@ void LuaMapNode::updateLayout()
 {
     foreach (QGraphicsProxyWidget* functionOutputConnector, (*functionOutputConnectors))
     {
-        emit ((OutputConnector*) functionOutputConnector->widget())->transferOutputsRequested(inputs);
+        emit static_cast<OutputConnector*>(functionOutputConnector->widget())->transferOutputsRequested(inputs);
     }
 }
 
@@ -94,5 +94,5 @@ void LuaMapNode::saveValues(YAML::Emitter* out)
 
     *out << YAML::Key << "function";
     *out << YAML::Value;
-    ((OutputConnector*) functionOutputConnectors->at(0)->widget())->saveComponent(out);
+    static_cast<OutputConnector*>(functionOutputConnectors->at(0)->widget())->saveComponent(out);
 }

@@ -21,25 +21,21 @@ class ConnectorBase : public QWidget
     Q_OBJECT
 public:
     explicit ConnectorBase(NodeParentWidget* nodeParentWidget, int subtype, bool canDisconnect);
-    ~ConnectorBase();
 
+    // getters and setters
     QSharedPointer<QStringList> getOutputs() const;
-    void outputsChanged();
-    int getTypeOfConnector() const;
-    QPointF getCenterPos() const;
-    void connectorLineDeleted();
-    void setConnectorLineConnected(bool isConnected);
-    void deleteLine();
 
+    int getTypeOfConnector() const;
+    int getSubtypeOfConnector() const;
+    void setSubtypeOfConnector(int newSubtypeOfConnector);
+
+    QPointF getCenterPos() const;
     NodeParentWidget* getNodeParentWidget() const;
 
-    void setConnectorLineCreated(bool newConnectorLineCreated);
-
     bool getConnectorLineConnected() const;
-
-    int getSubtypeOfConnector() const;
-
-    void setSubtypeOfConnector(int newSubtypeOfConnector);
+    void setConnectorLineConnected(bool isConnected);
+    void setConnectorLineCreated(bool newConnectorLineCreated);
+    void deleteLine();
 
 signals:
     void lineDragged();
@@ -52,26 +48,16 @@ signals:
     void transferOutputsRequested(QSharedPointer<QStringList> outputs);
     void saveRequested(YAML::Emitter* out);
 
-private:
-    QSharedPointer<QStringList> outputs;
-    bool highlight;
-    NodeParentWidget* nodeParentWidget;
-
-    void updateCenterPos();
-
-private slots:
-    void nodeParentWidgetHasMoved();
-    void transferOutputs(QSharedPointer<QStringList> outputs);
-
-    // QWidget interface
 protected:
     int typeOfConnector;
     int subtypeOfConnector;
     QPointF centerPos;
+    // is false if a connector can not be disconnected from another connector (e.g. extra nodes)
     bool canDisconnect;
     bool connectorLineCreated;
     bool connectorLineConnected;
 
+    // inherited from QWidget
     void paintEvent(QPaintEvent* event);
     void enterEvent(QEnterEvent* event);
     void leaveEvent(QEvent* event);
@@ -79,6 +65,20 @@ protected:
     void mouseReleaseEvent(QMouseEvent* event);
     void mouseMoveEvent(QMouseEvent* event);
     void moveEvent(QMoveEvent* event);
+
+private:
+    QSharedPointer<QStringList> outputs;
+    // indicates if the connector needs to be highlighted when the mouse is on it.
+    bool highlight;
+    NodeParentWidget* nodeParentWidget;
+
+    void updateCenterPos();
+    void outputsChanged();
+    void connectorLineDeleted();
+
+private slots:
+    void nodeParentWidgetHasMoved();
+    void transferOutputs(QSharedPointer<QStringList> outputs);
 };
 
 #endif // CONNECTORWIDGET_H

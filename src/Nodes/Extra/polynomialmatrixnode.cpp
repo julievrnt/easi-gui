@@ -30,8 +30,8 @@ void PolynomialMatrixNode::setValues(QSharedPointer<QStringList> inputs, QList<d
     QVBoxLayout* dimensionsLayout = this->layout()->findChild<QVBoxLayout*>("dimensionsLayout");
     for (int i =  values->size() - 1; i >= 0; i--)
     {
-        QHBoxLayout* row = (QHBoxLayout*) dimensionsLayout->children().at(values->size() - 1 - i);
-        ((QDoubleSpinBox*) row->itemAt(1)->widget())->setValue(values->at(i));
+        QHBoxLayout* row = static_cast<QHBoxLayout*>(dimensionsLayout->children().at(values->size() - 1 - i));
+        static_cast<QDoubleSpinBox*>(row->itemAt(1)->widget())->setValue(values->at(i));
     }
 }
 
@@ -60,8 +60,8 @@ QList<double>* PolynomialMatrixNode::getValues()
 
     for (int i = 0; i < dimensionsLayout->children().size(); i++)
     {
-        QHBoxLayout* row = (QHBoxLayout*) dimensionsLayout->children().at(i);
-        double value = ((QDoubleSpinBox*) row->itemAt(1)->widget())->value();
+        QHBoxLayout* row = static_cast<QHBoxLayout*>(dimensionsLayout->children().at(i));
+        double value = static_cast<QDoubleSpinBox*>(row->itemAt(1)->widget())->value();
         values->append(value);
     }
     return values;
@@ -113,15 +113,15 @@ void PolynomialMatrixNode::updateLayout()
         return;
 
     // retrieve old input
-    QHBoxLayout* firstRow = (QHBoxLayout*) rows.at(1);
-    QString oldInput = ((QLabel*) firstRow->itemAt(0)->widget())->text();
+    QHBoxLayout* firstRow = static_cast<QHBoxLayout*>(rows.at(1));
+    QString oldInput = static_cast<QLabel*>(firstRow->itemAt(0)->widget())->text();
     if (oldInput == inputs->at(0))
         return;
 
     for (int i = 1; i < rows.size(); i++)
     {
-        QHBoxLayout* row = (QHBoxLayout*) rows.at(i);
-        ((QLabel*) row->itemAt(0)->widget())->setText(inputs->at(0) + "^" + QString::number(i));
+        QHBoxLayout* row = static_cast<QHBoxLayout*>(rows.at(i));
+        static_cast<QLabel*>(row->itemAt(0)->widget())->setText(inputs->at(0) + "^" + QString::number(i));
     }
 }
 

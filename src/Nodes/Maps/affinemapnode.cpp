@@ -39,11 +39,11 @@ void AffineMapNode::setValues(QMap<QString, QList<double> >* values)
         double translationValue = matrixAndTranslationValues.takeLast();
 
         // set matrix values
-        AffineMatrixNode* matrixNode = (AffineMatrixNode*) this->affineMatrixProxies.at(i)->widget();
+        AffineMatrixNode* matrixNode = static_cast<AffineMatrixNode*>(this->affineMatrixProxies.at(i)->widget());
         matrixNode->setValues(inputs, &matrixAndTranslationValues);
 
         // set translation values
-        TranslationNode* translationNode = (TranslationNode*) this->translationProxies.at(i)->widget();
+        TranslationNode* translationNode = static_cast<TranslationNode*>(this->translationProxies.at(i)->widget());
         translationNode->setValue(translationValue);
     }
 
@@ -154,7 +154,7 @@ void AffineMapNode::updateLayout()
 {
     foreach (QGraphicsProxyWidget* mathOutputConnector, (*mathOutputConnectors))
     {
-        emit ((OutputConnector*) mathOutputConnector->widget())->transferOutputsRequested(inputs);
+        emit static_cast<OutputConnector*>(mathOutputConnector->widget())->transferOutputsRequested(inputs);
     }
 }
 
@@ -169,7 +169,7 @@ void AffineMapNode::saveValues(YAML::Emitter* out)
     {
         int index = outputs->indexOf(dimensions[i]);
         *out << YAML::Key << dimensions.at(i).toStdString();
-        ((OutputConnector*) mathOutputConnectors->at(index * 2)->widget())->saveComponent(out);
+        static_cast<OutputConnector*>(mathOutputConnectors->at(index * 2)->widget())->saveComponent(out);
     }
     *out << YAML::EndMap;
 
@@ -180,7 +180,7 @@ void AffineMapNode::saveValues(YAML::Emitter* out)
         int index = outputs->indexOf(dimensions[i]);
         *out << YAML::Key << dimensions.at(i).toStdString();
         *out << YAML::Value;
-        ((OutputConnector*) mathOutputConnectors->at(index * 2 + 1)->widget())->saveComponent(out);
+        static_cast<OutputConnector*>(mathOutputConnectors->at(index * 2 + 1)->widget())->saveComponent(out);
     }
     *out << YAML::EndMap;
 

@@ -25,16 +25,19 @@ ConnectorLine::ConnectorLine(OutputConnector* outputConnector, InputConnector* i
     setObjectName("Line");
 }
 
-ConnectorLine::~ConnectorLine()
-{
-
-}
-
+/**
+ * @brief Saves the proxy of the connector line
+ * @param newConnectorLineProxy
+ */
 void ConnectorLine::setConnectorLineProxy(QGraphicsProxyWidget* newConnectorLineProxy)
 {
     connectorLineProxy = newConnectorLineProxy;
 }
 
+/**
+ * @brief Returns the position of the end of the line that is not connected yet
+ * @return
+ */
 QPointF ConnectorLine::getPositionToCheck()
 {
     if (inputConnector == nullptr)
@@ -43,6 +46,10 @@ QPointF ConnectorLine::getPositionToCheck()
         return outputConnectorPoint;
 }
 
+/**
+ * @brief Connect a line to the given connector
+ * @param connector
+ */
 void ConnectorLine::connectLineToConnector(ConnectorBase* connector)
 {
     if (connector->getTypeOfConnector() == INPUTCONNECTOR)
@@ -66,7 +73,7 @@ void ConnectorLine::connectLineToConnector(ConnectorBase* connector)
                 return;
         }
 
-        inputConnector = (InputConnector*) connector;
+        inputConnector = static_cast<InputConnector*>(connector);
         inputConnectorPoint = inputConnector->getCenterPos();
         connect(this, SIGNAL(transferOutputsRequested(QSharedPointer<QStringList>)), inputConnector, SLOT(transferOutputs(QSharedPointer<QStringList>)));
         connect(this, SIGNAL(saveRequested(YAML::Emitter*)), inputConnector, SLOT(save(YAML::Emitter*)));
@@ -88,7 +95,7 @@ void ConnectorLine::connectLineToConnector(ConnectorBase* connector)
                 return;
         }
 
-        outputConnector = (OutputConnector*) connector;
+        outputConnector = static_cast<OutputConnector*>(connector);
         outputConnectorPoint = outputConnector->getCenterPos();
         connect(outputConnector, SIGNAL(transferOutputsRequested(QSharedPointer<QStringList>)), this, SLOT(transferOutputs(QSharedPointer<QStringList>)));
         connect(outputConnector, SIGNAL(saveRequested(YAML::Emitter*)), this, SLOT(save(YAML::Emitter*)));
@@ -123,6 +130,10 @@ void ConnectorLine::connectLineToConnector(ConnectorBase* connector)
     }
 }
 
+/**
+ * @brief Disconnect the line from a connector
+ * @param connector
+ */
 void ConnectorLine::disconnectLineFromConnector(ConnectorBase* connector)
 {
     connector->setConnectorLineConnected(false);
@@ -146,6 +157,15 @@ void ConnectorLine::disconnectLineFromConnector(ConnectorBase* connector)
         qDebug() << "error: neither input nor output";
 }
 
+
+/// ===========================================================================
+/// ========================= INHERITED FROM QWIDGET ==========================
+/// ===========================================================================
+
+/**
+ * @brief Paints a line from the input connector position to the output connector position. The color of the line corresponds to the color of the connectors.
+ * @param event
+ */
 void ConnectorLine::paintEvent(QPaintEvent* event)
 {
     QPainter painter(this);
@@ -178,6 +198,14 @@ void ConnectorLine::paintEvent(QPaintEvent* event)
     QWidget::paintEvent(event);
 }
 
+
+/// ===========================================================================
+/// ================================== SLOTS ==================================
+/// ===========================================================================
+
+/**
+ * @brief Draws a line from a connector to the mouse
+ */
 void ConnectorLine::isDragged()
 {
     if (isDone == true)
@@ -189,6 +217,9 @@ void ConnectorLine::isDragged()
     this->repaint();
 }
 
+/**
+ * @brief Emits a signal received by WidgetsHandler to inform it that the line is no more dragged and starts a timer. When the timer has timed out, the line is deleted.
+ */
 void ConnectorLine::isNoMoreDragged()
 {
     connect(getOtherConnectorTimer, SIGNAL(timeout()), this, SLOT(getOhterConnectorTimeOut()));
@@ -196,6 +227,10 @@ void ConnectorLine::isNoMoreDragged()
     emit drawnIsDone(this);
 }
 
+/**
+ * @brief Updates the position of the line when the connector has moved
+ * @param connectorType indicates which end of the line has moved
+ */
 void ConnectorLine::connectorHasMoved(int connectorType)
 {
     if (connectorType == INPUTCONNECTOR)
@@ -207,11 +242,19 @@ void ConnectorLine::connectorHasMoved(int connectorType)
     this->repaint();
 }
 
+/**
+ * @brief Calles connectLineToConnector(ConnectorBase* connector) when received
+ * @param connector
+ */
 void ConnectorLine::connectTo(ConnectorBase* connector)
 {
     connectLineToConnector(connector);
 }
 
+/**
+ * @brief When received from a connector, disconnects the line from the other connector
+ * @param connector
+ */
 void ConnectorLine::resetConnectorLine(ConnectorBase* connector)
 {
     if (connector == inputConnector)
@@ -232,12 +275,18 @@ void ConnectorLine::resetConnectorLine(ConnectorBase* connector)
         qDebug() << "error: neither input nor output";
 }
 
+/**
+ * @brief Calls deleteConnectorLine() when the timer has timed out
+ */
 void ConnectorLine::getOhterConnectorTimeOut()
 {
     getOtherConnectorTimer->stop();
     deleteConnectorLine();
 }
 
+/**
+ * @brief Disconnects the line from any connector it is connected to and deletes itself
+ */
 void ConnectorLine::deleteConnectorLine()
 {
     delete getOtherConnectorTimer;
@@ -258,6 +307,10 @@ void ConnectorLine::transferOutputs(QSharedPointer<QStringList> outputs)
     emit transferOutputsRequested(outputs);
 }
 
+/**
+ * @brief Emits a signal received by the input connector to save the content of its node.
+ * @param out YAML emitter
+ */
 void ConnectorLine::save(YAML::Emitter* out)
 {
     emit saveRequested(out);

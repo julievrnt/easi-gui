@@ -34,7 +34,7 @@ PolynomialMapNode::PolynomialMapNode(QSharedPointer<QStringList> inputs, QShared
     line->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
     degreeAndLineLayout->addWidget(line);
 
-    ((QVBoxLayout*) this->layout())->insertLayout(1, degreeAndLineLayout);
+    static_cast<QVBoxLayout*>(this->layout())->insertLayout(1, degreeAndLineLayout);
 
     setGeometry(QRect(0, 0, sizeHint().width(), sizeHint().height()));
 }
@@ -57,7 +57,7 @@ void PolynomialMapNode::setValues(QMap<QString, QList<double>>* values)
 
     // set degree value
     QHBoxLayout* degreeLayout = this->layout()->findChild<QHBoxLayout*>("degreeLayout");
-    ((QSpinBox*) degreeLayout->itemAt(1)->widget())->setValue(degree);
+    static_cast<QSpinBox*>(degreeLayout->itemAt(1)->widget())->setValue(degree);
 
     for (int i = 0; i < outputs->size(); i++)
     {
@@ -67,7 +67,7 @@ void PolynomialMapNode::setValues(QMap<QString, QList<double>>* values)
         QList<double> matrixValues = values->value(outputs->at(i));
 
         // set matrix values
-        PolynomialMatrixNode* matrixNode = (PolynomialMatrixNode*) this->polynomialMatrixProxies.at(i)->widget();
+        PolynomialMatrixNode* matrixNode = static_cast<PolynomialMatrixNode*>(this->polynomialMatrixProxies.at(i)->widget());
         matrixNode->setValues(inputs, &matrixValues);
     }
 
@@ -98,7 +98,7 @@ void PolynomialMapNode::degreeHasChanged(int newDegree)
 
     foreach (QGraphicsProxyWidget* polynomialMatrixProxy, polynomialMatrixProxies)
     {
-        ((PolynomialMatrixNode*) polynomialMatrixProxy->widget())->setDegree(newDegree);
+        static_cast<PolynomialMatrixNode*>(polynomialMatrixProxy->widget())->setDegree(newDegree);
     }
 
     setDegree(newDegree);
@@ -180,7 +180,7 @@ void PolynomialMapNode::updateLayout()
 {
     foreach (QGraphicsProxyWidget* mathOutputConnector, (*mathOutputConnectors))
     {
-        emit ((OutputConnector*) mathOutputConnector->widget())->transferOutputsRequested(inputs);
+        emit static_cast<OutputConnector*>(mathOutputConnector->widget())->transferOutputsRequested(inputs);
     }
 }
 
@@ -197,7 +197,7 @@ void PolynomialMapNode::saveValues(YAML::Emitter* out)
         int index = outputs->indexOf(dimensions[i]);
         *out << YAML::Key << dimensions.at(i).toStdString();
         *out << YAML::Value;
-        ((OutputConnector*) mathOutputConnectors->at(index)->widget())->saveComponent(out);
+        static_cast<OutputConnector*>(mathOutputConnectors->at(index)->widget())->saveComponent(out);
     }
 
     *out << YAML::EndMap;

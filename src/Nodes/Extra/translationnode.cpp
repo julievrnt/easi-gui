@@ -27,7 +27,7 @@ TranslationNode::TranslationNode() : NodeBase(nullptr)
 void TranslationNode::setValue(double value)
 {
     QVBoxLayout* translationLayout = this->layout()->findChild<QVBoxLayout*>("dimensionsLayout");
-    ((QDoubleSpinBox*) translationLayout->itemAt(0)->widget())->setValue(value);
+    static_cast<QDoubleSpinBox*>(translationLayout->itemAt(0)->widget())->setValue(value);
 }
 
 void TranslationNode::saveNodeContent(YAML::Emitter* out)
@@ -38,6 +38,6 @@ void TranslationNode::saveNodeContent(YAML::Emitter* out)
 void TranslationNode::saveValues(YAML::Emitter* out)
 {
     QVBoxLayout* translationLayout = this->layout()->findChild<QVBoxLayout*>("dimensionsLayout");
-    double value = ((QDoubleSpinBox*) translationLayout->itemAt(0)->widget())->value();
+    double value = static_cast<QDoubleSpinBox*>(translationLayout->itemAt(0)->widget())->value();
     *out << YAML::Key << value;
 }

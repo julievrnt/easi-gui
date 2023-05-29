@@ -12,7 +12,7 @@ SphericalDomainFilterNode::SphericalDomainFilterNode(QSharedPointer<QStringList>
         outputs = QSharedPointer<QStringList>(new QStringList(*inputs));
     createLayout(true, false);
 
-    QVBoxLayout* globalLayout = (QVBoxLayout*) this->layout();
+    QVBoxLayout* globalLayout = static_cast<QVBoxLayout*>(this->layout());
 
     QVBoxLayout* radiusAndLineLayout = new QVBoxLayout();
     QHBoxLayout* radiusLayout = new QHBoxLayout();
@@ -50,14 +50,14 @@ SphericalDomainFilterNode::SphericalDomainFilterNode(QSharedPointer<QStringList>
         return;
 
     QHBoxLayout* radiusLayout = this->layout()->findChild<QHBoxLayout*>("radiusLayout");
-    ((QDoubleSpinBox*) radiusLayout->itemAt(1)->widget())->setValue(values->at(0));
+    static_cast<QDoubleSpinBox*>(radiusLayout->itemAt(1)->widget())->setValue(values->at(0));
 
     QVBoxLayout* dimensionsLayout = this->layout()->findChild<QVBoxLayout*>("dimensionsLayout");
     for (int i = 1; i < values->size(); i++)
     {
-        QHBoxLayout* row = (QHBoxLayout*) dimensionsLayout->children().at(i - 1);
-        ((QLabel*) row->itemAt(0)->widget())->setText(outputs->at(i - 1));
-        ((QDoubleSpinBox*) row->itemAt(1)->widget())->setValue(values->at(i));
+        QHBoxLayout* row = static_cast<QHBoxLayout*>(dimensionsLayout->children().at(i - 1));
+        static_cast<QLabel*>(row->itemAt(0)->widget())->setText(outputs->at(i - 1));
+        static_cast<QDoubleSpinBox*>(row->itemAt(1)->widget())->setValue(values->at(i));
     }
 
     delete values;
@@ -70,9 +70,9 @@ QMap<QString, double>* SphericalDomainFilterNode::getCenterValues()
     QObjectList dimensionsLayout = this->layout()->findChild<QVBoxLayout*>("dimensionsLayout")->children();
     foreach (QObject* row, dimensionsLayout)
     {
-        QHBoxLayout* layout = (QHBoxLayout*) row;
-        QString name = ((QLabel*) layout->itemAt(0)->widget())->text();
-        double value = ((QDoubleSpinBox*) layout->itemAt(1)->widget())->value();
+        QHBoxLayout* layout = static_cast<QHBoxLayout*>(row);
+        QString name = static_cast<QLabel*>(layout->itemAt(0)->widget())->text();
+        double value = static_cast<QDoubleSpinBox*>(layout->itemAt(1)->widget())->value();
         centerValues->insert(name, value);
     }
 
@@ -131,7 +131,7 @@ void SphericalDomainFilterNode::updateLayout()
 void SphericalDomainFilterNode::saveValues(YAML::Emitter* out)
 {
     QHBoxLayout* radiusLayout = this->layout()->findChild<QHBoxLayout*>("radiusLayout");
-    double radiusValue = ((QDoubleSpinBox*) radiusLayout->itemAt(1)->widget())->value();
+    double radiusValue = static_cast<QDoubleSpinBox*>(radiusLayout->itemAt(1)->widget())->value();
 
     QMap<QString, double>* centerValues = getCenterValues();
     QStringList centerNames(*outputs);

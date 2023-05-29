@@ -20,7 +20,7 @@ void FunctionNode::setValue(QSharedPointer<QStringList> inputs, QString value)
     }
 
     QVBoxLayout* functionLayout = this->layout()->findChild<QVBoxLayout*>("functionLayout");
-    QTextEdit* function = (QTextEdit*) functionLayout->itemAt(0)->widget();
+    QTextEdit* function = static_cast<QTextEdit*>(functionLayout->itemAt(0)->widget());
     function->setText(value);
 }
 
@@ -68,7 +68,7 @@ void FunctionNode::updateLayout()
     {
         for (int i = 0; i < inputsLayout->count(); i++)
         {
-            oldInputs.append(((QPushButton*) inputsLayout->itemAt(i)->widget())->text());
+            oldInputs.append(static_cast<QPushButton*>(inputsLayout->itemAt(i)->widget())->text());
         }
     }
 
@@ -76,7 +76,7 @@ void FunctionNode::updateLayout()
     {
         if (!inputs->contains(oldInputs.at(i)))
         {
-            QPushButton* buttonToRemove = (QPushButton*) inputsLayout->itemAt(i)->widget();
+            QPushButton* buttonToRemove = static_cast<QPushButton*>(inputsLayout->itemAt(i)->widget());
             inputsLayout->removeWidget(buttonToRemove);
             buttonToRemove->deleteLater();
             oldInputs.remove(i);
@@ -113,7 +113,7 @@ void FunctionNode::saveValues(YAML::Emitter* out)
 QString FunctionNode::getValue()
 {
     QVBoxLayout* functionLayout = this->layout()->findChild<QVBoxLayout*>("functionLayout");
-    QTextEdit* function = (QTextEdit*) functionLayout->itemAt(0)->widget();
+    QTextEdit* function = static_cast<QTextEdit*>(functionLayout->itemAt(0)->widget());
     return function->toPlainText();
 }
 
@@ -122,6 +122,6 @@ void FunctionNode::inputButtonClicked(bool clicked)
     Q_UNUSED(clicked);
     QPushButton* inputButton = qobject_cast<QPushButton*>(sender());
     QVBoxLayout* functionLayout = this->layout()->findChild<QVBoxLayout*>("functionLayout");
-    QTextEdit* function = (QTextEdit*) functionLayout->itemAt(0)->widget();
+    QTextEdit* function = static_cast<QTextEdit*>(functionLayout->itemAt(0)->widget());
     function->insertPlainText(inputButton->text());
 }

@@ -18,29 +18,14 @@ public:
     ~WidgetsHandler();
 
     void init();
-    QGraphicsProxyWidget* addNode(NodeBase* node, QPointF pos = QPointF(50000, 2500));
-    QGraphicsProxyWidget* getProxyRoot() const;
-
-    // basic functions to handle nodes
-    void addRoot();
-    void deleteNode();
     void deleteWidget(QGraphicsProxyWidget* proxy);
     void deleteProxy(QGraphicsProxyWidget* proxy);
-    QPointF getPosNextTo(QGraphicsProxyWidget* parentProxyNode, QPointF pos = QPointF(0, 0));
+
+    // basic functions to handle nodes
+    void deleteNode();
     void connectNodes(NodeBase* parentNode, NodeBase* childNode);
-
-    // basic functions to handle connectors
-    void addInputConnector(InputConnector* inputConnector, QGraphicsProxyWidget* proxyNode, QPointF pos);
-    void addOutputConnector(OutputConnector* outputConnector, QGraphicsProxyWidget* proxyNode, QPointF pos);
-    void connectConnector(ConnectorBase* connector, QGraphicsProxyWidget* connectorProxy);
-
-    // basic functions to handle connector lines
-    void addConnectorLineToScene(ConnectorLine* connectorLine);
-    void createConnectorLine(ConnectorBase* connector);
-    void createConnectorLine(OutputConnector* outputConnector, InputConnector* inputConnector);
-    void saveNewConnectorLine(ConnectorLine* connectorLine);
-    void removeNewConnectorLine();
-    void checkConnectionBetweenConnectorAndLine(ConnectorBase* connector);
+    QPointF getPosNextTo(QGraphicsProxyWidget* parentProxyNode, QPointF pos = QPointF(0, 0));
+    QGraphicsProxyWidget* getProxyRoot() const;
 
     // add builder functions
     QGraphicsProxyWidget* addIncludeNode(QPointF pos = QPointF(50000, 2500), QString filePath = "");
@@ -81,10 +66,6 @@ public:
     QGraphicsProxyWidget* addFunctionNode(QPointF pos = QPointF(50000, 2500), QSharedPointer<QStringList> inputs = nullptr);
     QGraphicsProxyWidget* addLayeredModelNodeNode(QPointF pos = QPointF(50000, 2500), QSharedPointer<QStringList> inputs = nullptr);
 
-signals:
-    void saveRequested(YAML::Emitter* out);
-    void connectConnectorToLine(ConnectorBase* connector);
-
 private:
     EasiGraphicsView* easiGraphicsView;
     QGraphicsScene* nodeScene;
@@ -95,7 +76,27 @@ private:
 
     void createActions();
 
+    // basic functions to handle nodes
+    void addRoot();
+    QGraphicsProxyWidget* addNode(NodeBase* node, QPointF pos = QPointF(50000, 2500));
     void connectNode(QGraphicsProxyWidget* proxyNode);
+
+    // basic functions to handle connectors
+    void addInputConnector(InputConnector* inputConnector, QGraphicsProxyWidget* proxyNode, QPointF pos);
+    void addOutputConnector(OutputConnector* outputConnector, QGraphicsProxyWidget* proxyNode, QPointF pos);
+    void connectConnector(ConnectorBase* connector, QGraphicsProxyWidget* connectorProxy);
+
+    // basic functions to handle connector lines
+    void addConnectorLineToScene(ConnectorLine* connectorLine);
+    void createConnectorLine(ConnectorBase* connector);
+    void createConnectorLine(OutputConnector* outputConnector, InputConnector* inputConnector);
+    void saveNewConnectorLine(ConnectorLine* connectorLine);
+    void removeNewConnectorLine();
+    void checkConnectionBetweenConnectorAndLine(ConnectorBase* connector);
+
+signals:
+    void saveRequested(YAML::Emitter* out);
+    void connectConnectorToLine(ConnectorBase* connector);
 
 private slots:
     void nodeContextMenu(QPoint pos);

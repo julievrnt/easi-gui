@@ -120,8 +120,8 @@ QStringList* ASAGINode::getParameters()
     QVBoxLayout* dimensionsLayout = this->layout()->findChild<QVBoxLayout*>("dimensionsLayout");
     for (int i = 0; i < dimensionsLayout->children().size(); i++)
     {
-        QHBoxLayout* row = (QHBoxLayout*) dimensionsLayout->children().at(i);
-        QString parameter = ((QLineEdit*) row->itemAt(0)->widget())->text();
+        QHBoxLayout* row = static_cast<QHBoxLayout*>(dimensionsLayout->children().at(i));
+        QString parameter = static_cast<QLineEdit*>(row->itemAt(0)->widget())->text();
         parameters->append(parameter);
     }
 
@@ -135,7 +135,7 @@ void ASAGINode::selectFile(bool clicked)
     QHBoxLayout* fileLayout = this->layout()->findChild<QHBoxLayout*>("fileLayout");
     if (!filePath.isEmpty())
     {
-        ((QLabel*) fileLayout->itemAt(1)->widget())->setText(filePath);
+        static_cast<QLabel*>(fileLayout->itemAt(1)->widget())->setText(filePath);
         this->filePath = filePath;
     }
 }

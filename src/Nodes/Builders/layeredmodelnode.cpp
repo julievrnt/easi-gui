@@ -32,8 +32,8 @@ void LayeredModelNode::setValues(QMap<double, QList<double>>* values)
     for (int i = 0; i < values->size(); i++)
     {
         addNewNodesLayoutRow(nodesLayout, i);
-        QHBoxLayout* row = (QHBoxLayout*) nodesLayout->children().at(i);
-        ((QDoubleSpinBox*) row->itemAt(1)->widget())->setValue(keys.at(i));
+        QHBoxLayout* row = static_cast<QHBoxLayout*>(nodesLayout->children().at(i));
+        static_cast<QDoubleSpinBox*>(row->itemAt(1)->widget())->setValue(keys.at(i));
 
         addNodeConnector(i);
 
@@ -41,7 +41,7 @@ void LayeredModelNode::setValues(QMap<double, QList<double>>* values)
         QList<double> matrixValues = values->value(keys.at(i));
 
         // set matrix values
-        AffineMatrixNode* matrixNode = (AffineMatrixNode*) this->nodeProxies.at(i)->widget();
+        AffineMatrixNode* matrixNode = static_cast<AffineMatrixNode*>(this->nodeProxies.at(i)->widget());
         matrixNode->setValues(outputs, &matrixValues);
     }
 
@@ -199,8 +199,8 @@ QList<double>* LayeredModelNode::getNodesValues()
     QVBoxLayout* nodesLayout = this->layout()->findChild<QVBoxLayout*>("nodesLayout");
     foreach (QObject* child, nodesLayout->children())
     {
-        QHBoxLayout* row = (QHBoxLayout*) child;
-        double node = ((QDoubleSpinBox*) row->itemAt(1)->widget())->value();
+        QHBoxLayout* row = static_cast<QHBoxLayout*>(child);
+        double node = static_cast<QDoubleSpinBox*>(row->itemAt(1)->widget())->value();
         nodes->append(node);
     }
 
@@ -246,8 +246,8 @@ void LayeredModelNode::updateLayout()
 void LayeredModelNode::saveValues(YAML::Emitter* out)
 {
     *out << YAML::Key << "map" << YAML::Value;
-    if (outputConnectorModel != nullptr && ((OutputConnector*) outputConnectorModel->widget())->getConnectorLineConnected())
-        ((OutputConnector*) outputConnectorModel->widget())->saveComponent(out);
+    if (outputConnectorModel != nullptr && static_cast<OutputConnector*>(outputConnectorModel->widget())->getConnectorLineConnected())
+        static_cast<OutputConnector*>(outputConnectorModel->widget())->saveComponent(out);
     else
         *out << YAML::BeginMap << YAML::EndMap;
 
@@ -266,7 +266,7 @@ void LayeredModelNode::saveValues(YAML::Emitter* out)
     for (int i = 0; i < nodes->size(); i++)
     {
         *out << YAML::Key << nodes->at(i) << YAML::Value;
-        ((OutputConnector*) mathOutputConnectors->at(i)->widget())->saveComponent(out);
+        static_cast<OutputConnector*>(mathOutputConnectors->at(i)->widget())->saveComponent(out);
     }
     *out << YAML::EndMap;
 

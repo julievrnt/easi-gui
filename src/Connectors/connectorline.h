@@ -14,7 +14,6 @@ class ConnectorLine : public QWidget
 public:
     explicit ConnectorLine(ConnectorBase* connector, EasiGraphicsView* easiGraphicsView);
     explicit ConnectorLine(OutputConnector* outputConnector, InputConnector* inputConnector, EasiGraphicsView* easiGraphicsView);
-    ~ConnectorLine();
 
     void setConnectorLineProxy(QGraphicsProxyWidget* newConnectorLineProxy);
     QPointF getPositionToCheck();
@@ -27,6 +26,7 @@ signals:
     void saveRequested(YAML::Emitter* out);
 
 private:
+    // this attribute is used for the mapping when zooming in or out
     EasiGraphicsView* easiGraphicsView;
     QPointF inputConnectorPoint;
     QPointF outputConnectorPoint;
@@ -40,8 +40,7 @@ private:
     void connectLineToConnector(ConnectorBase* connector);
     void disconnectLineFromConnector(ConnectorBase* connector);
 
-    // QWidget interface
-protected:
+    // inherited from qwidget
     void paintEvent(QPaintEvent* event);
 
 private slots:

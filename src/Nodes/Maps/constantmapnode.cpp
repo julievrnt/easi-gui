@@ -29,9 +29,9 @@ ConstantMapNode::ConstantMapNode(QSharedPointer<QStringList> outputs, QList<doub
     QObjectList dimensionsLayout = this->layout()->findChild<QVBoxLayout*>("dimensionsLayout")->children();
     foreach (QObject* row, dimensionsLayout)
     {
-        QHBoxLayout* layout = (QHBoxLayout*) row;
-        int index = outputs->indexOf(((QLineEdit*) layout->itemAt(0)->widget())->text());
-        ((QDoubleSpinBox*) layout->itemAt(1)->widget())->setValue(values->at(index));
+        QHBoxLayout* layout = static_cast<QHBoxLayout*>(row);
+        int index = outputs->indexOf((static_cast<QLineEdit*>(layout->itemAt(0)->widget())->text()));
+        static_cast<QDoubleSpinBox*>(layout->itemAt(1)->widget())->setValue(values->at(index));
     }
     delete values;
 }
@@ -43,9 +43,9 @@ QMap<QString, double>*  ConstantMapNode::getValues()
     QObjectList dimensionsLayout = this->layout()->findChild<QVBoxLayout*>("dimensionsLayout")->children();
     foreach (QObject* row, dimensionsLayout)
     {
-        QHBoxLayout* layout = (QHBoxLayout*) row;
-        QString name = ((QLineEdit*) layout->itemAt(0)->widget())->text();
-        double value = ((QDoubleSpinBox*) layout->itemAt(1)->widget())->value();
+        QHBoxLayout* layout = static_cast<QHBoxLayout*>(row);
+        QString name = static_cast<QLineEdit*>(layout->itemAt(0)->widget())->text();
+        double value = static_cast<QDoubleSpinBox*>(layout->itemAt(1)->widget())->value();
         values->insert(name, value);
     }
 

@@ -56,7 +56,7 @@ void IncludeNode::selectFile(bool clicked)
     QHBoxLayout* fileLayout = this->layout()->findChild<QHBoxLayout*>("fileLayout");
     if (!filePath.isEmpty())
     {
-        ((QLabel*) fileLayout->itemAt(0)->widget())->setText(filePath);
+        static_cast<QLabel*>(fileLayout->itemAt(0)->widget())->setText(filePath);
         this->filePath = filePath;
     }
 }

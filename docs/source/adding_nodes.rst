@@ -1,9 +1,9 @@
 How to create new nodes
 =======================
 
-You may want to expand easi-gui by creating new types of nodes. Here is a tutorial to explain how the code works and how new nodes can be added. If you haven't read it yet, please read `Understanding the program's structure <https://easi-gui.readthedocs.io/en/latest/program_structure.html>`_ first.
+If new easi components are created, you may want to expand easi-gui by creating their corresponding nodes. Here is a tutorial to explain how the code works and how new nodes can be added. If you haven't read it yet, please read `Understanding the program's structure <https://easi-gui.readthedocs.io/en/latest/program_structure.html>`_ first.
 
-If you have an idea of how the program looks like, let's create a new map node called FooNode. FooNode should implements the following easi map:
+If you have an idea of how the program looks like, let's create a new map node called **FooNode**. FooNode should implements the following easi map:
 
 .. code-block:: YAML
 
@@ -18,7 +18,7 @@ If you have an idea of how the program looks like, let's create a new map node c
 :Codomain:
   keys in hello
 
-It will have the 3 basic layouts: the title layout, the dimensions layout and the components layout. The dimensions layout is the only one you will need to write. It will contains a list of editable lines and spin boxes (basically, it will looks like the Constant Map node).
+It will have the 3 basic layouts: the title layout, the dimensions layout and the components layout. The dimensions layout is the only one you will need to write. It will contains a list of editable lines and spin boxes (basically, it will looks like the **Constant Map** node).
 
 1 - Creating a new class
 ------------------------
@@ -63,7 +63,7 @@ Add the definition of these two methods in ``foonode.cpp`` (right-click on FooNo
 Like we said earlier, FooNode needs the title layout, the dimensions layout and the components layout. Luckily, there is a method in NodeBase that already creates the three of them for us. However, you need to give some information to the node, otherwise you may get some weird results. The necessary information is:
 
 * type of node (used by easi-gui to easily determine which node it is dealing with)
-* local tag (used as local tag when saved into a yaml file - corresponds to the line !Foo)
+* local tag (used as local tag when saved into a yaml file - corresponds to the line "!Foo")
 * index of the remove button (position of the - button inside a dimension row, is -1 by default)
 * index of the dimension's editable line (position of the editable lines inside a dimension row, is -1 by default)
 * title of the node (used when creating the title layout by NodeBase)
@@ -74,7 +74,7 @@ Before passing the information, you need to create the type of node, since it is
 
    #define FOONODE 26;
    
-Now go to ``foonode.cpp``. The type of node is then FOONODE. Since !Foo is a local tag, the variable localTag should be set as "Foo" (yaml-cpp adds the exclamation point). The Foo node should then look like the Constant Map node. This means that, in each dimension's row, it will have first an editable line, then a spin box and finally a remove button. The indexes for the remove button and the editable line are then respectively 2 and 0. As for the title, "foo" ist enough. In the constructor, add the following lines:
+Now go to ``foonode.cpp``. The type of node is then FOONODE. Since "!Foo" is a local tag, the variable localTag should be set as "Foo" (yaml-cpp adds the exclamation point). The **Foo** node should then look like the **Constant Map** node. This means that, in each dimension's row, it will have first an editable line, then a spin box and finally a remove button. The indexes for the remove button and the editable line are then respectively 2 and 0. As for the title, "foo" ist enough. In the constructor, add the following lines:
 
 .. code-block:: cpp
 
@@ -122,7 +122,7 @@ WidgetsHandler provides a method that adds nodes and deals with the needed signa
 .. code-block:: cpp
   
    QGraphicsProxyWidget* proxyNode = addNode(fooNode, pos);
-   NodeParentWidget* nodeParentWidget = (NodeParentWidget*)proxyNode->parentWidget();
+   NodeParentWidget* nodeParentWidget = static_cast<NodeParentWidget*>(proxyNode->parentWidget());
 
 The node is now added to the scene. Adding a connector works the same way:
 
@@ -152,7 +152,7 @@ To finish, you have to return the proxy of the node:
 4 - Preparing MainWindow
 ------------------------
 
-Now that the Foo node can be added to the scene, let's change the ui, such that you can test it.
+Now that the **Foo** node can be added to the scene, let's change the ui, such that you can test it.
 
 Open ``mainwindow.ui``. You should enter the Design view. If you are still in the Edit view, click on "Design" on the left tab. In the central view, click on the menu "Add Map...", then select "Type Here" at the end of the menu and enter "Foo".
 
@@ -170,7 +170,7 @@ Now, save your changes and open ``mainwindow.h``. At the end of the the file, yo
 
    void actionAddFoo();
 
-Add the definition of this method in ``mainwindow.cpp`` (right-click on the method, then "Refactor", finally "Add Definition in mainwindow.cpp"). This method is the one that says WidgetsHandler to add a Foo node. Add the following statement to the method:
+Add the definition of this method in ``mainwindow.cpp`` (right-click on the method, then "Refactor", finally "Add Definition in mainwindow.cpp"). This method is the one that says WidgetsHandler to add a **Foo** node. Add the following statement to the method:
 
 .. code-block:: cpp
 
@@ -182,7 +182,7 @@ Let's not forget to connect the object of the ui to the MainWindow function. In 
 
    connect(ui->actionAddFoo, SIGNAL(triggered(bool)), this, SLOT(actionAddFoo()));
 
-If you run easi-gui (Ctrl-R), you should be able to add a Foo node to the scene, move it wherever you want on the scene and connect it to other nodes. 
+If you run easi-gui (Ctrl-R), you should be able to add a **Foo** node to the scene, move it wherever you want on the scene and connect it to other nodes. 
 
 .. image:: fig/tutorial/foo_test.png
   :alt: Added a not finished Foo node to scene
@@ -205,7 +205,7 @@ First, let's create a row of type QHBoxLayout*.
 
 Let's recall the order in which the items should appear: first a editable line, then a spin box and finally the remove button. 
 
-The editable line has a small particularity. The outputs should be automatically transfered to the children of the Foo node. This means we need to update the outputs, whenever we type something. A method already exists for this and is called ``dimensionNameChanged``. Besides that, if the outputs are given, the rows are automatically added when ``createLayout()`` is called. Therefore, the content of the line will be either an already existing output, or the outputs list will be further expanded. NodeBase has a method called ``addLineEdit``, which adds an editable line to a layout. It takes the layout, the placeholder text and the row index as parameters. Let's choose "Dimensions X" as placeholder text, where X is the row index:
+The editable line has a small particularity. The outputs should be automatically transfered to the children of the **Foo** node. This means we need to update the outputs, whenever we type something. A method already exists for this and is called ``dimensionNameChanged``. Besides that, if the outputs are given, the rows are automatically added when ``createLayout()`` is called. Therefore, the content of the line will be either an already existing output, or the outputs list will be further expanded. NodeBase has a method called ``addLineEdit``, which adds an editable line to a layout. It takes the layout, the placeholder text and the row index as parameters. Let's choose "Dimensions X" as placeholder text, where X is the row index:
 
 .. code-block:: cpp
 
@@ -250,7 +250,7 @@ If you run easi-gui again, you should be able to click on the + button and edit 
 5.2 -Saving the values
 ^^^^^^^^^^^^^^^^^^^^^^
 
-You are almost done ! The next step is to save the content of the Foo nodes. As said before, the content is saved in ``saveValues``. To be exact, the local tag is saved by the NodeBase function ``saveNodeContent``, so you will only save the rest of the node. Before saving them, let's create a method that gives us the dimensions layout content. In ``foonode.h``, create the function
+You are almost done! The next step is to save the content of the **Foo** nodes. As said before, the content is saved in ``saveValues``. To be exact, the local tag is saved by the NodeBase function ``saveNodeContent``, so you will only save the rest of the node. Before saving them, let's create a method that gives us the dimensions layout content. In ``foonode.h``, create the function
 
 .. code-block:: cpp
 
@@ -262,7 +262,7 @@ and add its definition to ``foonode.cpp`` (right-click on the method, then "Refa
 
    QMap<QString, double>* values = new QMap<QString, double>();
 
-Then, you need to retrieve the dimensions layout. It has been named "dimensionsLayout" by NodeBase and can be retrieve using the ``findChild`` method of QLayout:
+Then, you need to retrieve the dimensions layout. It has been named "dimensionsLayout" by NodeBase and can be retrieved using the ``findChild`` method of QLayout:
 
 .. code-block:: cpp
 
@@ -274,9 +274,9 @@ The function gives the rows as a list of QObject. You will need to iterate throu
 
    foreach (QObject* layout, dimensionsLayout)
    {
-       QHBoxLayout* row = (QHBoxLayout*) layout;
-       QString name = ((QLineEdit*) row->itemAt(0)->widget())->text();
-       double value = ((QDoubleSpinBox*) row->itemAt(1)->widget())->value();
+       QHBoxLayout* row = static_cast<QHBoxLayout*>(layout);
+       QString name = static_cast<QLineEdit*>(row->itemAt(0)->widget())->text();
+       double value = static_cast<QDoubleSpinBox*>(row->itemAt(1)->widget())->value();
        values->insert(name, value);
    }
 
@@ -302,7 +302,7 @@ Then, let's take a look again at how the yaml code should look like:
       <dimension>: <double>
     ...
     
-As said before, !Foo has already been added by NodeBase. Note that the content of the nodes are already stored inside a map, so "hello" can then be added directly as a ``YAML::Key``. Its ``YAML::Value`` is a new map, in which each dimension's name is a key and each dimension's value is... a value. Here's the code:
+As said before, "!Foo" has already been added by NodeBase. Note that the content of the nodes are already stored inside a map, so "hello" can then be added directly as a ``YAML::Key``. Its ``YAML::Value`` is a new map, in which each dimension's name is a key and each dimension's value is a value. Here's the code:
 
 .. code-block:: cpp
 
@@ -322,7 +322,7 @@ Let's not forget to free the memory:
 
    delete values;
 
-Run again your application, create a new Foo node, add a dimension called "world" and give it as value 1. Then connect the Foo node to the Inputs and save your file.
+Run again your application, create a new **Foo** node, add a dimension called "world" and give it as value 1. Then connect the **Foo** node to the **Inputs** and save your file.
 
 .. image:: fig/tutorial/foo_save.png
   :alt: Test to save Foo node
@@ -338,7 +338,7 @@ If you open the file in a text editor, you should see the following:
 5.3 - Preparing FooNode for being opened
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-For now, each type our node is added to the scene, it is empty. It then needs to be able to be created directly with the values. Let's create another constructor that takes a QSharedPointer<QStringList> and a QList<double>* as parameters (we assume that the outputs and the values are stored in the same order):
+For now, each time our node is added to the scene, it is empty. It then needs to be able to be created directly with the values. Let's create another constructor that takes a QSharedPointer<QStringList> and a QList<double>* as parameters (we assume that the outputs and the values are stored in the same order):
 
 .. code-block:: cpp
    
@@ -359,7 +359,7 @@ Don't forget to update the constructor in ``foonode.cpp`` and pass the outputs t
        ...
    }
 
-Let's go back to our other constructor, call the first constructor from it and pass it the outputs. The list values could also be inexistant, so let's return if values is a null pointer:
+Let's go back to our other constructor, call the first constructor from it and pass the outputs. The list values could also be null, so let's return if values is a null pointer:
 
 .. code-block:: cpp
    
@@ -368,7 +368,7 @@ Let's go back to our other constructor, call the first constructor from it and p
        
    }
 
-Now, all rows have already been created, and you only need to fill the spin boxes. First, let's return if values is a null pointer to avoid calling the next functions for nothing:
+Now, all rows have already been created, and you only need to fill the spin boxes. First, let's return if values is a null pointer:
 
 .. code-block:: cpp
    
@@ -382,9 +382,9 @@ Then, exactly as you did to get the values, retrieve the dimensions layout and i
    QObjectList dimensionsLayout = this->layout()->findChild<QVBoxLayout*>("dimensionsLayout")->children();
     foreach (QObject* layout, dimensionsLayout)
     {
-        QHBoxLayout* row = (QHBoxLayout*) layout;
-        int index = outputs->indexOf(((QLineEdit*) row->itemAt(0)->widget())->text());
-        ((QDoubleSpinBox*) row->itemAt(1)->widget())->setValue(values->at(index));
+        QHBoxLayout* row = static_cast<QHBoxLayout*>(layout);
+        int index = outputs->indexOf(static_cast<QLineEdit*>(row->itemAt(0)->widget())->text());
+        static_cast<QDoubleSpinBox*>(row->itemAt(1)->widget())->setValue(values->at(index));
     }
     
 Let's not forget to release the memory:
@@ -396,7 +396,7 @@ Let's not forget to release the memory:
 6 - Update WidgetsHandler
 -------------------------
 
-If you try to run easi-gui, you will get an error, since you have changed the FooNode constructor. Go to ``widgetshandler.h`` and let's update the ``addFooNode`` signature. We already know, that we need to pass a QSharedPointer<QStringList> and a QList<double>* to the parameters. The function should now look like this:
+If you try to run easi-gui, you will get an error, since you have changed the FooNode constructor. Go to ``widgetshandler.h`` and let's update the ``addFooNode`` signature. We already know that we need to pass a QSharedPointer<QStringList> and a QList<double>* to the parameters. The function should now look like this:
 
 .. code-block:: cpp
    
@@ -415,13 +415,13 @@ Update the signature of this method in ``widgetshandler.cpp`` and pass outputs a
 7 - Opening the Node
 --------------------
 
-This is the last step ! Go back to ``MainWindow.h``. Among the open functions, add the following one:
+This is the last step! Go back to ``MainWindow.h``. Among the open functions, add the following one:
 
 .. code-block:: cpp
    
    void openFooNode(QGraphicsProxyWidget* parentProxyNode, YAML::Node* node, QSharedPointer<QStringList> inputs);
 
-Add the definition of this method in ``mainwindow.cpp`` (right-click on the method, then "Refactor", finally "Add Definition in mainwindow.cpp"). It has three parameters: the proxy of the parent node, to which our foo node needs to be connected, our foo node as ``YAML::Node``, and the outputs of the parent, which become the inputs of our foo node. Since it doesn't need any input, you can add the following line to avoid the warnings:
+Add the definition of this method in ``mainwindow.cpp`` (right-click on the method, then "Refactor", finally "Add Definition in mainwindow.cpp"). It has three parameters: the proxy of the parent node, to which our **Foo** node needs to be connected, our **Foo** node as ``YAML::Node``, and the outputs of the parent, which become the inputs of our **Foo** node. Since it doesn't need any input, you can add the following line to avoid the warnings:
 
 .. code-block:: cpp
    
@@ -455,9 +455,9 @@ To finish, you need to add the node.
 
 However, it would be nice if the node is next to its parent. You can use the function ``widgetsHandler->getPosNextTo`` to retrieve its position (it takes the proxy of the parent node as argument). 
 
-After having added the Foo node, it needs to be connected to its parent. Luckily for you, another method also already exists for this: ``widgetsHandler->connectNodes``. It takes the parent node and the node (not the proxies !) as arguments.
+After having added the **Foo** node, it needs to be connected to its parent. Luckily for you, another method also already exists for this: ``widgetsHandler->connectNodes``. It takes the parent node and the node (not the proxies!) as arguments.
 
-Now that the node is added and connected, its components come next. Just call the method ``openComponents`` and give it the proxy of the foo node, the current YAML::Node and the outputs as arguments.
+Now that the node is added and connected, its components come next. Just call the method ``openComponents`` and give it the proxy of the **Foo** node, the current YAML::Node and the outputs as arguments.
 
 .. code-block:: cpp
    
@@ -465,18 +465,18 @@ Now that the node is added and connected, its components come next. Just call th
     QGraphicsProxyWidget* proxyNode = widgetsHandler->addFooNode(widgetsHandler->getPosNextTo(parentProxyNode), outputs, values);
 
     // connect them
-    widgetsHandler->connectNodes((NodeBase*) parentProxyNode->widget(), (NodeBase*) proxyNode->widget());
+    widgetsHandler->connectNodes(static_cast<NodeBase*>(parentProxyNode->widget(), static_cast<NodeBase*>(proxyNode->widget());
 
     openComponents(proxyNode, node, outputs);
 
-Maybe you have already thought about it, but there is a last small step to this tutorial. ``openFooNode`` has not be called yet. For this, look for ``openNode`` and add this condition among the other map conditions:
+Maybe you have already thought about it but there is a last small step to this tutorial: ``openFooNode`` has not be called yet. For this, look for ``openNode`` and add this condition among the other map conditions:
 
 .. code-block:: cpp
 
    else if (tagOfNode == "!Foo")
        openFooNode(parentProxyNode, node, outputs);
 
-You are officially done ! You can save the project, run easi-gui and open the file you saved earlier:
+You are officially done! You can save the project, run easi-gui and open the file you saved earlier:
 
 .. image:: fig/tutorial/hello_world.png
   :alt: YAML file containing a Foo node opened

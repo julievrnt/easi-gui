@@ -22,8 +22,8 @@ GroupFilterNode::GroupFilterNode(QSharedPointer<QStringList> inputs, QList<doubl
     for (int i = 0; i < values->size(); i++)
     {
         addNewDimensionsLayoutRow(dimensionsLayout, i);
-        QHBoxLayout* row = (QHBoxLayout*) dimensionsLayout->itemAt(i);
-        ((QDoubleSpinBox*) row->itemAt(0)->widget())->setValue(values->at(i));
+        QHBoxLayout* row = static_cast<QHBoxLayout*>(dimensionsLayout->itemAt(i));
+        static_cast<QDoubleSpinBox*>(row->itemAt(0)->widget())->setValue(values->at(i));
     }
 
     delete values;
@@ -36,8 +36,8 @@ QList<double>* GroupFilterNode::getValues()
     QObjectList dimensionsLayout = this->layout()->findChild<QVBoxLayout*>("dimensionsLayout")->children();
     foreach (QObject* row, dimensionsLayout)
     {
-        QHBoxLayout* layout = (QHBoxLayout*) row;
-        double value = ((QDoubleSpinBox*) layout->itemAt(0)->widget())->value();
+        QHBoxLayout* layout = static_cast<QHBoxLayout*>(row);
+        double value = static_cast<QDoubleSpinBox*>(layout->itemAt(0)->widget())->value();
         values->append(value);
     }
 

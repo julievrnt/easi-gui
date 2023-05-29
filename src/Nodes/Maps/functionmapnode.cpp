@@ -34,7 +34,7 @@ void FunctionMapNode::setValues(QMap<QString, QString>* values)
         QString function = values->value(outputs->at(i));
 
         // set matrix values
-        FunctionNode* functionNode = (FunctionNode*) this->functionNodeProxies.at(i)->widget();
+        FunctionNode* functionNode = static_cast<FunctionNode*>(this->functionNodeProxies.at(i)->widget());
         functionNode->setValue(inputs, function);
     }
 
@@ -116,7 +116,7 @@ void FunctionMapNode::updateLayout()
 {
     foreach (QGraphicsProxyWidget* functionOutputConnector, (*functionOutputConnectors))
     {
-        emit ((OutputConnector*) functionOutputConnector->widget())->transferOutputsRequested(inputs);
+        emit static_cast<OutputConnector*>(functionOutputConnector->widget())->transferOutputsRequested(inputs);
     }
 }
 
@@ -133,7 +133,7 @@ void FunctionMapNode::saveValues(YAML::Emitter* out)
         int index = outputs->indexOf(dimensions[i]);
         *out << YAML::Key << dimensions.at(i).toStdString();
         *out << YAML::Value;
-        ((OutputConnector*) functionOutputConnectors->at(index)->widget())->saveComponent(out);
+        static_cast<OutputConnector*>(functionOutputConnectors->at(index)->widget())->saveComponent(out);
     }
 
     *out << YAML::EndMap;

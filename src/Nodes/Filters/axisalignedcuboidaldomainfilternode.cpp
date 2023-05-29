@@ -13,7 +13,7 @@ AxisAlignedCuboidalDomainFilterNode::AxisAlignedCuboidalDomainFilterNode(QShared
         outputs = QSharedPointer<QStringList>(new QStringList(*inputs));
     createLayout(true, false);
 
-    QLabel* title = (QLabel*) this->layout()->findChild<QVBoxLayout*>("titleLayout")->itemAt(0)->widget();
+    QLabel* title = static_cast<QLabel*>(this->layout()->findChild<QVBoxLayout*>("titleLayout")->itemAt(0)->widget());
     title->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     title->setFixedWidth(260);
 
@@ -30,8 +30,8 @@ AxisAlignedCuboidalDomainFilterNode::AxisAlignedCuboidalDomainFilterNode(QShared
 
     for (int i = 0; i < outputs->size(); i++)
     {
-        ((QDoubleSpinBox*) lowerLimitLayout.at(i)->itemAt(1)->widget())->setValue(values->at(i * 2));
-        ((QDoubleSpinBox*) upperLimitLayout.at(i)->itemAt(1)->widget())->setValue(values->at(i * 2 + 1));
+        static_cast<QDoubleSpinBox*>(lowerLimitLayout.at(i)->itemAt(1)->widget())->setValue(values->at(i * 2));
+        static_cast<QDoubleSpinBox*>(upperLimitLayout.at(i)->itemAt(1)->widget())->setValue(values->at(i * 2 + 1));
     }
 
     delete values;
@@ -46,8 +46,8 @@ QList<double>* AxisAlignedCuboidalDomainFilterNode::getValues()
 
     for (int i = 0; i < outputs->size(); i++)
     {
-        double lowerLimitValue = ((QDoubleSpinBox*) lowerLimitLayout.at(i)->itemAt(1)->widget())->value();
-        double upperLimitValue = ((QDoubleSpinBox*) upperLimitLayout.at(i)->itemAt(1)->widget())->value();
+        double lowerLimitValue = static_cast<QDoubleSpinBox*>(lowerLimitLayout.at(i)->itemAt(1)->widget())->value();
+        double upperLimitValue = static_cast<QDoubleSpinBox*>(upperLimitLayout.at(i)->itemAt(1)->widget())->value();
         values->append(lowerLimitValue * 1000.0 / 1000.0);
         values->append(upperLimitValue * 1000.0 / 1000.0);
     }

@@ -31,7 +31,6 @@ private:
     WidgetsHandler* widgetsHandler;
     bool notSaved = false;
 
-    // connect functions
     void connectActions();
 
     // basic functions in editor

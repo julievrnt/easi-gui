@@ -101,10 +101,10 @@ void SwitchComponentNode::addNewDimensionsLayoutRow(QVBoxLayout* dimensionsLayou
 void SwitchComponentNode::saveNodeContent(YAML::Emitter* out)
 {
     saveValues(out);
-    if (!((OutputConnector*) outputConnectors->at(0)->widget())->getConnectorLineConnected())
+    if (!static_cast<OutputConnector*>(outputConnectors->at(0)->widget())->getConnectorLineConnected())
         return;
     *out << YAML::Value;
-    ((OutputConnector*) outputConnectors->at(0)->widget())->saveComponent(out);
+    static_cast<OutputConnector*>(outputConnectors->at(0)->widget())->saveComponent(out);
 }
 
 void SwitchComponentNode::saveValues(YAML::Emitter* out)
