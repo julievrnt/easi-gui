@@ -580,7 +580,7 @@ QGraphicsProxyWidget* WidgetsHandler::addSphericalDomainFilterNode(QPointF pos, 
     return proxyNode;
 }
 
-QGraphicsProxyWidget* WidgetsHandler::addGroupFilterNode(QPointF pos, QSharedPointer<QStringList> inputs, QList<double>* values)
+QGraphicsProxyWidget* WidgetsHandler::addGroupFilterNode(QPointF pos, QSharedPointer<QStringList> inputs, QList<int>* values)
 {
     GroupFilterNode* groupFilterNode = new GroupFilterNode(inputs, values);
     QGraphicsProxyWidget* proxyNode = addNode(groupFilterNode, pos);

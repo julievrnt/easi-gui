@@ -447,15 +447,15 @@ void MainWindow::openSphericalDomainFilterNode(QGraphicsProxyWidget* parentProxy
 void MainWindow::openGroupFilterNode(QGraphicsProxyWidget* parentProxyNode, YAML::Node* node, QSharedPointer<QStringList> inputs)
 {
     // maps matrix and translation values to outputs
-    QList<double>* values = new QList<double>();
+    QList<int>* values = new QList<int>();
 
     YAML::iterator it = node->begin();
     if (it->second.IsScalar())
-        values->append(it->second.as<double>());
+        values->append(it->second.as<int>());
     else
     {
         for (std::size_t i = 0; i < it->second.size(); i++)
-            values->append(it->second[i].as<double>());
+            values->append(it->second[i].as<int>());
     }
 
     // add node

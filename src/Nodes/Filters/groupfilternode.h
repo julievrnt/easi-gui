@@ -8,10 +8,10 @@ class GroupFilterNode : public NodeBase
     Q_OBJECT
 public:
     GroupFilterNode(QSharedPointer<QStringList> inputs = nullptr);
-    GroupFilterNode(QSharedPointer<QStringList> inputs, QList<double>* values);
+    GroupFilterNode(QSharedPointer<QStringList> inputs, QList<int>* values);
 
 private:
-    QList<double>* getValues();
+    QList<int>* getValues();
 
     // NodeBase interface
 protected:

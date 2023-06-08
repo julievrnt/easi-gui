@@ -1,6 +1,6 @@
 #include "groupfilternode.h"
-#include <QDoubleSpinBox>
-#include "float.h"
+#include <QSpinBox>
+#include <limits.h>
 
 GroupFilterNode::GroupFilterNode(QSharedPointer<QStringList> inputs) : NodeBase(inputs)
 {
@@ -13,7 +13,7 @@ GroupFilterNode::GroupFilterNode(QSharedPointer<QStringList> inputs) : NodeBase(
     setGeometry(QRect(0, 0, sizeHint().width(), sizeHint().height()));
 }
 
-GroupFilterNode::GroupFilterNode(QSharedPointer<QStringList> inputs, QList<double>* values) : GroupFilterNode(inputs)
+GroupFilterNode::GroupFilterNode(QSharedPointer<QStringList> inputs, QList<int>* values) : GroupFilterNode(inputs)
 {
     if (values == nullptr)
         return;
@@ -23,21 +23,21 @@ GroupFilterNode::GroupFilterNode(QSharedPointer<QStringList> inputs, QList<doubl
     {
         addNewDimensionsLayoutRow(dimensionsLayout, i);
         QHBoxLayout* row = static_cast<QHBoxLayout*>(dimensionsLayout->itemAt(i));
-        static_cast<QDoubleSpinBox*>(row->itemAt(0)->widget())->setValue(values->at(i));
+        static_cast<QSpinBox*>(row->itemAt(0)->widget())->setValue(values->at(i));
     }
 
     delete values;
 }
 
-QList<double>* GroupFilterNode::getValues()
+QList<int>* GroupFilterNode::getValues()
 {
-    QList<double>* values = new QList<double>();
+    QList<int>* values = new QList<int>();
 
     QObjectList dimensionsLayout = this->layout()->findChild<QVBoxLayout*>("dimensionsLayout")->children();
     foreach (QObject* row, dimensionsLayout)
     {
         QHBoxLayout* layout = static_cast<QHBoxLayout*>(row);
-        double value = static_cast<QDoubleSpinBox*>(layout->itemAt(0)->widget())->value();
+        int value = static_cast<QSpinBox*>(layout->itemAt(0)->widget())->value();
         values->append(value);
     }
 
@@ -48,10 +48,9 @@ void GroupFilterNode::addNewDimensionsLayoutRow(QVBoxLayout* dimensionsLayout, i
 {
     QHBoxLayout* row = new QHBoxLayout();
 
-    QDoubleSpinBox* valueField = new QDoubleSpinBox();
+    QSpinBox* valueField = new QSpinBox();
     valueField->setButtonSymbols(QAbstractSpinBox::NoButtons);
-    valueField->setRange(-DBL_MAX, DBL_MAX);
-    valueField->setDecimals(3);
+    valueField->setRange(INT_MIN, INT_MAX);
     valueField->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
     valueField->setMaximumWidth(100);
     valueField->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
@@ -70,7 +69,7 @@ void GroupFilterNode::updateLayout()
 
 void GroupFilterNode::saveValues(YAML::Emitter* out)
 {
-    QList<double>* values = getValues();
+    QList<int>* values = getValues();
 
     *out << YAML::Key << "groups";
     if (values->size() == 1)
