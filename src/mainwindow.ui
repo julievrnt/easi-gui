@@ -64,17 +64,6 @@
     <addaction name="actionSave"/>
     <addaction name="actionSaveAs"/>
    </widget>
-   <widget class="QMenu" name="menuEdit">
-    <property name="title">
-     <string>Edit</string>
-    </property>
-    <addaction name="actionUndo"/>
-    <addaction name="actionRedo"/>
-    <addaction name="separator"/>
-    <addaction name="actionCut"/>
-    <addaction name="actionCopy"/>
-    <addaction name="actionPaste"/>
-   </widget>
    <widget class="QMenu" name="menuAdd_Builders">
     <property name="title">
      <string>Add Builders</string>
@@ -83,7 +72,6 @@
     <addaction name="actionAddInclude"/>
    </widget>
    <addaction name="menuFile"/>
-   <addaction name="menuEdit"/>
    <addaction name="menuAdd_map"/>
    <addaction name="menuAdd_Filter"/>
    <addaction name="menuAdd_Builders"/>
