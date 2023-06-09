@@ -23,8 +23,8 @@ The nodes are divided into four categories: maps, filters, builders and extra. E
 
 The main methods needed for the subclasses are: ``addNewDimensionsLayoutRow`` and ``saveValues``. The first method is used to add a new row of dimensions / parameters used as outputs (see e.g. the **Constant Map** node or the **Affine Map** node). ``saveValues`` is where the content of a node is saved.
 
-Connectors
-----------
+Connectors & ConnectorLine
+--------------------------
 
 They are two types of connectors: **InputConnector** and **OutputConnector**. Like their names suggest, one serves as the input of a node, while the other one is one of the many connectors to which another node can be connected. Except for a special case (see `Color Codes <https://easi-gui.readthedocs.io/en/latest/getting_started.html#color-codes>`_), an **InputConnector** can only be connected to an **OutputConnector** of the same subtype. The different subtypes and color codes are:
 
@@ -34,3 +34,5 @@ They are two types of connectors: **InputConnector** and **OutputConnector**. Li
 * EVAL - red
 
 If you want to change the color of a connector or to create a new subtype of connector, you will need to update the parent class called **ConnectorBase**.
+
+**ConnectorLine** is a class that represents a line between an **InputConnector** and **OutputConnector**.
