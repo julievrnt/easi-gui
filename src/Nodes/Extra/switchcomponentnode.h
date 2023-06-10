@@ -27,6 +27,10 @@ protected:
 
 private slots:
     void parameterNameChanged(QString newParameter);
+
+    // NodeBase interface
+protected slots:
+    void removeDimensionsLayoutRowRequested(bool clicked);
 };
 
 #endif // SWITCHCOMPONENTNODE_H

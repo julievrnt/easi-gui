@@ -560,6 +560,8 @@ void NodeBase::saveValues(YAML::Emitter* out)
  */
 void NodeBase::saveComponents(YAML::Emitter* out)
 {
+    if (outputConnectors->size() == 0)
+        return;
     if (!static_cast<OutputConnector*>(outputConnectors->at(0)->widget())->getConnectorLineConnected())
         return;
     *out << YAML::Key << "components";
@@ -603,6 +605,7 @@ void NodeBase::removeDimensionsLayoutRowRequested(bool clicked)
     removeLayoutRow(dimensionsLayout, index);
     if (dimensionLineEditIndex != -1)
     {
+        qDebug() << outputs->size() << " vs " << index;
         outputs->removeAt(index);
         emit transferOutputsRequested(outputs);
     }

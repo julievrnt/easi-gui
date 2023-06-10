@@ -123,3 +123,22 @@ void SwitchComponentNode::parameterNameChanged(QString newParameter)
     parameters->insert(index, newParameter);
     parameters->removeAt(index + 1);
 }
+
+void SwitchComponentNode::removeDimensionsLayoutRowRequested(bool clicked)
+{
+    Q_UNUSED(clicked);
+    QVBoxLayout* dimensionsLayout = this->layout()->findChild<QVBoxLayout*>("dimensionsLayout");
+    QPushButton* removeButton = qobject_cast<QPushButton*>(sender());
+    int index = removeButton->objectName().toInt();
+    removeLayoutRow(dimensionsLayout, index);
+    if (dimensionLineEditIndex != -1)
+        parameters->removeAt(index);
+    if (index != dimensionsLayout->children().size())
+    {
+        if (removeButtonIndex != -1)
+            renameNextRemoveButtons(dimensionsLayout, index);
+        if (dimensionLineEditIndex != -1)
+            renameNextDimensionLineEdit(dimensionsLayout, index);
+    }
+    performResize();
+}

@@ -66,7 +66,7 @@
    </widget>
    <widget class="QMenu" name="menuAdd_Builders">
     <property name="title">
-     <string>Add Builders</string>
+     <string>Add Builder...</string>
     </property>
     <addaction name="actionAddLayeredModel"/>
     <addaction name="actionAddInclude"/>
